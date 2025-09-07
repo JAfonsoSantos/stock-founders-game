@@ -1,0 +1,117 @@
+{
+  "common": {
+    "loading": "加载中...",
+    "save": "保存",
+    "cancel": "取消",
+    "delete": "删除",
+    "edit": "编辑",
+    "create": "创建",
+    "submit": "提交",
+    "search": "搜索",
+    "back": "返回",
+    "next": "下一步",
+    "previous": "上一步",
+    "close": "关闭",
+    "success": "成功",
+    "error": "错误",
+    "warning": "警告"
+  },
+  "auth": {
+    "signIn": "登录",
+    "signOut": "退出",
+    "email": "邮箱",
+    "signInWithEmail": "用邮箱登录",
+    "checkEmail": "请检查您的邮箱获取登录链接！",
+    "welcome": "欢迎来到创业股票市场"
+  },
+  "game": {
+    "title": "游戏",
+    "create": "创建游戏",
+    "name": "游戏名称",
+    "currency": "货币",
+    "language": "语言",
+    "startDate": "开始日期",
+    "endDate": "结束日期",
+    "status": {
+      "draft": "草稿",
+      "preMarket": "预市场",
+      "open": "开放",
+      "closed": "关闭",
+      "results": "结果"
+    },
+    "allowSecondary": "允许二级交易",
+    "showPublicLeaderboards": "显示公开排行榜",
+    "circuitBreaker": "熔断机制",
+    "maxPricePerShare": "每股最高价格"
+  },
+  "startup": {
+    "title": "创业公司",
+    "name": "名称",
+    "description": "描述",
+    "website": "网站",
+    "linkedin": "LinkedIn",
+    "totalShares": "总股数",
+    "sharesRemaining": "剩余股数",
+    "currentPrice": "当前价格",
+    "marketCap": "市值"
+  },
+  "investment": {
+    "title": "投资",
+    "amount": "金额",
+    "quantity": "数量",
+    "pricePerShare": "每股价格",
+    "totalCost": "总成本",
+    "availableShares": "可用股数",
+    "invest": "投资",
+    "buy": "买入",
+    "sell": "卖出"
+  },
+  "portfolio": {
+    "title": "投资组合",
+    "currentValue": "当前价值",
+    "totalInvested": "总投资",
+    "profitLoss": "盈亏",
+    "roi": "投资回报率",
+    "cash": "现金",
+    "holdings": "持仓"
+  },
+  "participant": {
+    "title": "参与者",
+    "role": "角色",
+    "budget": "预算",
+    "founder": "创始人",
+    "angel": "天使投资人",
+    "vc": "风险投资",
+    "organizer": "组织者"
+  },
+  "email": {
+    "invite": {
+      "subject": "{gameName}邀请",
+      "greeting": "您受邀参加！",
+      "body": "您被邀请参与{gameName}，一个激动人心的创业股票市场游戏。",
+      "cta": "加入游戏"
+    },
+    "marketOpen": {
+      "subject": "🚀 {gameName} - 市场开盘！",
+      "body": "市场现已开放。开始投资吧！"
+    },
+    "lastMinutes": {
+      "subject": "⏰ {gameName} - 最后几分钟！",
+      "body": "距离市场关闭还有{minutes}分钟。"
+    },
+    "results": {
+      "subject": "🏆 {gameName} - 最终结果",
+      "body": "游戏已结束。查看最终结果。"
+    }
+  },
+  "leaderboard": {
+    "title": "排行榜",
+    "topStartups": "顶级创业公司",
+    "topAngels": "顶级天使投资人",
+    "topVCs": "顶级风险投资",
+    "rank": "排名",
+    "name": "名称",
+    "value": "价值",
+    "return": "回报"
+  }
+}

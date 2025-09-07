@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 
-type Locale = 'en' | 'pt' | 'es' | 'fr' | 'de' | 'it' | 'zh' | 'ja' | 'ko' | 'ar';
+type Locale = 'en' | 'pt' | 'es' | 'fr' | 'de' | 'zh' | 'ja' | 'ar' | 'hi' | 'ru';
 
 interface I18nContextType {
   locale: Locale;
@@ -18,7 +18,7 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
     // Load locale from localStorage or browser
     const savedLocale = localStorage.getItem('locale') as Locale;
     const browserLocale = navigator.language.split('-')[0] as Locale;
-    const supportedLocales: Locale[] = ['en', 'pt', 'es', 'fr', 'de', 'it', 'zh', 'ja', 'ko', 'ar'];
+    const supportedLocales: Locale[] = ['en', 'pt', 'es', 'fr', 'de', 'zh', 'ja', 'ar', 'hi', 'ru'];
     
     const initialLocale = savedLocale || 
       (supportedLocales.includes(browserLocale) ? browserLocale : 'en');
@@ -111,9 +111,9 @@ export const SUPPORTED_LOCALES = [
   { code: 'es', name: 'Español', flag: '🇪🇸' },
   { code: 'fr', name: 'Français', flag: '🇫🇷' },
   { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
-  { code: 'it', name: 'Italiano', flag: '🇮🇹' },
   { code: 'zh', name: '中文', flag: '🇨🇳' },
   { code: 'ja', name: '日本語', flag: '🇯🇵' },
-  { code: 'ko', name: '한국어', flag: '🇰🇷' },
-  { code: 'ar', name: 'العربية', flag: '🇸🇦' }
+  { code: 'ar', name: 'العربية', flag: '🇸🇦' },
+  { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' },
+  { code: 'ru', name: 'Русский', flag: '🇷🇺' }
 ] as const;
