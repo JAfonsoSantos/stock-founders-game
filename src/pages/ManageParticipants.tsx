@@ -78,26 +78,33 @@ export default function ManageParticipants() {
         setNewParticipant(prev => ({ ...prev, budget: founderRole.default_budget }));
       }
       
-      // Fetch participants with demo email
+      // Fetch participants without JOIN to avoid RLS issues
       const { data: participantsData } = await supabase
         .from("participants")
-        .select(`
-          *,
-          users (
-            first_name,
-            last_name
-          )
-        `)
+        .select("*")
         .eq("game_id", gameId)
         .order("created_at", { ascending: false });
 
-      // Add demo emails for participants
+      // Get user data separately for each participant
       if (participantsData) {
-        const participantsWithEmails = participantsData.map(participant => ({
-          ...participant,
-          email: `${(participant.users?.first_name || 'demo').toLowerCase()}.${(participant.users?.last_name || 'user').toLowerCase()}@demo.com`
-        }));
-        setParticipants(participantsWithEmails);
+        const participantsWithUserData = await Promise.all(
+          participantsData.map(async (participant) => {
+            const { data: userData } = await supabase
+              .from("users")
+              .select("first_name, last_name")
+              .eq("id", participant.user_id)
+              .single();
+
+            return {
+              ...participant,
+              users: userData,
+              email: userData ? 
+                `${(userData.first_name || 'demo').toLowerCase()}.${(userData.last_name || 'user').toLowerCase()}@demo.com` :
+                'demo@example.com'
+            };
+          })
+        );
+        setParticipants(participantsWithUserData);
       }
       
       else {
@@ -170,23 +177,30 @@ export default function ManageParticipants() {
       // Refresh participants
       const { data: participantsData } = await supabase
         .from("participants")
-        .select(`
-          *,
-          users (
-            first_name,
-            last_name
-          )
-        `)
+        .select("*")
         .eq("game_id", gameId)
         .order("created_at", { ascending: false });
       
-      // Add demo emails for participants
+      // Get user data separately for each participant
       if (participantsData) {
-        const participantsWithEmails = participantsData.map(participant => ({
-          ...participant,
-          email: `${(participant.users?.first_name || 'demo').toLowerCase()}.${(participant.users?.last_name || 'user').toLowerCase()}@demo.com`
-        }));
-        setParticipants(participantsWithEmails);
+        const participantsWithUserData = await Promise.all(
+          participantsData.map(async (participant) => {
+            const { data: userData } = await supabase
+              .from("users")
+              .select("first_name, last_name")
+              .eq("id", participant.user_id)
+              .single();
+
+            return {
+              ...participant,
+              users: userData,
+              email: userData ? 
+                `${(userData.first_name || 'demo').toLowerCase()}.${(userData.last_name || 'user').toLowerCase()}@demo.com` :
+                'demo@example.com'
+            };
+          })
+        );
+        setParticipants(participantsWithUserData);
       } else {
         setParticipants([]);
       }
@@ -261,23 +275,30 @@ export default function ManageParticipants() {
       // Refresh participants list
       const { data: participantsData } = await supabase
         .from("participants")
-        .select(`
-          *,
-          users (
-            first_name,
-            last_name
-          )
-        `)
+        .select("*")
         .eq("game_id", gameId)
         .order("created_at", { ascending: false });
       
-      // Add demo emails for participants
+      // Get user data separately for each participant
       if (participantsData) {
-        const participantsWithEmails = participantsData.map(participant => ({
-          ...participant,
-          email: `${(participant.users?.first_name || 'demo').toLowerCase()}.${(participant.users?.last_name || 'user').toLowerCase()}@demo.com`
-        }));
-        setParticipants(participantsWithEmails);
+        const participantsWithUserData = await Promise.all(
+          participantsData.map(async (participant) => {
+            const { data: userData } = await supabase
+              .from("users")
+              .select("first_name, last_name")
+              .eq("id", participant.user_id)
+              .single();
+
+            return {
+              ...participant,
+              users: userData,
+              email: userData ? 
+                `${(userData.first_name || 'demo').toLowerCase()}.${(userData.last_name || 'user').toLowerCase()}@demo.com` :
+                'demo@example.com'
+            };
+          })
+        );
+        setParticipants(participantsWithUserData);
       } else {
         setParticipants([]);
       }
@@ -318,23 +339,30 @@ export default function ManageParticipants() {
       // Refresh participants list
       const { data: participantsData } = await supabase
         .from("participants")
-        .select(`
-          *,
-          users (
-            first_name,
-            last_name
-          )
-        `)
+        .select("*")
         .eq("game_id", gameId)
         .order("created_at", { ascending: false });
       
-      // Add demo emails for participants
+      // Get user data separately for each participant
       if (participantsData) {
-        const participantsWithEmails = participantsData.map(participant => ({
-          ...participant,
-          email: `${(participant.users?.first_name || 'demo').toLowerCase()}.${(participant.users?.last_name || 'user').toLowerCase()}@demo.com`
-        }));
-        setParticipants(participantsWithEmails);
+        const participantsWithUserData = await Promise.all(
+          participantsData.map(async (participant) => {
+            const { data: userData } = await supabase
+              .from("users")
+              .select("first_name, last_name")
+              .eq("id", participant.user_id)
+              .single();
+
+            return {
+              ...participant,
+              users: userData,
+              email: userData ? 
+                `${(userData.first_name || 'demo').toLowerCase()}.${(userData.last_name || 'user').toLowerCase()}@demo.com` :
+                'demo@example.com'
+            };
+          })
+        );
+        setParticipants(participantsWithUserData);
       } else {
         setParticipants([]);
       }
@@ -391,23 +419,30 @@ export default function ManageParticipants() {
                     const refreshData = async () => {
                       const { data: participantsData } = await supabase
                         .from("participants")
-                        .select(`
-                          *,
-                          users (
-                            first_name,
-                            last_name
-                          )
-                        `)
+                        .select("*")
                         .eq("game_id", gameId)
                         .order("created_at", { ascending: false });
                       
-                      // Add demo emails for participants
+                      // Get user data separately for each participant
                       if (participantsData) {
-                        const participantsWithEmails = participantsData.map(participant => ({
-                          ...participant,
-                          email: `${(participant.users?.first_name || 'demo').toLowerCase()}.${(participant.users?.last_name || 'user').toLowerCase()}@demo.com`
-                        }));
-                        setParticipants(participantsWithEmails);
+                        const participantsWithUserData = await Promise.all(
+                          participantsData.map(async (participant) => {
+                            const { data: userData } = await supabase
+                              .from("users")
+                              .select("first_name, last_name")
+                              .eq("id", participant.user_id)
+                              .single();
+
+                            return {
+                              ...participant,
+                              users: userData,
+                              email: userData ? 
+                                `${(userData.first_name || 'demo').toLowerCase()}.${(userData.last_name || 'user').toLowerCase()}@demo.com` :
+                                'demo@example.com'
+                            };
+                          })
+                        );
+                        setParticipants(participantsWithUserData);
                       } else {
                         setParticipants([]);
                       }
