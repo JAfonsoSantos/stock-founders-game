@@ -104,37 +104,24 @@ export default function ManageParticipants() {
     setAddLoading(true);
 
     try {
-      // For demo purposes, create a demo participant 
-      // In a real app, you'd send invitations and handle user signup
-      
-      const demoUserId = crypto.randomUUID();
-      
-      // Create demo user record
-      const { error: userError } = await supabase
-        .from("users")
-        .insert({
-          id: demoUserId,
-          first_name: newParticipant.first_name,
-          last_name: newParticipant.last_name
-        });
-
-      if (userError) {
-        console.log("User might already exist or demo creation failed:", userError);
-      }
-
-      // Add participant
-      const { error } = await supabase
-        .from("participants")
-        .insert({
-          game_id: gameId,
-          user_id: demoUserId,
-          role: newParticipant.role,
-          initial_budget: newParticipant.budget,
-          current_cash: newParticipant.budget
-        });
+      // Use RPC function to add demo participant
+      const { data, error } = await supabase.rpc('add_demo_participant', {
+        p_game_id: gameId,
+        p_email: newParticipant.email,
+        p_first_name: newParticipant.first_name,
+        p_last_name: newParticipant.last_name,
+        p_role: newParticipant.role,
+        p_budget: newParticipant.budget
+      });
 
       if (error) {
         toast.error("Failed to add participant: " + error.message);
+        return;
+      }
+
+      const result = data as any;
+      if (result?.error) {
+        toast.error("Failed to add participant: " + result.error);
         return;
       }
 

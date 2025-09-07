@@ -844,6 +844,17 @@ export type Database = {
         Args: { p_notification_id: string }
         Returns: Json
       }
+      add_demo_participant: {
+        Args: {
+          p_budget: number
+          p_email: string
+          p_first_name: string
+          p_game_id: string
+          p_last_name: string
+          p_role: Database["public"]["Enums"]["participant_role"]
+        }
+        Returns: Json
+      }
       calculate_vwap3_for_startup: {
         Args: { startup_uuid: string }
         Returns: number
