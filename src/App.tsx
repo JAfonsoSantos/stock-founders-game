@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import Dashboard from "./pages/Dashboard";
 import Auth from "./pages/Auth";
 import CreateGame from "./pages/CreateGame";
+import GameOrganizer from "./pages/GameOrganizer";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -68,6 +69,11 @@ const App = () => (
             <Route path="/games/new" element={
               <ProtectedRoute>
                 <CreateGame />
+              </ProtectedRoute>
+            } />
+            <Route path="/games/:gameId/organizer" element={
+              <ProtectedRoute>
+                <GameOrganizer />
               </ProtectedRoute>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
