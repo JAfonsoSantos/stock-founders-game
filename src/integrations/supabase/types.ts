@@ -834,6 +834,10 @@ export type Database = {
       }
     }
     Functions: {
+      accept_secondary_trade: {
+        Args: { p_notification_id: string }
+        Returns: Json
+      }
       calculate_vwap3_for_startup: {
         Args: { startup_uuid: string }
         Returns: number
@@ -841,6 +845,16 @@ export type Database = {
       create_primary_order: {
         Args: {
           p_auto_accept_min_price?: number
+          p_game_id: string
+          p_price_per_share: number
+          p_qty: number
+          p_startup_id: string
+        }
+        Returns: Json
+      }
+      create_secondary_trade_request: {
+        Args: {
+          p_buyer_email: string
           p_game_id: string
           p_price_per_share: number
           p_qty: number
