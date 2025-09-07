@@ -42,22 +42,18 @@ export default function InvestModal({ startup, participant, gameId, onClose, onS
     setLoading(true);
     
     try {
-      // Temporarily call the function directly until types are updated
-      const { data, error } = await supabase
-        .from('orders_primary')
-        .insert({
-          game_id: gameId,
-          startup_id: startup.id,
-          buyer_participant_id: participant.id,
-          qty: Number(quantity),
-          price_per_share: Number(pricePerShare),
-          status: 'pending'
-        })
-        .select()
-        .single();
+      const { data, error } = await supabase.rpc('create_primary_order', {
+        p_game_id: gameId,
+        p_startup_id: startup.id,
+        p_qty: Number(quantity),
+        p_price_per_share: Number(pricePerShare),
+        p_auto_accept_min_price: null
+      });
 
       if (error) {
         toast.error(error.message);
+      } else if (data && typeof data === 'object' && 'error' in data && data.error) {
+        toast.error(String(data.error));
       } else {
         toast.success("Investment order created successfully!");
         onSuccess();

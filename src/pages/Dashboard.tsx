@@ -168,6 +168,14 @@ export default function Dashboard() {
                         <span className="text-sm text-muted-foreground">
                           Currency: {game.currency}
                         </span>
+                      <div className="flex space-x-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => navigate(`/games/${game.id}/leaderboard`)}
+                        >
+                          Leaderboard
+                        </Button>
                         <Button 
                           variant="outline" 
                           size="sm"
@@ -176,6 +184,7 @@ export default function Dashboard() {
                           <Settings className="h-4 w-4 mr-2" />
                           Manage
                         </Button>
+                      </div>
                       </div>
                     </CardContent>
                   </Card>
@@ -225,14 +234,22 @@ export default function Dashboard() {
                           <p className="font-medium">{participation.games.currency} {participation.current_cash.toLocaleString()}</p>
                         </div>
                       </div>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="w-full mt-4"
-                        onClick={() => navigate(`/games/${participation.games.id}/discover`)}
-                      >
-                        Enter Game
-                      </Button>
+                      <div className="flex space-x-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => navigate(`/games/${participation.games.id}/me`)}
+                        >
+                          My Portfolio
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => navigate(`/games/${participation.games.id}/discover`)}
+                        >
+                          Enter Game
+                        </Button>
+                      </div>
                     </CardContent>
                   </Card>
                 ))

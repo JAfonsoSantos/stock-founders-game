@@ -14,6 +14,8 @@ import GameSettings from "./pages/GameSettings";
 import Join from "./pages/Join";
 import Discover from "./pages/Discover";
 import PlayerDashboard from "./pages/PlayerDashboard";
+import StartupProfile from "./pages/StartupProfile";
+import Leaderboard from "./pages/Leaderboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -106,6 +108,16 @@ const App = () => (
             <Route path="/games/:gameId/me" element={
               <ProtectedRoute>
                 <PlayerDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/games/:gameId/startup/:slug" element={
+              <ProtectedRoute>
+                <StartupProfile />
+              </ProtectedRoute>
+            } />
+            <Route path="/games/:gameId/leaderboard" element={
+              <ProtectedRoute>
+                <Leaderboard />
               </ProtectedRoute>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
