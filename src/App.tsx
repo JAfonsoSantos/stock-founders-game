@@ -8,6 +8,9 @@ import Dashboard from "./pages/Dashboard";
 import Auth from "./pages/Auth";
 import CreateGame from "./pages/CreateGame";
 import GameOrganizer from "./pages/GameOrganizer";
+import Join from "./pages/Join";
+import Discover from "./pages/Discover";
+import PlayerDashboard from "./pages/PlayerDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -74,6 +77,17 @@ const App = () => (
             <Route path="/games/:gameId/organizer" element={
               <ProtectedRoute>
                 <GameOrganizer />
+              </ProtectedRoute>
+            } />
+            <Route path="/join/:gameId" element={<Join />} />
+            <Route path="/games/:gameId/discover" element={
+              <ProtectedRoute>
+                <Discover />
+              </ProtectedRoute>
+            } />
+            <Route path="/games/:gameId/me" element={
+              <ProtectedRoute>
+                <PlayerDashboard />
               </ProtectedRoute>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
