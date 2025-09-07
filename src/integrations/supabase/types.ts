@@ -838,6 +838,18 @@ export type Database = {
         Args: { startup_uuid: string }
         Returns: number
       }
+      is_game_owner: {
+        Args: { game_uuid: string }
+        Returns: boolean
+      }
+      is_participant_of_user: {
+        Args: { participant_uuid: string }
+        Returns: boolean
+      }
+      is_user_participant_in_game: {
+        Args: { game_uuid: string }
+        Returns: boolean
+      }
     }
     Enums: {
       founder_member_role: "owner" | "member"
