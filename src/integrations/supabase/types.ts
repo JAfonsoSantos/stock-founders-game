@@ -44,35 +44,7 @@ export type Database = {
             foreignKeyName: "founder_members_participant_id_fkey"
             columns: ["participant_id"]
             isOneToOne: false
-            referencedRelation: "leaderboard_angels"
-            referencedColumns: ["participant_id"]
-          },
-          {
-            foreignKeyName: "founder_members_participant_id_fkey"
-            columns: ["participant_id"]
-            isOneToOne: false
-            referencedRelation: "leaderboard_vcs"
-            referencedColumns: ["participant_id"]
-          },
-          {
-            foreignKeyName: "founder_members_participant_id_fkey"
-            columns: ["participant_id"]
-            isOneToOne: false
             referencedRelation: "participants"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "founder_members_participant_id_fkey"
-            columns: ["participant_id"]
-            isOneToOne: false
-            referencedRelation: "portfolio_view"
-            referencedColumns: ["participant_id"]
-          },
-          {
-            foreignKeyName: "founder_members_startup_id_fkey"
-            columns: ["startup_id"]
-            isOneToOne: false
-            referencedRelation: "leaderboard_startups"
             referencedColumns: ["id"]
           },
           {
@@ -206,29 +178,8 @@ export type Database = {
             foreignKeyName: "notifications_from_participant_id_fkey"
             columns: ["from_participant_id"]
             isOneToOne: false
-            referencedRelation: "leaderboard_angels"
-            referencedColumns: ["participant_id"]
-          },
-          {
-            foreignKeyName: "notifications_from_participant_id_fkey"
-            columns: ["from_participant_id"]
-            isOneToOne: false
-            referencedRelation: "leaderboard_vcs"
-            referencedColumns: ["participant_id"]
-          },
-          {
-            foreignKeyName: "notifications_from_participant_id_fkey"
-            columns: ["from_participant_id"]
-            isOneToOne: false
             referencedRelation: "participants"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "notifications_from_participant_id_fkey"
-            columns: ["from_participant_id"]
-            isOneToOne: false
-            referencedRelation: "portfolio_view"
-            referencedColumns: ["participant_id"]
           },
           {
             foreignKeyName: "notifications_game_id_fkey"
@@ -241,29 +192,8 @@ export type Database = {
             foreignKeyName: "notifications_to_participant_id_fkey"
             columns: ["to_participant_id"]
             isOneToOne: false
-            referencedRelation: "leaderboard_angels"
-            referencedColumns: ["participant_id"]
-          },
-          {
-            foreignKeyName: "notifications_to_participant_id_fkey"
-            columns: ["to_participant_id"]
-            isOneToOne: false
-            referencedRelation: "leaderboard_vcs"
-            referencedColumns: ["participant_id"]
-          },
-          {
-            foreignKeyName: "notifications_to_participant_id_fkey"
-            columns: ["to_participant_id"]
-            isOneToOne: false
             referencedRelation: "participants"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "notifications_to_participant_id_fkey"
-            columns: ["to_participant_id"]
-            isOneToOne: false
-            referencedRelation: "portfolio_view"
-            referencedColumns: ["participant_id"]
           },
         ]
       }
@@ -312,48 +242,6 @@ export type Database = {
             foreignKeyName: "orders_primary_buyer_participant_id_fkey"
             columns: ["buyer_participant_id"]
             isOneToOne: false
-            referencedRelation: "leaderboard_angels"
-            referencedColumns: ["participant_id"]
-          },
-          {
-            foreignKeyName: "orders_primary_buyer_participant_id_fkey"
-            columns: ["buyer_participant_id"]
-            isOneToOne: false
-            referencedRelation: "leaderboard_vcs"
-            referencedColumns: ["participant_id"]
-          },
-          {
-            foreignKeyName: "orders_primary_buyer_participant_id_fkey"
-            columns: ["buyer_participant_id"]
-            isOneToOne: false
-            referencedRelation: "participants"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "orders_primary_buyer_participant_id_fkey"
-            columns: ["buyer_participant_id"]
-            isOneToOne: false
-            referencedRelation: "portfolio_view"
-            referencedColumns: ["participant_id"]
-          },
-          {
-            foreignKeyName: "orders_primary_decided_by_participant_id_fkey"
-            columns: ["decided_by_participant_id"]
-            isOneToOne: false
-            referencedRelation: "leaderboard_angels"
-            referencedColumns: ["participant_id"]
-          },
-          {
-            foreignKeyName: "orders_primary_decided_by_participant_id_fkey"
-            columns: ["decided_by_participant_id"]
-            isOneToOne: false
-            referencedRelation: "leaderboard_vcs"
-            referencedColumns: ["participant_id"]
-          },
-          {
-            foreignKeyName: "orders_primary_decided_by_participant_id_fkey"
-            columns: ["decided_by_participant_id"]
-            isOneToOne: false
             referencedRelation: "participants"
             referencedColumns: ["id"]
           },
@@ -361,21 +249,14 @@ export type Database = {
             foreignKeyName: "orders_primary_decided_by_participant_id_fkey"
             columns: ["decided_by_participant_id"]
             isOneToOne: false
-            referencedRelation: "portfolio_view"
-            referencedColumns: ["participant_id"]
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "orders_primary_game_id_fkey"
             columns: ["game_id"]
             isOneToOne: false
             referencedRelation: "games"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "orders_primary_startup_id_fkey"
-            columns: ["startup_id"]
-            isOneToOne: false
-            referencedRelation: "leaderboard_startups"
             referencedColumns: ["id"]
           },
           {
@@ -468,35 +349,7 @@ export type Database = {
             foreignKeyName: "positions_participant_id_fkey"
             columns: ["participant_id"]
             isOneToOne: false
-            referencedRelation: "leaderboard_angels"
-            referencedColumns: ["participant_id"]
-          },
-          {
-            foreignKeyName: "positions_participant_id_fkey"
-            columns: ["participant_id"]
-            isOneToOne: false
-            referencedRelation: "leaderboard_vcs"
-            referencedColumns: ["participant_id"]
-          },
-          {
-            foreignKeyName: "positions_participant_id_fkey"
-            columns: ["participant_id"]
-            isOneToOne: false
             referencedRelation: "participants"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "positions_participant_id_fkey"
-            columns: ["participant_id"]
-            isOneToOne: false
-            referencedRelation: "portfolio_view"
-            referencedColumns: ["participant_id"]
-          },
-          {
-            foreignKeyName: "positions_startup_id_fkey"
-            columns: ["startup_id"]
-            isOneToOne: false
-            referencedRelation: "leaderboard_startups"
             referencedColumns: ["id"]
           },
           {
@@ -603,29 +456,8 @@ export type Database = {
             foreignKeyName: "trades_buyer_participant_id_fkey"
             columns: ["buyer_participant_id"]
             isOneToOne: false
-            referencedRelation: "leaderboard_angels"
-            referencedColumns: ["participant_id"]
-          },
-          {
-            foreignKeyName: "trades_buyer_participant_id_fkey"
-            columns: ["buyer_participant_id"]
-            isOneToOne: false
-            referencedRelation: "leaderboard_vcs"
-            referencedColumns: ["participant_id"]
-          },
-          {
-            foreignKeyName: "trades_buyer_participant_id_fkey"
-            columns: ["buyer_participant_id"]
-            isOneToOne: false
             referencedRelation: "participants"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "trades_buyer_participant_id_fkey"
-            columns: ["buyer_participant_id"]
-            isOneToOne: false
-            referencedRelation: "portfolio_view"
-            referencedColumns: ["participant_id"]
           },
           {
             foreignKeyName: "trades_game_id_fkey"
@@ -638,35 +470,7 @@ export type Database = {
             foreignKeyName: "trades_seller_participant_id_fkey"
             columns: ["seller_participant_id"]
             isOneToOne: false
-            referencedRelation: "leaderboard_angels"
-            referencedColumns: ["participant_id"]
-          },
-          {
-            foreignKeyName: "trades_seller_participant_id_fkey"
-            columns: ["seller_participant_id"]
-            isOneToOne: false
-            referencedRelation: "leaderboard_vcs"
-            referencedColumns: ["participant_id"]
-          },
-          {
-            foreignKeyName: "trades_seller_participant_id_fkey"
-            columns: ["seller_participant_id"]
-            isOneToOne: false
             referencedRelation: "participants"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "trades_seller_participant_id_fkey"
-            columns: ["seller_participant_id"]
-            isOneToOne: false
-            referencedRelation: "portfolio_view"
-            referencedColumns: ["participant_id"]
-          },
-          {
-            foreignKeyName: "trades_startup_id_fkey"
-            columns: ["startup_id"]
-            isOneToOne: false
-            referencedRelation: "leaderboard_startups"
             referencedColumns: ["id"]
           },
           {
@@ -713,134 +517,7 @@ export type Database = {
       }
     }
     Views: {
-      leaderboard_angels: {
-        Row: {
-          current_cash: number | null
-          game_id: string | null
-          initial_budget: number | null
-          participant_id: string | null
-          portfolio_value: number | null
-          roi_percentage: number | null
-          role: Database["public"]["Enums"]["participant_role"] | null
-          total_value: number | null
-          user_id: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "participants_game_id_fkey"
-            columns: ["game_id"]
-            isOneToOne: false
-            referencedRelation: "games"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "participants_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      leaderboard_startups: {
-        Row: {
-          game_id: string | null
-          id: string | null
-          last_vwap_price: number | null
-          logo_url: string | null
-          market_cap: number | null
-          name: string | null
-          shares_sold: number | null
-          total_shares: number | null
-        }
-        Insert: {
-          game_id?: string | null
-          id?: string | null
-          last_vwap_price?: number | null
-          logo_url?: string | null
-          market_cap?: never
-          name?: string | null
-          shares_sold?: never
-          total_shares?: number | null
-        }
-        Update: {
-          game_id?: string | null
-          id?: string | null
-          last_vwap_price?: number | null
-          logo_url?: string | null
-          market_cap?: never
-          name?: string | null
-          shares_sold?: never
-          total_shares?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "startups_game_id_fkey"
-            columns: ["game_id"]
-            isOneToOne: false
-            referencedRelation: "games"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      leaderboard_vcs: {
-        Row: {
-          current_cash: number | null
-          game_id: string | null
-          initial_budget: number | null
-          participant_id: string | null
-          portfolio_value: number | null
-          roi_percentage: number | null
-          role: Database["public"]["Enums"]["participant_role"] | null
-          total_value: number | null
-          user_id: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "participants_game_id_fkey"
-            columns: ["game_id"]
-            isOneToOne: false
-            referencedRelation: "games"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "participants_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      portfolio_view: {
-        Row: {
-          current_cash: number | null
-          game_id: string | null
-          initial_budget: number | null
-          participant_id: string | null
-          portfolio_value: number | null
-          roi_percentage: number | null
-          role: Database["public"]["Enums"]["participant_role"] | null
-          total_value: number | null
-          user_id: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "participants_game_id_fkey"
-            columns: ["game_id"]
-            isOneToOne: false
-            referencedRelation: "games"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "participants_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
+      [_ in never]: never
     }
     Functions: {
       accept_secondary_trade: {
@@ -889,6 +566,61 @@ export type Database = {
           p_order_id: string
         }
         Returns: Json
+      }
+      get_angel_leaderboard: {
+        Args: { p_game_id?: string }
+        Returns: {
+          current_cash: number
+          game_id: string
+          initial_budget: number
+          participant_id: string
+          portfolio_value: number
+          roi_percentage: number
+          role: Database["public"]["Enums"]["participant_role"]
+          total_value: number
+          user_id: string
+        }[]
+      }
+      get_portfolio_data: {
+        Args: { p_game_id?: string }
+        Returns: {
+          current_cash: number
+          game_id: string
+          initial_budget: number
+          participant_id: string
+          portfolio_value: number
+          roi_percentage: number
+          role: Database["public"]["Enums"]["participant_role"]
+          total_value: number
+          user_id: string
+        }[]
+      }
+      get_startup_leaderboard: {
+        Args: { p_game_id?: string }
+        Returns: {
+          game_id: string
+          id: string
+          last_vwap_price: number
+          logo_url: string
+          market_cap: number
+          name: string
+          shares_sold: number
+          total_shares: number
+        }[]
+      }
+      get_vc_leaderboard: {
+        Args: { p_game_id?: string }
+        Returns: {
+          current_cash: number
+          game_id: string
+          initial_budget: number
+          participant_id: string
+          portfolio_value: number
+          roi_percentage: number
+          role: Database["public"]["Enums"]["participant_role"]
+          total_value: number
+          user_id: string
+        }[]
       }
       is_game_owner: {
         Args: { game_uuid: string }

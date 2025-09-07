@@ -53,28 +53,19 @@ export default function Leaderboard() {
       
       // Fetch startup leaderboard
       const { data: startupsData } = await supabase
-        .from("leaderboard_startups")
-        .select("*")
-        .eq("game_id", gameId)
-        .order("market_cap", { ascending: false, nullsFirst: false });
+        .rpc("get_startup_leaderboard", { p_game_id: gameId });
       
       setStartupLeaderboard(startupsData || []);
       
       // Fetch angel leaderboard
       const { data: angelsData } = await supabase
-        .from("leaderboard_angels")
-        .select("*")
-        .eq("game_id", gameId)
-        .order("roi_percentage", { ascending: false, nullsFirst: false });
+        .rpc("get_angel_leaderboard", { p_game_id: gameId });
       
       setAngelLeaderboard(angelsData || []);
       
       // Fetch VC leaderboard
       const { data: vcsData } = await supabase
-        .from("leaderboard_vcs")
-        .select("*")
-        .eq("game_id", gameId)
-        .order("roi_percentage", { ascending: false, nullsFirst: false });
+        .rpc("get_vc_leaderboard", { p_game_id: gameId });
       
       setVcLeaderboard(vcsData || []);
       setLoading(false);

@@ -56,15 +56,17 @@ export default function PlayerDashboard() {
       
       setParticipant(participantData);
       
-      // Fetch portfolio view
+      // Fetch portfolio data
       const { data: portfolioData } = await supabase
-        .from("portfolio_view")
-        .select("*")
-        .eq("participant_id", participantData.id)
-        .single();
+        .rpc("get_portfolio_data", { p_game_id: gameId });
       
-      if (portfolioData) {
-        setParticipant(prev => ({ ...prev, ...portfolioData }));
+      // Find the current participant's data
+      const currentParticipantPortfolio = portfolioData?.find(
+        (p: any) => p.participant_id === participantData.id
+      );
+      
+      if (currentParticipantPortfolio) {
+        setParticipant(prev => ({ ...prev, ...currentParticipantPortfolio }));
       }
       
       // Fetch positions
