@@ -76,11 +76,11 @@ export default function CreateGame() {
       return;
     }
 
-    if (formData.endsAt <= formData.startsAt) {
+    if (formData.endsAt < formData.startsAt) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "End date must be after start date",
+        description: "End date cannot be before start date",
       });
       return;
     }
