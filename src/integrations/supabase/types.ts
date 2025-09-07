@@ -860,6 +860,14 @@ export type Database = {
         Args: { game_uuid: string }
         Returns: boolean
       }
+      is_game_owner_direct: {
+        Args: { game_uuid: string }
+        Returns: boolean
+      }
+      is_participant_in_game_direct: {
+        Args: { game_uuid: string }
+        Returns: boolean
+      }
       is_participant_of_user: {
         Args: { participant_uuid: string }
         Returns: boolean
