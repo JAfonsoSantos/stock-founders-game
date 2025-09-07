@@ -38,7 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signIn = async (email: string) => {
-    const redirectUrl = `${window.location.origin}/`;
+    const redirectUrl = `https://stox.games/`;
     
     const { error } = await supabase.auth.signInWithOtp({
       email,
