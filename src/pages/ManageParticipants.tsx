@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, Plus, UserPlus, Mail, Trash2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import CSVParticipantImport from "@/components/CSVParticipantImport";
 
 export default function ManageParticipants() {
   const { gameId } = useParams();
@@ -205,17 +206,42 @@ export default function ManageParticipants() {
                 Back to Dashboard
               </Button>
               
-              <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
-                <DialogTrigger asChild>
-                  <Button>
-                    <UserPlus className="w-4 h-4 mr-2" />
-                    Add Participant
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Add New Participant</DialogTitle>
-                  </DialogHeader>
+              <div className="flex space-x-2">
+                <CSVParticipantImport 
+                  gameId={gameId!}
+                  gameRoles={gameRoles}
+                  onImportComplete={() => {
+                    // Refresh participants
+                    const refreshData = async () => {
+                      const { data: participantsData } = await supabase
+                        .from("participants")
+                        .select(`
+                          *,
+                          users (
+                            first_name,
+                            last_name
+                          )
+                        `)
+                        .eq("game_id", gameId)
+                        .order("created_at", { ascending: false });
+                      
+                      setParticipants(participantsData || []);
+                    };
+                    refreshData();
+                  }}
+                />
+                
+                <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
+                  <DialogTrigger asChild>
+                    <Button>
+                      <UserPlus className="w-4 h-4 mr-2" />
+                      Add Participant
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Add New Participant</DialogTitle>
+                    </DialogHeader>
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="email">Email</Label>
@@ -282,7 +308,8 @@ export default function ManageParticipants() {
                     </div>
                   </div>
                 </DialogContent>
-              </Dialog>
+                </Dialog>
+              </div>
             </div>
           </div>
         </div>

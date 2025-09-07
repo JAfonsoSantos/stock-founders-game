@@ -20,6 +20,7 @@ export default function PlayerDashboard() {
   const [participant, setParticipant] = useState<any>(null);
   const [positions, setPositions] = useState<any[]>([]);
   const [trades, setTrades] = useState<any[]>([]);
+  const [portfolio, setPortfolio] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [sellModalOpen, setSellModalOpen] = useState(false);
   const [selectedPosition, setSelectedPosition] = useState<any>(null);
