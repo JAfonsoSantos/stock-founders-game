@@ -9,8 +9,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Plus, UserPlus, Mail, Trash2 } from "lucide-react";
+import { Loader2, Plus, UserPlus, Mail, Trash2, Edit, RotateCcw } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { sendInviteEmail } from "@/lib/email";
 import CSVParticipantImport from "@/components/CSVParticipantImport";
@@ -33,6 +34,15 @@ export default function ManageParticipants() {
   });
   const [addLoading, setAddLoading] = useState(false);
   const [sendingInvites, setSendingInvites] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [selectedParticipant, setSelectedParticipant] = useState<any>(null);
+  const [editParticipant, setEditParticipant] = useState({
+    id: "",
+    role: "founder" as const,
+    budget: 0
+  });
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user || !gameId) return;
@@ -184,6 +194,116 @@ export default function ManageParticipants() {
       toast.error("Failed to send invitations");
     } finally {
       setSendingInvites(false);
+    }
+  };
+
+  const resendInvite = async (participant: any) => {
+    setActionLoading(participant.id);
+    try {
+      const testEmail = user?.email || 'test@example.com';
+      await sendInviteEmail([testEmail], gameId!, gameInfo.name, gameInfo.locale);
+      toast.success(`Demo invitation resent to ${testEmail}! (would be sent to participant's email in production)`);
+    } catch (error) {
+      console.error('Failed to resend invitation:', error);
+      toast.error("Failed to resend invitation");
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const openEditModal = (participant: any) => {
+    setSelectedParticipant(participant);
+    setEditParticipant({
+      id: participant.id,
+      role: participant.role,
+      budget: participant.initial_budget
+    });
+    setShowEditModal(true);
+  };
+
+  const saveEditParticipant = async () => {
+    setActionLoading(editParticipant.id);
+    try {
+      const { error } = await supabase
+        .from("participants")
+        .update({
+          role: editParticipant.role,
+          initial_budget: editParticipant.budget,
+          current_cash: editParticipant.budget // Reset cash to new budget
+        })
+        .eq("id", editParticipant.id);
+
+      if (error) throw error;
+
+      toast.success("Participant updated successfully!");
+      setShowEditModal(false);
+      
+      // Refresh participants list
+      const { data: participantsData } = await supabase
+        .from("participants")
+        .select(`
+          *,
+          users (
+            first_name,
+            last_name
+          )
+        `)
+        .eq("game_id", gameId)
+        .order("created_at", { ascending: false });
+      
+      setParticipants(participantsData || []);
+    } catch (error: any) {
+      toast.error("Failed to update participant: " + error.message);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const openDeleteDialog = (participant: any) => {
+    setSelectedParticipant(participant);
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDeleteParticipant = async () => {
+    if (!selectedParticipant) return;
+    
+    setActionLoading(selectedParticipant.id);
+    try {
+      // First delete related positions
+      await supabase
+        .from("positions")
+        .delete()
+        .eq("participant_id", selectedParticipant.id);
+
+      // Then delete the participant
+      const { error } = await supabase
+        .from("participants")
+        .delete()
+        .eq("id", selectedParticipant.id);
+
+      if (error) throw error;
+
+      toast.success("Participant deleted successfully!");
+      setShowDeleteDialog(false);
+      
+      // Refresh participants list
+      const { data: participantsData } = await supabase
+        .from("participants")
+        .select(`
+          *,
+          users (
+            first_name,
+            last_name
+          )
+        `)
+        .eq("game_id", gameId)
+        .order("created_at", { ascending: false });
+      
+      setParticipants(participantsData || []);
+    } catch (error: any) {
+      toast.error("Failed to delete participant: " + error.message);
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -358,6 +478,7 @@ export default function ManageParticipants() {
                   <TableHead>Current Cash</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Joined</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -379,6 +500,39 @@ export default function ManageParticipants() {
                     <TableCell>
                       {new Date(participant.created_at).toLocaleDateString()}
                     </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => resendInvite(participant)}
+                          disabled={actionLoading === participant.id}
+                          title="Resend invitation"
+                        >
+                          {actionLoading === participant.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <RotateCcw className="h-4 w-4" />
+                          )}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => openEditModal(participant)}
+                          title="Edit participant"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => openDeleteDialog(participant)}
+                          title="Delete participant"
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -398,6 +552,76 @@ export default function ManageParticipants() {
             )}
           </CardContent>
         </Card>
+
+        {/* Edit Participant Modal */}
+        <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit Participant</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Participant</Label>
+                <div className="text-sm text-muted-foreground">
+                  {selectedParticipant?.users?.first_name || "Demo"} {selectedParticipant?.users?.last_name || "User"}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Role</Label>
+                <Select value={editParticipant.role} onValueChange={(value) => setEditParticipant(prev => ({ ...prev, role: value as any }))}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {gameRoles.map((role) => (
+                      <SelectItem key={role.id} value={role.role}>
+                        {role.role.charAt(0).toUpperCase() + role.role.slice(1)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="editBudget">Initial Budget</Label>
+                <Input
+                  id="editBudget"
+                  type="number"
+                  min="0"
+                  value={editParticipant.budget}
+                  onChange={(e) => setEditParticipant(prev => ({ ...prev, budget: Number(e.target.value) }))}
+                />
+              </div>
+              <div className="flex space-x-3 pt-4">
+                <Button variant="outline" onClick={() => setShowEditModal(false)} className="flex-1">
+                  Cancel
+                </Button>
+                <Button onClick={saveEditParticipant} disabled={actionLoading === editParticipant.id} className="flex-1">
+                  {actionLoading === editParticipant.id ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save Changes"}
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Participant</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete {selectedParticipant?.users?.first_name || "Demo"} {selectedParticipant?.users?.last_name || "User"}? 
+                This action cannot be undone and will remove all their positions and trades.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={confirmDeleteParticipant} disabled={actionLoading === selectedParticipant?.id}>
+                {actionLoading === selectedParticipant?.id ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );
