@@ -91,16 +91,14 @@ export default function ManageParticipants() {
           participantsData.map(async (participant) => {
             const { data: userData } = await supabase
               .from("users")
-              .select("first_name, last_name")
+              .select("first_name, last_name, email")
               .eq("id", participant.user_id)
               .single();
 
             return {
               ...participant,
               users: userData,
-              email: userData ? 
-                `${(userData.first_name || 'demo').toLowerCase()}.${(userData.last_name || 'user').toLowerCase()}@demo.com` :
-                'demo@example.com'
+              email: userData?.email || '—'
             };
           })
         );
@@ -187,16 +185,14 @@ export default function ManageParticipants() {
           participantsData.map(async (participant) => {
             const { data: userData } = await supabase
               .from("users")
-              .select("first_name, last_name")
+              .select("first_name, last_name, email")
               .eq("id", participant.user_id)
               .single();
 
             return {
               ...participant,
               users: userData,
-              email: userData ? 
-                `${(userData.first_name || 'demo').toLowerCase()}.${(userData.last_name || 'user').toLowerCase()}@demo.com` :
-                'demo@example.com'
+              email: userData?.email || '—'
             };
           })
         );
@@ -285,16 +281,14 @@ export default function ManageParticipants() {
           participantsData.map(async (participant) => {
             const { data: userData } = await supabase
               .from("users")
-              .select("first_name, last_name")
+              .select("first_name, last_name, email")
               .eq("id", participant.user_id)
               .single();
 
             return {
               ...participant,
               users: userData,
-              email: userData ? 
-                `${(userData.first_name || 'demo').toLowerCase()}.${(userData.last_name || 'user').toLowerCase()}@demo.com` :
-                'demo@example.com'
+              email: userData?.email || '—'
             };
           })
         );
@@ -349,16 +343,14 @@ export default function ManageParticipants() {
           participantsData.map(async (participant) => {
             const { data: userData } = await supabase
               .from("users")
-              .select("first_name, last_name")
+              .select("first_name, last_name, email")
               .eq("id", participant.user_id)
               .single();
 
             return {
               ...participant,
               users: userData,
-              email: userData ? 
-                `${(userData.first_name || 'demo').toLowerCase()}.${(userData.last_name || 'user').toLowerCase()}@demo.com` :
-                'demo@example.com'
+              email: userData?.email || '—'
             };
           })
         );
@@ -429,16 +421,14 @@ export default function ManageParticipants() {
                           participantsData.map(async (participant) => {
                             const { data: userData } = await supabase
                               .from("users")
-                              .select("first_name, last_name")
+                              .select("first_name, last_name, email")
                               .eq("id", participant.user_id)
                               .single();
 
                             return {
                               ...participant,
                               users: userData,
-                              email: userData ? 
-                                `${(userData.first_name || 'demo').toLowerCase()}.${(userData.last_name || 'user').toLowerCase()}@demo.com` :
-                                'demo@example.com'
+                              email: userData?.email || '—'
                             };
                           })
                         );
@@ -544,11 +534,11 @@ export default function ManageParticipants() {
         </div>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Current Participants ({participants.length})</CardTitle>
-            <CardDescription>
-              All participants currently enrolled in this game
-            </CardDescription>
+            <CardHeader>
+              <CardTitle>Current Participants ({participants.length})</CardTitle>
+              <CardDescription>
+                All participants currently enrolled in this game
+              </CardDescription>
           </CardHeader>
           <CardContent>
             <Table>
@@ -568,10 +558,10 @@ export default function ManageParticipants() {
                 {participants.map((participant) => (
                   <TableRow key={participant.id}>
                     <TableCell className="font-medium">
-                      {participant.users?.first_name || "Demo"} {participant.users?.last_name || "User"}
+                      {participant.users?.first_name || ""} {participant.users?.last_name || ""}
                     </TableCell>
                     <TableCell className="text-muted-foreground">
-                      {participant.email}
+                      {participant.email || '—'}
                     </TableCell>
                     <TableCell>
                       {getRoleBadge(participant.role)}
