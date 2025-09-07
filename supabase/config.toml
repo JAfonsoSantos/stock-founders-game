@@ -54,3 +54,6 @@ enable_sms_confirmations = false
 
 [functions.send-email]
 verify_jwt = false
+
+[functions.merge-accounts]
+verify_jwt = false

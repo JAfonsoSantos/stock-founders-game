@@ -27,6 +27,8 @@ interface Participation {
   games: Game;
 }
 
+import { MergeAccountsButton } from "@/components/MergeAccountsButton";
+
 export default function Dashboard() {
   const { user, signOut } = useAuth();
   const { t } = useI18n();
@@ -251,6 +253,7 @@ export default function Dashboard() {
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold">Startup Stock Market</h1>
           <div className="flex items-center gap-4">
+            <MergeAccountsButton />
             <span className="text-sm text-muted-foreground">
               {user?.email}
             </span>
