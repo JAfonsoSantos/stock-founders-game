@@ -212,13 +212,18 @@ export default function ManageParticipants() {
 
     setSendingInvites(true);
     try {
-      // For demo participants, we'll use a test email or the game owner's email
-      // In a real app, you'd have actual participant emails stored
-      const testEmail = user?.email || 'test@example.com';
-      const emails = [testEmail]; // Using owner's email as demo
+      // Get all participant emails
+      const emails = participants
+        .map(p => p.email || p.users?.email)
+        .filter(email => email && email !== '—');
+
+      if (emails.length === 0) {
+        toast.error("No valid participant emails found");
+        return;
+      }
 
       await sendInviteEmail(emails, gameId!, gameInfo.name, gameInfo.locale);
-      toast.success(`Demo invitation sent to ${testEmail}! (In production, would send to all ${participants.length} participants)`);
+      toast.success(`Invitations sent to ${emails.length} participants`);
     } catch (error) {
       console.error('Failed to send invitations:', error);
       toast.error("Failed to send invitations");
@@ -230,9 +235,15 @@ export default function ManageParticipants() {
   const resendInvite = async (participant: any) => {
     setActionLoading(participant.id);
     try {
-      const testEmail = user?.email || 'test@example.com';
-      await sendInviteEmail([testEmail], gameId!, gameInfo.name, gameInfo.locale);
-      toast.success(`Demo invitation resent to ${testEmail}! (would be sent to participant's email in production)`);
+      const participantEmail = participant.email || participant.users?.email;
+      
+      if (!participantEmail || participantEmail === '—') {
+        toast.error("Participant email not found");
+        return;
+      }
+
+      await sendInviteEmail([participantEmail], gameId!, gameInfo.name, gameInfo.locale);
+      toast.success(`Invitation sent to ${participantEmail}`);
     } catch (error) {
       console.error('Failed to resend invitation:', error);
       toast.error("Failed to resend invitation");
