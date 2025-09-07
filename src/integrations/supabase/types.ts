@@ -117,6 +117,8 @@ export type Database = {
         Row: {
           allow_secondary: boolean
           circuit_breaker: boolean
+          circuit_breaker_active: boolean | null
+          circuit_breaker_until: string | null
           created_at: string
           currency: string
           ends_at: string
@@ -133,6 +135,8 @@ export type Database = {
         Insert: {
           allow_secondary?: boolean
           circuit_breaker?: boolean
+          circuit_breaker_active?: boolean | null
+          circuit_breaker_until?: string | null
           created_at?: string
           currency?: string
           ends_at: string
@@ -149,6 +153,8 @@ export type Database = {
         Update: {
           allow_secondary?: boolean
           circuit_breaker?: boolean
+          circuit_breaker_active?: boolean | null
+          circuit_breaker_until?: string | null
           created_at?: string
           currency?: string
           ends_at?: string
@@ -889,6 +895,10 @@ export type Database = {
       is_user_participant_in_game: {
         Args: { game_uuid: string }
         Returns: boolean
+      }
+      reset_expired_circuit_breakers: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
     }
     Enums: {
