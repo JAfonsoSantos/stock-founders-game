@@ -139,7 +139,19 @@ export default function GameOrganizer() {
 
           {/* Quick Actions */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card className="cursor-pointer hover:bg-accent/50 transition-colors">
+            <Card
+              role="button"
+              tabIndex={0}
+              onClick={() =>
+                toast({ title: "Manage Participants", description: "Coming soon: add/edit players via CSV or individually." })
+              }
+              onKeyDown={(e) => {
+                if (e.key === "Enter")
+                  toast({ title: "Manage Participants", description: "Coming soon: add/edit players via CSV or individually." });
+              }}
+              className="cursor-pointer hover:bg-accent/50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+              aria-label="Manage Participants"
+            >
               <CardContent className="flex flex-col items-center justify-center p-6">
                 <Users className="h-8 w-8 mb-2 text-primary" />
                 <h3 className="font-semibold">Manage Participants</h3>
@@ -149,7 +161,19 @@ export default function GameOrganizer() {
               </CardContent>
             </Card>
 
-            <Card className="cursor-pointer hover:bg-accent/50 transition-colors">
+            <Card
+              role="button"
+              tabIndex={0}
+              onClick={() =>
+                toast({ title: "Manage Startups", description: "Coming soon: create startups and upload logos." })
+              }
+              onKeyDown={(e) => {
+                if (e.key === "Enter")
+                  toast({ title: "Manage Startups", description: "Coming soon: create startups and upload logos." });
+              }}
+              className="cursor-pointer hover:bg-accent/50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+              aria-label="Manage Startups"
+            >
               <CardContent className="flex flex-col items-center justify-center p-6">
                 <Building2 className="h-8 w-8 mb-2 text-primary" />
                 <h3 className="font-semibold">Manage Startups</h3>
@@ -159,7 +183,19 @@ export default function GameOrganizer() {
               </CardContent>
             </Card>
 
-            <Card className="cursor-pointer hover:bg-accent/50 transition-colors">
+            <Card
+              role="button"
+              tabIndex={0}
+              onClick={() =>
+                toast({ title: "Game Settings", description: "Coming soon: configure currency, language and toggles." })
+              }
+              onKeyDown={(e) => {
+                if (e.key === "Enter")
+                  toast({ title: "Game Settings", description: "Coming soon: configure currency, language and toggles." });
+              }}
+              className="cursor-pointer hover:bg-accent/50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+              aria-label="Game Settings"
+            >
               <CardContent className="flex flex-col items-center justify-center p-6">
                 <Settings className="h-8 w-8 mb-2 text-primary" />
                 <h3 className="font-semibold">Game Settings</h3>
@@ -169,7 +205,19 @@ export default function GameOrganizer() {
               </CardContent>
             </Card>
 
-            <Card className="cursor-pointer hover:bg-accent/50 transition-colors">
+            <Card
+              role="button"
+              tabIndex={0}
+              onClick={() =>
+                toast({ title: "Start Game", description: "Coming soon: change status from draft to pre-market/open." })
+              }
+              onKeyDown={(e) => {
+                if (e.key === "Enter")
+                  toast({ title: "Start Game", description: "Coming soon: change status from draft to pre-market/open." });
+              }}
+              className="cursor-pointer hover:bg-accent/50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+              aria-label="Start Game"
+            >
               <CardContent className="flex flex-col items-center justify-center p-6">
                 <Play className="h-8 w-8 mb-2 text-primary" />
                 <h3 className="font-semibold">Start Game</h3>
