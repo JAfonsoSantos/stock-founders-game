@@ -1,148 +1,159 @@
-# Startup Stock Market
+# Startup Stock Market 🚀
 
-Uma plataforma completa para simulação de mercado de ações de startups em eventos. Os fundadores vendem ações das suas startups a outros participantes (Angels e VCs), com um organizador que controla o mercado.
+A complete platform for running startup investment games at events. Founders sell shares of their startups to other participants (Angels, VCs) in real-time trading sessions.
 
-## 🚀 Características Principais
+## 🎯 Quick Start
 
-### Para Organizadores
-- **Criação de Jogos**: Configure jogos com moeda, idioma, datas e regras customizáveis
-- **Gestão de Participantes**: Adicione participantes com diferentes papéis (Founder, Angel, VC)
-- **Controlo do Mercado**: Abra/feche mercados, ative trading secundário
-- **Dashboard Analytics**: Acompanhe KPIs em tempo real
-- **Sistema de Emails**: Envie convites e notificações automáticas
+### 1. First Time Setup
 
-### Para Participantes
-- **Discovery**: Explore startups disponíveis para investimento
-- **Trading Primário**: Proponha investimentos diretamente às startups
-- **Trading Secundário**: Negocie ações entre participantes (quando ativado)
-- **Portfolio**: Acompanhe investimentos, P&L e posições
-- **Leaderboards**: Veja rankings por market cap e ROI
+**Create Demo Game:**
+1. Visit your dashboard
+2. Click "Create Demo" to get a pre-configured game with sample startups and participants
+3. The demo includes 4 startups with realistic data and initial trading activity
 
-### Funcionalidades Técnicas
-- **VWAP(3)**: Preço oficial baseado nas últimas 3 transações
-- **Circuit Breaker**: Pausa automática em variações > ±200%
-- **Row Level Security**: Segurança completa na base de dados
-- **Realtime Updates**: Atualizações em tempo real via Supabase
-- **Multi-idioma**: Suporte para 10 idiomas principais
-- **Multi-moeda**: Suporte para 10 moedas principais
+**Or Create Custom Game:**
+1. Click "New Game" from dashboard
+2. Configure game settings (name, currency, dates, market rules)
+3. Invite participants via CSV import or individual invites
+4. Add your startups (name, description, shares, logo)
 
-## 🛠 Stack Tecnológica
+### 2. Game Flow
 
-- **Frontend**: React 18 + TypeScript + Tailwind CSS + shadcn/ui
-- **Backend**: Supabase (Auth, Database, Realtime, Storage)
-- **Email**: Resend (configuração necessária)
-- **Deployment**: Lovable (deploy automático)
+```
+Draft → Pre-Market → Open → Closed → Results
+```
 
-## 📁 Estrutura da Base de Dados
+- **Draft**: Setup phase - configure everything
+- **Pre-Market**: Countdown to market open
+- **Open**: Active trading period
+- **Closed**: Trading stopped
+- **Results**: Final leaderboards and reports
 
-### Tabelas Principais
-- `games` - Configuração dos jogos
-- `participants` - Participantes em cada jogo
-- `startups` - Startups disponíveis para investimento
-- `trades` - Histórico de todas as transações
-- `positions` - Posições atuais dos participantes
-- `orders_primary` - Pedidos de investimento primário
+### 3. Key Features
 
-### Views Automáticas
-- `leaderboard_startups` - Ranking por market cap
-- `leaderboard_angels` - Ranking Angels por ROI
-- `leaderboard_vcs` - Ranking VCs por ROI
-- `portfolio_view` - Valor total do portfolio por participante
+**For Organizers:**
+- Complete game management dashboard
+- CSV participant import
+- Real-time market controls (open/close, secondary trading toggle)
+- Email system (invites, market updates, results)
+- Live analytics and KPIs
 
-## 🚀 Como Começar
+**For Participants:**
+- **Primary Market**: Buy shares directly from startups (founders approve/reject)
+- **Secondary Market**: Trade shares with other participants (when enabled)
+- Real-time portfolio tracking and P&L
+- Live startup pricing (VWAP of last 3 trades)
+- Circuit breaker protection (configurable)
 
-### 1. Configuração Inicial
-A base de dados já está configurada com todas as tabelas, políticas RLS e triggers necessários.
+**For Founders:**
+- Startup profile management
+- Order approval dashboard
+- Team member management
+- Auto-accept minimum price settings
 
-### 2. Autenticação
-- Faça login com o seu email
-- Receberá um magic link para acesso seguro
-- O seu perfil será criado automaticamente
+## 🎮 Testing Guide
 
-### 3. Criar Primeiro Jogo
-1. Clique em "New Game" no dashboard
-2. Configure nome, moeda, datas e regras
-3. Defina orçamentos default por papel
-4. Clique "Create Game"
+### Demo Game Experience
+1. **Dashboard**: Create demo game to see realistic data
+2. **Organizer View**: Go to "Manage" → explore all tabs (Players, Startups, Controls, Emails)
+3. **Market Controls**: 
+   - Change game status to "Open" 
+   - Toggle secondary market on/off
+   - View live KPIs
+4. **Player Experience**: Click "Enter Game" to see marketplace
+5. **Investment Flow**: Try creating primary market orders
+6. **Portfolio**: Check "My Portfolio" for holdings and P&L
 
-### 4. Gestão do Jogo
-- **Players**: Adicione participantes por email
-- **Startups**: Crie as startups que participarão
-- **Controls**: Controle o estado do mercado
-- **Emails**: Envie notificações aos participantes
+### Key Things to Test
+- [ ] Game creation and setup
+- [ ] Participant management (CSV import)
+- [ ] Startup profile creation
+- [ ] Market opening/closing
+- [ ] Primary market trades (order → approval → execution)
+- [ ] Secondary market trades (if enabled)
+- [ ] Real-time price updates (VWAP calculation)
+- [ ] Portfolio tracking and P&L
+- [ ] Leaderboards (public/private toggle)
+- [ ] Email notifications
+- [ ] Mobile responsiveness
 
-### 5. Durante o Jogo
-- Participantes exploram startups em `/games/{id}/discover`
-- Fazem propostas de investimento
-- Fundadores aceitam/rejeitam em `/games/{id}/startup/{slug}/admin`
-- Preços são calculados automaticamente via VWAP(3)
+## 🏗️ Technical Architecture
 
-## 📊 Regras de Negócio
+### Frontend
+- **React 18** + **TypeScript** + **Vite**
+- **Tailwind CSS** + **shadcn/ui** components
+- **React Router** for navigation
+- **TanStack Query** for data fetching
+- **next-intl** for i18n (10 languages)
 
-### Papéis
-- **Founder**: Gere a startup, aceita/rejeita investimentos
-- **Angel**: Investe com orçamento médio (default: $100k)
-- **VC**: Investe com orçamento alto (default: $1M)
-- **Organizer**: Controla o jogo todo
+### Backend (Supabase)
+- **PostgreSQL** with Row Level Security (RLS)
+- **Real-time subscriptions** for live updates
+- **Authentication** (magic link)
+- **Storage** for startup logos
+- **Edge Functions** for email sending
 
-### Estados do Jogo
-1. **Draft**: Configuração inicial
-2. **Pre-market**: Preparação antes do início
-3. **Open**: Mercado ativo para trading
-4. **Closed**: Mercado fechado
-5. **Results**: Resultados finais
+### Key Business Logic
+- **VWAP Pricing**: Price = weighted average of last 3 trades
+- **Market Cap**: VWAP × total shares issued
+- **Circuit Breaker**: 60s pause if price moves >±200%
+- **Roles & Budgets**: Founder (10k), Angel (100k), VC (1M) - configurable
 
-### Preço VWAP(3)
-- Calculado automaticamente após cada trade
-- Baseado nas últimas 3 transações
-- Usado para market cap e valorização do portfolio
+## 📧 Email System
 
-### Trading Secundário
-- Desabilitado por default
-- Quando ativo: participantes podem vender entre si
-- Requer dupla confirmação (vendedor + comprador)
+Integrated **Resend** for automated emails:
+- Invite participants with join links
+- Pre-market reminders (T-24h)
+- Market open notifications
+- Last 10 minutes alerts
+- Trade request notifications (secondary market)
+- Final results reports
 
-## 🔐 Segurança
+## 🌍 Internationalization
 
-- **Row Level Security (RLS)** em todas as tabelas
-- **Políticas granulares** por papel e ação
-- **Validações automáticas** de saldo e posições
-- **Triggers de integridade** de dados
+**Supported Languages**: English, Portuguese, Spanish, French, German, Chinese, Japanese, Arabic, Hindi, Russian
 
-## 🎯 Próximos Passos
+**Supported Currencies**: USD, EUR, CNY, JPY, GBP, INR, AUD, CAD, CHF, HKD
 
-1. **Configurar Resend** (opcional): Para emails automáticos
-2. **Adicionar Storage** (opcional): Para logos das startups  
-3. **Personalizar Design**: Ajustar cores e branding
+## 🔐 Security Features
 
-## 📧 Configuração de Email (Opcional)
+- Row Level Security (RLS) on all tables
+- Circuit breaker for price volatility
+- Maximum price per share limits
+- Order expiration and validation
+- Real-time fraud detection patterns
 
-Para ativar emails automáticos:
-1. Crie conta em [Resend.com](https://resend.com)
-2. Valide o seu domínio
-3. Obtenha API key em [API Keys](https://resend.com/api-keys)
-4. Configure a secret `RESEND_API_KEY` no Supabase
+## 🚀 Deployment Ready
 
-## 🌍 Multi-idioma (Futuro)
+**Environment Variables Required:**
+```
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+RESEND_API_KEY=your_resend_key
+```
 
-Preparado para suporte a:
-- 🇺🇸 English
-- 🇨🇳 中文 (Chinese)  
-- 🇮🇳 हिन्दी (Hindi)
-- 🇪🇸 Español
-- 🇸🇦 العربية (Arabic)
-- 🇧🇩 বাংলা (Bengali)
-- 🇵🇹 Português
-- 🇷🇺 Русский (Russian)
-- 🇯🇵 日本語 (Japanese)
-- 🇩🇪 Deutsch (German)
+**Database Setup:**
+1. Run migrations in `supabase/migrations/` via Supabase Dashboard SQL Editor
+2. Configure storage bucket "logos" for startup images
+3. Deploy edge functions from `supabase/functions/`
 
-## 💰 Multi-moeda
+## 💡 Pro Tips
 
-Suporte completo para:
-- USD, EUR, CNY, JPY, GBP
-- INR, AUD, CAD, CHF, HKD
+1. **Demo First**: Always start with demo game to understand the full flow
+2. **Mobile Ready**: Test on mobile - fully responsive design
+3. **Real-time**: All updates are live - open multiple tabs to see real-time sync
+4. **Circuit Breaker**: Test with volatile pricing to see 60s pause mechanism
+5. **Secondary Market**: Enable for more dynamic trading experience
+6. **Email Integration**: Configure Resend for complete participant communication
+
+## 🎯 Perfect For
+
+- **Startup Events**: Pitch competitions, demo days, conferences
+- **Corporate Training**: Investment simulation, financial education
+- **University Courses**: Entrepreneurship, finance, economics
+- **Accelerator Programs**: Portfolio company valuation exercises
 
 ---
 
-**Startup Stock Market** - Criado com ❤️ usando Lovable, Supabase e React.
+**Ready to launch your startup stock market? Start with the demo game! 🎉**

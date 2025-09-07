@@ -227,12 +227,12 @@ export default function Dashboard() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "draft": return "bg-gray-100 text-gray-800";
-      case "pre_market": return "bg-yellow-100 text-yellow-800";
-      case "open": return "bg-green-100 text-green-800";
-      case "closed": return "bg-red-100 text-red-800";
-      case "results": return "bg-blue-100 text-blue-800";
-      default: return "bg-gray-100 text-gray-800";
+      case "draft": return "bg-muted text-muted-foreground";
+      case "pre_market": return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300";
+      case "open": return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 animate-pulse";
+      case "closed": return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300";
+      case "results": return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300";
+      default: return "bg-muted text-muted-foreground";
     }
   };
 
@@ -327,36 +327,40 @@ export default function Dashboard() {
                 </Card>
               ) : (
                 ownedGames.map((game) => (
-                  <Card key={game.id} className="hover:shadow-md transition-shadow">
+                  <Card key={game.id} className="hover:shadow-lg transition-all duration-200 hover:scale-[1.02] group">
                     <CardHeader>
                       <div className="flex justify-between items-start">
                         <div>
-                          <CardTitle className="text-lg flex items-center">
+                          <CardTitle className="text-lg flex items-center group-hover:text-primary transition-colors">
                             {game.name}
                             {game.name.includes("Demo") && (
-                              <Sparkles className="h-4 w-4 ml-2 text-primary" />
+                              <Sparkles className="h-4 w-4 ml-2 text-primary animate-pulse" />
                             )}
                           </CardTitle>
                           <CardDescription>
                             {new Date(game.starts_at).toLocaleDateString()} - {new Date(game.ends_at).toLocaleDateString()}
                           </CardDescription>
                         </div>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(game.status)}`}>
-                          {game.status.replace('_', ' ')}
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(game.status)}`}>
+                          {game.status.replace('_', ' ').toUpperCase()}
                         </span>
                       </div>
                     </CardHeader>
                     <CardContent>
                       <div className="flex justify-between items-center">
-                        <span className="text-sm text-muted-foreground">
-                          Currency: {game.currency}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-muted-foreground">Currency:</span>
+                          <span className="font-mono px-2 py-1 bg-muted rounded text-sm font-medium">
+                            {game.currency}
+                          </span>
+                        </div>
                         <div className="flex space-x-2">
                           {game.status === 'open' && (
                             <Button 
                               variant="default" 
                               size="sm"
                               onClick={() => navigate(`/games/${game.id}/discover`)}
+                              className="bg-green-600 hover:bg-green-700 text-white shadow-md"
                             >
                               <Play className="h-4 w-4 mr-2" />
                               Enter Game
@@ -366,6 +370,7 @@ export default function Dashboard() {
                             variant="outline" 
                             size="sm"
                             onClick={() => navigate(`/games/${game.id}/organizer`)}
+                            className="hover:bg-muted"
                           >
                             <Settings className="h-4 w-4 mr-2" />
                             Manage
@@ -395,42 +400,54 @@ export default function Dashboard() {
                 </Card>
               ) : (
                 participations.map((participation) => (
-                  <Card key={participation.id} className="cursor-pointer hover:shadow-md transition-shadow">
+                  <Card key={participation.id} className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:scale-[1.02] group">
                     <CardHeader>
                       <div className="flex justify-between items-start">
                         <div>
-                          <CardTitle className="text-lg">{participation.games.name}</CardTitle>
-                          <CardDescription>
-                            Role: {participation.role.toUpperCase()}
+                          <CardTitle className="text-lg group-hover:text-primary transition-colors">
+                            {participation.games.name}
+                          </CardTitle>
+                          <CardDescription className="flex items-center gap-2">
+                            <span className="font-medium text-primary">
+                              {participation.role.toUpperCase()}
+                            </span>
+                            <span className="text-muted-foreground">•</span>
+                            <span>{participation.games.currency}</span>
                           </CardDescription>
                         </div>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(participation.games.status)}`}>
-                          {participation.games.status.replace('_', ' ')}
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(participation.games.status)}`}>
+                          {participation.games.status.replace('_', ' ').toUpperCase()}
                         </span>
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div>
-                          <span className="text-muted-foreground">Budget:</span>
-                          <p className="font-medium">{participation.games.currency} {participation.initial_budget.toLocaleString()}</p>
+                      <div className="grid grid-cols-2 gap-4 text-sm mb-4">
+                        <div className="p-3 bg-muted rounded-lg">
+                          <span className="text-muted-foreground text-xs">Initial Budget</span>
+                          <p className="font-bold text-lg">
+                            {participation.games.currency} {participation.initial_budget.toLocaleString()}
+                          </p>
                         </div>
-                        <div>
-                          <span className="text-muted-foreground">Cash:</span>
-                          <p className="font-medium">{participation.games.currency} {participation.current_cash.toLocaleString()}</p>
+                        <div className="p-3 bg-muted rounded-lg">
+                          <span className="text-muted-foreground text-xs">Available Cash</span>
+                          <p className="font-bold text-lg">
+                            {participation.games.currency} {participation.current_cash.toLocaleString()}
+                          </p>
                         </div>
                       </div>
-                      <div className="flex space-x-2 mt-4">
+                      <div className="flex space-x-2">
                         <Button 
                           variant="outline" 
                           size="sm" 
                           onClick={() => navigate(`/games/${participation.games.id}/me`)}
+                          className="flex-1"
                         >
                           My Portfolio
                         </Button>
                         <Button 
                           size="sm" 
                           onClick={() => navigate(`/games/${participation.games.id}/discover`)}
+                          className="flex-1"
                         >
                           <Play className="h-4 w-4 mr-2" />
                           Enter Game
