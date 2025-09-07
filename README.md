@@ -1,73 +1,148 @@
-# Welcome to your Lovable project
+# Startup Stock Market
 
-## Project info
+Uma plataforma completa para simulação de mercado de ações de startups em eventos. Os fundadores vendem ações das suas startups a outros participantes (Angels e VCs), com um organizador que controla o mercado.
 
-**URL**: https://lovable.dev/projects/7549b806-c708-474d-989f-9838a83ae185
+## 🚀 Características Principais
 
-## How can I edit this code?
+### Para Organizadores
+- **Criação de Jogos**: Configure jogos com moeda, idioma, datas e regras customizáveis
+- **Gestão de Participantes**: Adicione participantes com diferentes papéis (Founder, Angel, VC)
+- **Controlo do Mercado**: Abra/feche mercados, ative trading secundário
+- **Dashboard Analytics**: Acompanhe KPIs em tempo real
+- **Sistema de Emails**: Envie convites e notificações automáticas
 
-There are several ways of editing your application.
+### Para Participantes
+- **Discovery**: Explore startups disponíveis para investimento
+- **Trading Primário**: Proponha investimentos diretamente às startups
+- **Trading Secundário**: Negocie ações entre participantes (quando ativado)
+- **Portfolio**: Acompanhe investimentos, P&L e posições
+- **Leaderboards**: Veja rankings por market cap e ROI
 
-**Use Lovable**
+### Funcionalidades Técnicas
+- **VWAP(3)**: Preço oficial baseado nas últimas 3 transações
+- **Circuit Breaker**: Pausa automática em variações > ±200%
+- **Row Level Security**: Segurança completa na base de dados
+- **Realtime Updates**: Atualizações em tempo real via Supabase
+- **Multi-idioma**: Suporte para 10 idiomas principais
+- **Multi-moeda**: Suporte para 10 moedas principais
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/7549b806-c708-474d-989f-9838a83ae185) and start prompting.
+## 🛠 Stack Tecnológica
 
-Changes made via Lovable will be committed automatically to this repo.
+- **Frontend**: React 18 + TypeScript + Tailwind CSS + shadcn/ui
+- **Backend**: Supabase (Auth, Database, Realtime, Storage)
+- **Email**: Resend (configuração necessária)
+- **Deployment**: Lovable (deploy automático)
 
-**Use your preferred IDE**
+## 📁 Estrutura da Base de Dados
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Tabelas Principais
+- `games` - Configuração dos jogos
+- `participants` - Participantes em cada jogo
+- `startups` - Startups disponíveis para investimento
+- `trades` - Histórico de todas as transações
+- `positions` - Posições atuais dos participantes
+- `orders_primary` - Pedidos de investimento primário
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Views Automáticas
+- `leaderboard_startups` - Ranking por market cap
+- `leaderboard_angels` - Ranking Angels por ROI
+- `leaderboard_vcs` - Ranking VCs por ROI
+- `portfolio_view` - Valor total do portfolio por participante
 
-Follow these steps:
+## 🚀 Como Começar
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### 1. Configuração Inicial
+A base de dados já está configurada com todas as tabelas, políticas RLS e triggers necessários.
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### 2. Autenticação
+- Faça login com o seu email
+- Receberá um magic link para acesso seguro
+- O seu perfil será criado automaticamente
 
-# Step 3: Install the necessary dependencies.
-npm i
+### 3. Criar Primeiro Jogo
+1. Clique em "New Game" no dashboard
+2. Configure nome, moeda, datas e regras
+3. Defina orçamentos default por papel
+4. Clique "Create Game"
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+### 4. Gestão do Jogo
+- **Players**: Adicione participantes por email
+- **Startups**: Crie as startups que participarão
+- **Controls**: Controle o estado do mercado
+- **Emails**: Envie notificações aos participantes
 
-**Edit a file directly in GitHub**
+### 5. Durante o Jogo
+- Participantes exploram startups em `/games/{id}/discover`
+- Fazem propostas de investimento
+- Fundadores aceitam/rejeitam em `/games/{id}/startup/{slug}/admin`
+- Preços são calculados automaticamente via VWAP(3)
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 📊 Regras de Negócio
 
-**Use GitHub Codespaces**
+### Papéis
+- **Founder**: Gere a startup, aceita/rejeita investimentos
+- **Angel**: Investe com orçamento médio (default: $100k)
+- **VC**: Investe com orçamento alto (default: $1M)
+- **Organizer**: Controla o jogo todo
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Estados do Jogo
+1. **Draft**: Configuração inicial
+2. **Pre-market**: Preparação antes do início
+3. **Open**: Mercado ativo para trading
+4. **Closed**: Mercado fechado
+5. **Results**: Resultados finais
 
-## What technologies are used for this project?
+### Preço VWAP(3)
+- Calculado automaticamente após cada trade
+- Baseado nas últimas 3 transações
+- Usado para market cap e valorização do portfolio
 
-This project is built with:
+### Trading Secundário
+- Desabilitado por default
+- Quando ativo: participantes podem vender entre si
+- Requer dupla confirmação (vendedor + comprador)
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 🔐 Segurança
 
-## How can I deploy this project?
+- **Row Level Security (RLS)** em todas as tabelas
+- **Políticas granulares** por papel e ação
+- **Validações automáticas** de saldo e posições
+- **Triggers de integridade** de dados
 
-Simply open [Lovable](https://lovable.dev/projects/7549b806-c708-474d-989f-9838a83ae185) and click on Share -> Publish.
+## 🎯 Próximos Passos
 
-## Can I connect a custom domain to my Lovable project?
+1. **Configurar Resend** (opcional): Para emails automáticos
+2. **Adicionar Storage** (opcional): Para logos das startups  
+3. **Personalizar Design**: Ajustar cores e branding
 
-Yes, you can!
+## 📧 Configuração de Email (Opcional)
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+Para ativar emails automáticos:
+1. Crie conta em [Resend.com](https://resend.com)
+2. Valide o seu domínio
+3. Obtenha API key em [API Keys](https://resend.com/api-keys)
+4. Configure a secret `RESEND_API_KEY` no Supabase
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+## 🌍 Multi-idioma (Futuro)
+
+Preparado para suporte a:
+- 🇺🇸 English
+- 🇨🇳 中文 (Chinese)  
+- 🇮🇳 हिन्दी (Hindi)
+- 🇪🇸 Español
+- 🇸🇦 العربية (Arabic)
+- 🇧🇩 বাংলা (Bengali)
+- 🇵🇹 Português
+- 🇷🇺 Русский (Russian)
+- 🇯🇵 日本語 (Japanese)
+- 🇩🇪 Deutsch (German)
+
+## 💰 Multi-moeda
+
+Suporte completo para:
+- USD, EUR, CNY, JPY, GBP
+- INR, AUD, CAD, CHF, HKD
+
+---
+
+**Startup Stock Market** - Criado com ❤️ usando Lovable, Supabase e React.
