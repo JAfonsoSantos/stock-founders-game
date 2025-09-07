@@ -8,21 +8,38 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Loader2, Wallet, TrendingUp, DollarSign, Activity, ArrowUpDown } from "lucide-react";
-import { toast } from "sonner";
+import { useToast } from "@/components/ui/use-toast";
+import { SecondaryTradeModal } from "@/components/SecondaryTradeModal";
+import { NotificationCenter } from "@/components/NotificationCenter";
 
 export default function PlayerDashboard() {
   const { gameId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { toast } = useToast();
   const [participant, setParticipant] = useState<any>(null);
   const [positions, setPositions] = useState<any[]>([]);
   const [trades, setTrades] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [sellModalOpen, setSellModalOpen] = useState(false);
+  const [selectedPosition, setSelectedPosition] = useState<any>(null);
+  const [gameAllowsSecondary, setGameAllowsSecondary] = useState(false);
 
   useEffect(() => {
     if (!user || !gameId) return;
     
     const fetchData = async () => {
+      // Fetch game and participant data
+      const { data: gameData } = await supabase
+        .from('games')
+        .select('*')
+        .eq('id', gameId)
+        .single();
+
+      if (gameData) {
+        setGameAllowsSecondary(gameData.allow_secondary);
+      }
+      
       // Check if user is participant
       const { data: participantData } = await supabase
         .from("participants")
@@ -102,6 +119,11 @@ export default function PlayerDashboard() {
     return currentValue - cost;
   };
 
+  const handleSellClick = (position: any) => {
+    setSelectedPosition(position);
+    setSellModalOpen(true);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -120,8 +142,17 @@ export default function PlayerDashboard() {
           </p>
         </div>
 
-        {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="space-y-6">
+          {/* Notification Center */}
+          {participant && (
+            <NotificationCenter 
+              participantId={participant.id} 
+              gameId={gameId!} 
+            />
+          )}
+
+          {/* Summary Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Cash Balance</CardTitle>
@@ -189,6 +220,7 @@ export default function PlayerDashboard() {
                       <TableHead>Current Price</TableHead>
                       <TableHead>Market Value</TableHead>
                       <TableHead>P&L</TableHead>
+                      <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -225,6 +257,18 @@ export default function PlayerDashboard() {
                                 </span>
                               )}
                             </div>
+                          </TableCell>
+                          <TableCell>
+                            {gameAllowsSecondary && position.qty_total > 0 && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleSellClick(position)}
+                              >
+                                <ArrowUpDown className="h-3 w-3 mr-1" />
+                                Vender
+                              </Button>
+                            )}
                           </TableCell>
                         </TableRow>
                       );
@@ -309,6 +353,19 @@ export default function PlayerDashboard() {
             </Card>
           </TabsContent>
         </Tabs>
+
+          {/* Secondary Trade Modal */}
+          {selectedPosition && (
+            <SecondaryTradeModal
+              isOpen={sellModalOpen}
+              onClose={() => setSellModalOpen(false)}
+              gameId={gameId!}
+              startupId={selectedPosition.startup_id}
+              startupName={selectedPosition.startups?.name}
+              maxQuantity={selectedPosition.qty_total}
+            />
+          )}
+        </div>
       </div>
     </div>
   );

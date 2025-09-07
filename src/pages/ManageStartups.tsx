@@ -9,7 +9,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ArrowLeft, Plus, Building2, Trash2, Edit, ExternalLink } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
+import { LogoUpload } from "@/components/LogoUpload";
 
 interface Startup {
   id: string;
@@ -28,12 +29,14 @@ interface Startup {
 export default function ManageStartups() {
   const { gameId } = useParams<{ gameId: string }>();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [startups, setStartups] = useState<Startup[]>([]);
   const [loading, setLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
   const [newStartup, setNewStartup] = useState({
     slug: "",
     name: "",
+    logo_url: "",
     description: "",
     website: "",
     linkedin: "",
@@ -103,6 +106,7 @@ export default function ManageStartups() {
           game_id: gameId,
           slug: newStartup.slug,
           name: newStartup.name,
+          logo_url: newStartup.logo_url || null,
           description: newStartup.description || null,
           website: newStartup.website || null,
           linkedin: newStartup.linkedin || null,
@@ -121,6 +125,7 @@ export default function ManageStartups() {
       setNewStartup({
         slug: "",
         name: "",
+        logo_url: "",
         description: "",
         website: "",
         linkedin: "",
@@ -220,6 +225,12 @@ export default function ManageStartups() {
                       value={newStartup.slug}
                       onChange={(e) => setNewStartup(prev => ({ ...prev, slug: e.target.value }))}
                       placeholder="awesome-startup"
+                    />
+                  </div>
+                  <div>
+                    <LogoUpload
+                      startupSlug={newStartup.slug}
+                      onLogoUploaded={(url) => setNewStartup({ ...newStartup, logo_url: url })}
                     />
                   </div>
                 </div>
