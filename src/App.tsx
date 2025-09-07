@@ -16,6 +16,7 @@ import Join from "./pages/Join";
 import Discover from "./pages/Discover";
 import PlayerDashboard from "./pages/PlayerDashboard";
 import StartupProfile from "./pages/StartupProfile";
+import StartupAdmin from "./pages/StartupAdmin";
 import Leaderboard from "./pages/Leaderboard";
 import NotFound from "./pages/NotFound";
 
@@ -115,6 +116,11 @@ const App = () => (
             <Route path="/games/:gameId/startup/:slug" element={
               <ProtectedRoute>
                 <StartupProfile />
+              </ProtectedRoute>
+            } />
+            <Route path="/games/:gameId/startup/:slug/admin" element={
+              <ProtectedRoute>
+                <StartupAdmin />
               </ProtectedRoute>
             } />
             <Route path="/games/:gameId/leaderboard" element={

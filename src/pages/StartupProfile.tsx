@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
-import { Loader2, Building, TrendingUp, ExternalLink, Globe, Linkedin, CheckCircle, XCircle } from "lucide-react";
+import { Loader2, Building, TrendingUp, ExternalLink, Globe, Linkedin, CheckCircle, XCircle, Settings } from "lucide-react";
 import { toast } from "sonner";
 import InvestModal from "@/components/InvestModal";
 
@@ -209,6 +209,15 @@ export default function StartupProfile() {
               <Button onClick={() => navigate(`/games/${gameId}/discover`)}>
                 Back to Discover
               </Button>
+              {isFounder && (
+                <Button 
+                  variant="outline"
+                  onClick={() => navigate(`/games/${gameId}/startup/${slug}/admin`)}
+                >
+                  <Settings className="w-4 h-4 mr-2" />
+                  Manage Startup
+                </Button>
+              )}
               {!isFounder && startup.primary_shares_remaining > 0 && (
                 <Button onClick={() => setShowInvestModal(true)}>
                   <TrendingUp className="w-4 h-4 mr-2" />
