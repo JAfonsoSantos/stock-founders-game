@@ -838,6 +838,24 @@ export type Database = {
         Args: { startup_uuid: string }
         Returns: number
       }
+      create_primary_order: {
+        Args: {
+          p_auto_accept_min_price?: number
+          p_game_id: string
+          p_price_per_share: number
+          p_qty: number
+          p_startup_id: string
+        }
+        Returns: Json
+      }
+      decide_primary_order: {
+        Args: {
+          p_decided_by_participant_id?: string
+          p_decision: string
+          p_order_id: string
+        }
+        Returns: Json
+      }
       is_game_owner: {
         Args: { game_uuid: string }
         Returns: boolean
