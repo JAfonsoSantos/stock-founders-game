@@ -65,6 +65,31 @@ export default function GameOrganizer() {
     }
   };
 
+  const startGame = async () => {
+    try {
+      const { error } = await supabase
+        .from("games")
+        .update({ status: "pre_market" })
+        .eq("id", gameId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Game Started",
+        description: "Game status changed to pre-market. Participants can now prepare for trading.",
+      });
+
+      // Refresh game data
+      fetchGame();
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message,
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -142,12 +167,9 @@ export default function GameOrganizer() {
             <Card
               role="button"
               tabIndex={0}
-              onClick={() =>
-                toast({ title: "Manage Participants", description: "Coming soon: add/edit players via CSV or individually." })
-              }
+              onClick={() => navigate(`/games/${gameId}/participants`)}
               onKeyDown={(e) => {
-                if (e.key === "Enter")
-                  toast({ title: "Manage Participants", description: "Coming soon: add/edit players via CSV or individually." });
+                if (e.key === "Enter") navigate(`/games/${gameId}/participants`);
               }}
               className="cursor-pointer hover:bg-accent/50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
               aria-label="Manage Participants"
@@ -164,12 +186,9 @@ export default function GameOrganizer() {
             <Card
               role="button"
               tabIndex={0}
-              onClick={() =>
-                toast({ title: "Manage Startups", description: "Coming soon: create startups and upload logos." })
-              }
+              onClick={() => navigate(`/games/${gameId}/startups`)}
               onKeyDown={(e) => {
-                if (e.key === "Enter")
-                  toast({ title: "Manage Startups", description: "Coming soon: create startups and upload logos." });
+                if (e.key === "Enter") navigate(`/games/${gameId}/startups`);
               }}
               className="cursor-pointer hover:bg-accent/50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
               aria-label="Manage Startups"
@@ -186,12 +205,9 @@ export default function GameOrganizer() {
             <Card
               role="button"
               tabIndex={0}
-              onClick={() =>
-                toast({ title: "Game Settings", description: "Coming soon: configure currency, language and toggles." })
-              }
+              onClick={() => navigate(`/games/${gameId}/settings`)}
               onKeyDown={(e) => {
-                if (e.key === "Enter")
-                  toast({ title: "Game Settings", description: "Coming soon: configure currency, language and toggles." });
+                if (e.key === "Enter") navigate(`/games/${gameId}/settings`);
               }}
               className="cursor-pointer hover:bg-accent/50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
               aria-label="Game Settings"
@@ -208,12 +224,27 @@ export default function GameOrganizer() {
             <Card
               role="button"
               tabIndex={0}
-              onClick={() =>
-                toast({ title: "Start Game", description: "Coming soon: change status from draft to pre-market/open." })
-              }
+              onClick={() => {
+                if (game.status === "draft") {
+                  startGame();
+                } else {
+                  toast({ 
+                    title: "Game Status", 
+                    description: `Game is currently in ${game.status} status.` 
+                  });
+                }
+              }}
               onKeyDown={(e) => {
-                if (e.key === "Enter")
-                  toast({ title: "Start Game", description: "Coming soon: change status from draft to pre-market/open." });
+                if (e.key === "Enter") {
+                  if (game.status === "draft") {
+                    startGame();
+                  } else {
+                    toast({ 
+                      title: "Game Status", 
+                      description: `Game is currently in ${game.status} status.` 
+                    });
+                  }
+                }
               }}
               className="cursor-pointer hover:bg-accent/50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
               aria-label="Start Game"
@@ -222,7 +253,7 @@ export default function GameOrganizer() {
                 <Play className="h-8 w-8 mb-2 text-primary" />
                 <h3 className="font-semibold">Start Game</h3>
                 <p className="text-sm text-muted-foreground text-center">
-                  Launch the game when ready
+                  {game.status === "draft" ? "Launch the game when ready" : `Current status: ${game.status}`}
                 </p>
               </CardContent>
             </Card>

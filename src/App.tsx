@@ -8,6 +8,9 @@ import Dashboard from "./pages/Dashboard";
 import Auth from "./pages/Auth";
 import CreateGame from "./pages/CreateGame";
 import GameOrganizer from "./pages/GameOrganizer";
+import ManageParticipants from "./pages/ManageParticipants";
+import ManageStartups from "./pages/ManageStartups";
+import GameSettings from "./pages/GameSettings";
 import Join from "./pages/Join";
 import Discover from "./pages/Discover";
 import PlayerDashboard from "./pages/PlayerDashboard";
@@ -77,6 +80,21 @@ const App = () => (
             <Route path="/games/:gameId/organizer" element={
               <ProtectedRoute>
                 <GameOrganizer />
+              </ProtectedRoute>
+            } />
+            <Route path="/games/:gameId/participants" element={
+              <ProtectedRoute>
+                <ManageParticipants />
+              </ProtectedRoute>
+            } />
+            <Route path="/games/:gameId/startups" element={
+              <ProtectedRoute>
+                <ManageStartups />
+              </ProtectedRoute>
+            } />
+            <Route path="/games/:gameId/settings" element={
+              <ProtectedRoute>
+                <GameSettings />
               </ProtectedRoute>
             } />
             <Route path="/join/:gameId" element={<Join />} />
