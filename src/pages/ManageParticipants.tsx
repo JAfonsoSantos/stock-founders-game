@@ -78,7 +78,7 @@ export default function ManageParticipants() {
         setNewParticipant(prev => ({ ...prev, budget: founderRole.default_budget }));
       }
       
-      // Fetch participants
+      // Fetch participants with demo email
       const { data: participantsData } = await supabase
         .from("participants")
         .select(`
@@ -90,8 +90,19 @@ export default function ManageParticipants() {
         `)
         .eq("game_id", gameId)
         .order("created_at", { ascending: false });
+
+      // Add demo emails for participants
+      if (participantsData) {
+        const participantsWithEmails = participantsData.map(participant => ({
+          ...participant,
+          email: `${(participant.users?.first_name || 'demo').toLowerCase()}.${(participant.users?.last_name || 'user').toLowerCase()}@demo.com`
+        }));
+        setParticipants(participantsWithEmails);
+      }
       
-      setParticipants(participantsData || []);
+      else {
+        setParticipants([]);
+      }
       setLoading(false);
     };
 
@@ -169,7 +180,16 @@ export default function ManageParticipants() {
         .eq("game_id", gameId)
         .order("created_at", { ascending: false });
       
-      setParticipants(participantsData || []);
+      // Add demo emails for participants
+      if (participantsData) {
+        const participantsWithEmails = participantsData.map(participant => ({
+          ...participant,
+          email: `${(participant.users?.first_name || 'demo').toLowerCase()}.${(participant.users?.last_name || 'user').toLowerCase()}@demo.com`
+        }));
+        setParticipants(participantsWithEmails);
+      } else {
+        setParticipants([]);
+      }
     } catch (error) {
       toast.error("Failed to add participant");
     } finally {
@@ -251,7 +271,16 @@ export default function ManageParticipants() {
         .eq("game_id", gameId)
         .order("created_at", { ascending: false });
       
-      setParticipants(participantsData || []);
+      // Add demo emails for participants
+      if (participantsData) {
+        const participantsWithEmails = participantsData.map(participant => ({
+          ...participant,
+          email: `${(participant.users?.first_name || 'demo').toLowerCase()}.${(participant.users?.last_name || 'user').toLowerCase()}@demo.com`
+        }));
+        setParticipants(participantsWithEmails);
+      } else {
+        setParticipants([]);
+      }
     } catch (error: any) {
       toast.error("Failed to update participant: " + error.message);
     } finally {
@@ -299,7 +328,16 @@ export default function ManageParticipants() {
         .eq("game_id", gameId)
         .order("created_at", { ascending: false });
       
-      setParticipants(participantsData || []);
+      // Add demo emails for participants
+      if (participantsData) {
+        const participantsWithEmails = participantsData.map(participant => ({
+          ...participant,
+          email: `${(participant.users?.first_name || 'demo').toLowerCase()}.${(participant.users?.last_name || 'user').toLowerCase()}@demo.com`
+        }));
+        setParticipants(participantsWithEmails);
+      } else {
+        setParticipants([]);
+      }
     } catch (error: any) {
       toast.error("Failed to delete participant: " + error.message);
     } finally {
@@ -363,7 +401,16 @@ export default function ManageParticipants() {
                         .eq("game_id", gameId)
                         .order("created_at", { ascending: false });
                       
-                      setParticipants(participantsData || []);
+                      // Add demo emails for participants
+                      if (participantsData) {
+                        const participantsWithEmails = participantsData.map(participant => ({
+                          ...participant,
+                          email: `${(participant.users?.first_name || 'demo').toLowerCase()}.${(participant.users?.last_name || 'user').toLowerCase()}@demo.com`
+                        }));
+                        setParticipants(participantsWithEmails);
+                      } else {
+                        setParticipants([]);
+                      }
                     };
                     refreshData();
                   }}
@@ -473,6 +520,7 @@ export default function ManageParticipants() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Name</TableHead>
+                  <TableHead>Email</TableHead>
                   <TableHead>Role</TableHead>
                   <TableHead>Initial Budget</TableHead>
                   <TableHead>Current Cash</TableHead>
@@ -486,6 +534,9 @@ export default function ManageParticipants() {
                   <TableRow key={participant.id}>
                     <TableCell className="font-medium">
                       {participant.users?.first_name || "Demo"} {participant.users?.last_name || "User"}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {participant.email}
                     </TableCell>
                     <TableCell>
                       {getRoleBadge(participant.role)}
