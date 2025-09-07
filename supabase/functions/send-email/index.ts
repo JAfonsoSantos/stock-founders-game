@@ -110,7 +110,7 @@ const handler = async (req: Request): Promise<Response> => {
     const html = await renderAsync(template);
 
     const emailResponse = await resend.emails.send({
-      from: "Startup Stock Market <noreply@lovableproject.com>",
+      from: "Startup Stock Market <onboarding@resend.dev>",
       to: emailRequest.to,
       subject: subject,
       html: html,
