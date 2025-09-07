@@ -9,12 +9,13 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Plus, UserPlus, Mail, Trash2, Edit, RotateCcw } from "lucide-react";
+import { Loader2, Plus, UserPlus, Mail, Trash2, Edit, RotateCcw, QrCode } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { sendInviteEmail } from "@/lib/email";
 import CSVParticipantImport from "@/components/CSVParticipantImport";
+import { QRCode } from "@/components/QRCode";
 
 export default function ManageParticipants() {
   const { gameId } = useParams();
@@ -43,6 +44,7 @@ export default function ManageParticipants() {
     budget: 0
   });
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [showQRCode, setShowQRCode] = useState(false);
 
   useEffect(() => {
     if (!user || !gameId) return;
@@ -389,6 +391,8 @@ export default function ManageParticipants() {
     return <Badge variant={colors[role] || "default"}>{role.toUpperCase()}</Badge>;
   };
 
+  const joinUrl = `https://stox.games/join/${gameId}`;
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -414,7 +418,15 @@ export default function ManageParticipants() {
               </Button>
               
               <div className="flex space-x-2">
-                <CSVParticipantImport 
+                <Button
+                  variant="outline"
+                  onClick={() => setShowQRCode(!showQRCode)}
+                >
+                  <QrCode className="w-4 h-4 mr-2" />
+                  {showQRCode ? "Hide" : "Show"} QR Code
+                </Button>
+                
+                <CSVParticipantImport
                   gameId={gameId!}
                   gameRoles={gameRoles}
                   onImportComplete={() => {
@@ -543,6 +555,18 @@ export default function ManageParticipants() {
             </div>
           </div>
         </div>
+
+        {/* QR Code Section */}
+        {showQRCode && (
+          <div className="mb-8">
+            <QRCode
+              url={joinUrl}
+              title="Game Invitation QR Code"
+              size={250}
+              className="max-w-sm mx-auto"
+            />
+          </div>
+        )}
 
         <Card>
             <CardHeader>

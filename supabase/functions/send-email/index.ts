@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@4.0.0";
 import { renderAsync } from "npm:@react-email/components@0.0.22";
 import React from "npm:react@18.3.1";
+import QRCode from "npm:qrcode@1.5.4";
 import { InviteEmail } from "./templates/invite.tsx";
 import { MarketOpenEmail } from "./templates/market-open.tsx";
 import { LastMinutesEmail } from "./templates/last-minutes.tsx";
@@ -37,11 +38,28 @@ const handler = async (req: Request): Promise<Response> => {
 
     switch (emailRequest.type) {
       case 'invite':
+        // Generate QR code for invite
+        let qrCodeBase64 = '';
+        try {
+          const joinUrl = emailRequest.data?.joinUrl || `https://stox.games/join/${emailRequest.gameId}`;
+          qrCodeBase64 = await QRCode.toDataURL(joinUrl, {
+            width: 200,
+            margin: 2,
+            color: {
+              dark: '#000000',
+              light: '#FFFFFF'
+            }
+          });
+        } catch (qrError) {
+          console.error('Error generating QR code:', qrError);
+        }
+
         template = React.createElement(InviteEmail, {
           gameName: emailRequest.gameName,
           gameId: emailRequest.gameId,
           locale: emailRequest.locale || 'en',
-          joinUrl: emailRequest.data?.joinUrl || `${Deno.env.get('SUPABASE_URL')}/join/${emailRequest.gameId}`
+          joinUrl: emailRequest.data?.joinUrl || `https://stox.games/join/${emailRequest.gameId}`,
+          qrCodeBase64: qrCodeBase64
         });
         subject = emailRequest.locale === 'pt' 
           ? `Convite para ${emailRequest.gameName}` 

@@ -18,9 +18,10 @@ interface InviteEmailProps {
   gameId: string;
   joinUrl: string;
   locale: string;
+  qrCodeBase64?: string;
 }
 
-export const InviteEmail = ({ gameName, gameId, joinUrl, locale }: InviteEmailProps) => {
+export const InviteEmail = ({ gameName, gameId, joinUrl, locale, qrCodeBase64 }: InviteEmailProps) => {
   const isPortuguese = locale === 'pt';
   
   return (
@@ -85,6 +86,25 @@ export const InviteEmail = ({ gameName, gameId, joinUrl, locale }: InviteEmailPr
               {isPortuguese ? '🚀 Juntar-se ao Jogo' : '🚀 Join the Game'}
             </Button>
           </Section>
+          
+          {qrCodeBase64 && (
+            <Section style={qrSection}>
+              <Text style={qrText}>
+                {isPortuguese 
+                  ? 'Ou escaneie este QR code:'
+                  : 'Or scan this QR code:'}
+              </Text>
+              <div style={{ textAlign: 'center' }}>
+                <Img
+                  src={qrCodeBase64}
+                  alt="QR Code para participar do jogo"
+                  width="200"
+                  height="200"
+                  style={qrImage}
+                />
+              </div>
+            </Section>
+          )}
           
           <Text style={smallText}>
             {isPortuguese 
@@ -188,4 +208,25 @@ const footer = {
   lineHeight: "22px",
   margin: "32px 32px 0",
   textAlign: "center" as const,
+};
+
+const qrSection = {
+  textAlign: "center" as const,
+  margin: "32px 0",
+  padding: "24px",
+  backgroundColor: "#f9fafb",
+  borderRadius: "8px",
+};
+
+const qrText = {
+  color: "#374151",
+  fontSize: "16px",
+  lineHeight: "26px",
+  margin: "0 0 16px 0",
+  fontWeight: "600",
+};
+
+const qrImage = {
+  border: "2px solid #e5e7eb",
+  borderRadius: "8px",
 };
