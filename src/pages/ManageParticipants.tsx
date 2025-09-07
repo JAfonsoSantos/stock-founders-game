@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, Plus, UserPlus, Mail, Trash2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { sendInviteEmail } from "@/lib/email";
 import CSVParticipantImport from "@/components/CSVParticipantImport";
 
 export default function ManageParticipants() {
@@ -31,6 +32,7 @@ export default function ManageParticipants() {
     budget: 0
   });
   const [addLoading, setAddLoading] = useState(false);
+  const [sendingInvites, setSendingInvites] = useState(false);
 
   useEffect(() => {
     if (!user || !gameId) return;
@@ -125,7 +127,16 @@ export default function ManageParticipants() {
         return;
       }
 
-      toast.success(`Participant added! In a real app, an invitation would be sent to ${newParticipant.email}`);
+      // Send invitation email (demo: sends to game owner's email)
+      try {
+        const testEmail = user?.email || 'test@example.com';
+        await sendInviteEmail([testEmail], gameId!, gameInfo.name, gameInfo.locale);
+        toast.success(`Participant added! Demo invitation sent to ${testEmail} (would be sent to ${newParticipant.email} in production)`);
+      } catch (emailError) {
+        console.error('Email sending failed:', emailError);
+        toast.success(`Participant added! (Note: Email invitation failed to send)`);
+      }
+      
       setShowAddModal(false);
       setNewParticipant({
         email: "",
@@ -153,6 +164,26 @@ export default function ManageParticipants() {
       toast.error("Failed to add participant");
     } finally {
       setAddLoading(false);
+    }
+  };
+
+  const sendInvitesToAll = async () => {
+    if (!gameInfo || participants.length === 0) return;
+
+    setSendingInvites(true);
+    try {
+      // For demo participants, we'll use a test email or the game owner's email
+      // In a real app, you'd have actual participant emails stored
+      const testEmail = user?.email || 'test@example.com';
+      const emails = [testEmail]; // Using owner's email as demo
+
+      await sendInviteEmail(emails, gameId!, gameInfo.name, gameInfo.locale);
+      toast.success(`Demo invitation sent to ${testEmail}! (In production, would send to all ${participants.length} participants)`);
+    } catch (error) {
+      console.error('Failed to send invitations:', error);
+      toast.error("Failed to send invitations");
+    } finally {
+      setSendingInvites(false);
     }
   };
 
@@ -217,6 +248,15 @@ export default function ManageParticipants() {
                     refreshData();
                   }}
                 />
+                
+                <Button 
+                  onClick={sendInvitesToAll}
+                  disabled={sendingInvites || participants.length === 0}
+                  variant="outline"
+                >
+                  <Mail className="w-4 h-4 mr-2" />
+                  {sendingInvites ? "Sending..." : "Send Invites"}
+                </Button>
                 
                 <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
                   <DialogTrigger asChild>
