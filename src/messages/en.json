@@ -1,0 +1,123 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "submit": "Submit",
+    "search": "Search",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "success": "Success",
+    "error": "Error",
+    "warning": "Warning"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "email": "Email",
+    "signInWithEmail": "Sign in with email",
+    "checkEmail": "Check your email for the magic link!",
+    "welcome": "Welcome to Startup Stock Market"
+  },
+  "game": {
+    "title": "Game",
+    "create": "Create Game",
+    "name": "Game Name",
+    "currency": "Currency",
+    "language": "Language",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "status": {
+      "draft": "Draft",
+      "preMarket": "Pre Market",
+      "open": "Open",
+      "closed": "Closed",
+      "results": "Results"
+    },
+    "allowSecondary": "Allow Secondary Trading",
+    "showPublicLeaderboards": "Show Public Leaderboards",
+    "circuitBreaker": "Circuit Breaker",
+    "maxPricePerShare": "Max Price Per Share"
+  },
+  "startup": {
+    "title": "Startup",
+    "name": "Name",
+    "description": "Description",
+    "website": "Website",
+    "linkedin": "LinkedIn",
+    "logo": "Logo",
+    "totalShares": "Total Shares",
+    "sharesRemaining": "Shares Remaining",
+    "marketCap": "Market Cap",
+    "lastPrice": "Last Price",
+    "vwapPrice": "VWAP Price"
+  },
+  "trading": {
+    "invest": "Invest",
+    "sell": "Sell",
+    "buy": "Buy",
+    "quantity": "Quantity",
+    "pricePerShare": "Price Per Share",
+    "totalCost": "Total Cost",
+    "balance": "Balance",
+    "portfolio": "Portfolio",
+    "positions": "Positions",
+    "trades": "Trades",
+    "orders": "Orders",
+    "pending": "Pending",
+    "accepted": "Accepted",
+    "rejected": "Rejected",
+    "primaryMarket": "Primary Market",
+    "secondaryMarket": "Secondary Market"
+  },
+  "participant": {
+    "role": {
+      "founder": "Founder",
+      "angel": "Angel",
+      "vc": "VC",
+      "organizer": "Organizer"
+    },
+    "budget": "Budget",
+    "currentCash": "Current Cash",
+    "invested": "Invested",
+    "totalValue": "Total Value",
+    "roi": "ROI"
+  },
+  "leaderboard": {
+    "title": "Leaderboard",
+    "topStartups": "Top Startups",
+    "topAngels": "Top Angels",
+    "topVCs": "Top VCs",
+    "rank": "Rank",
+    "value": "Value",
+    "change": "Change"
+  },
+  "email": {
+    "invite": {
+      "subject": "You're invited to join Startup Stock Market",
+      "title": "Game Invitation",
+      "message": "You've been invited to participate in a startup stock market game.",
+      "joinButton": "Join Game"
+    },
+    "marketOpen": {
+      "subject": "Market is now open!",
+      "title": "Trading Started",
+      "message": "The market is now open for trading. Start investing in your favorite startups!"
+    },
+    "lastMinutes": {
+      "subject": "Last 10 minutes of trading!",
+      "title": "Hurry Up!",
+      "message": "Only 10 minutes left to make your final trades."
+    },
+    "results": {
+      "subject": "Game Results",
+      "title": "Final Results",
+      "message": "Here are the final results of the startup stock market game."
+    }
+  }
+}

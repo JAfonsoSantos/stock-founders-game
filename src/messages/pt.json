@@ -1,0 +1,123 @@
+{
+  "common": {
+    "loading": "Carregando...",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "Criar",
+    "submit": "Submeter",
+    "search": "Pesquisar",
+    "back": "Voltar",
+    "next": "Seguinte",
+    "previous": "Anterior",
+    "close": "Fechar",
+    "success": "Sucesso",
+    "error": "Erro",
+    "warning": "Aviso"
+  },
+  "auth": {
+    "signIn": "Entrar",
+    "signOut": "Sair",
+    "email": "Email",
+    "signInWithEmail": "Entrar com email",
+    "checkEmail": "Verifique o seu email para o link mágico!",
+    "welcome": "Bem-vindo ao Startup Stock Market"
+  },
+  "game": {
+    "title": "Jogo",
+    "create": "Criar Jogo",
+    "name": "Nome do Jogo",
+    "currency": "Moeda",
+    "language": "Idioma",
+    "startDate": "Data de Início",
+    "endDate": "Data de Fim",
+    "status": {
+      "draft": "Rascunho",
+      "preMarket": "Pré-mercado",
+      "open": "Aberto",
+      "closed": "Fechado",
+      "results": "Resultados"
+    },
+    "allowSecondary": "Permitir Trading Secundário",
+    "showPublicLeaderboards": "Mostrar Leaderboards Públicos",
+    "circuitBreaker": "Circuit Breaker",
+    "maxPricePerShare": "Preço Máximo por Ação"
+  },
+  "startup": {
+    "title": "Startup",
+    "name": "Nome",
+    "description": "Descrição",
+    "website": "Website",
+    "linkedin": "LinkedIn",
+    "logo": "Logo",
+    "totalShares": "Total de Ações",
+    "sharesRemaining": "Ações Restantes",
+    "marketCap": "Capitalização de Mercado",
+    "lastPrice": "Último Preço",
+    "vwapPrice": "Preço VWAP"
+  },
+  "trading": {
+    "invest": "Investir",
+    "sell": "Vender",
+    "buy": "Comprar",
+    "quantity": "Quantidade",
+    "pricePerShare": "Preço por Ação",
+    "totalCost": "Custo Total",
+    "balance": "Saldo",
+    "portfolio": "Portfólio",
+    "positions": "Posições",
+    "trades": "Negócios",
+    "orders": "Ordens",
+    "pending": "Pendente",
+    "accepted": "Aceite",
+    "rejected": "Rejeitado",
+    "primaryMarket": "Mercado Primário",
+    "secondaryMarket": "Mercado Secundário"
+  },
+  "participant": {
+    "role": {
+      "founder": "Fundador",
+      "angel": "Angel",
+      "vc": "VC",
+      "organizer": "Organizador"
+    },
+    "budget": "Orçamento",
+    "currentCash": "Dinheiro Atual",
+    "invested": "Investido",
+    "totalValue": "Valor Total",
+    "roi": "ROI"
+  },
+  "leaderboard": {
+    "title": "Classificação",
+    "topStartups": "Top Startups",
+    "topAngels": "Top Angels",
+    "topVCs": "Top VCs",
+    "rank": "Posição",
+    "value": "Valor",
+    "change": "Mudança"
+  },
+  "email": {
+    "invite": {
+      "subject": "Foi convidado para se juntar ao Startup Stock Market",
+      "title": "Convite para o Jogo",
+      "message": "Foi convidado para participar num jogo de mercado bolsista de startups.",
+      "joinButton": "Juntar-se ao Jogo"
+    },
+    "marketOpen": {
+      "subject": "O mercado está agora aberto!",
+      "title": "Trading Iniciado",
+      "message": "O mercado está agora aberto para trading. Comece a investir nas suas startups favoritas!"
+    },
+    "lastMinutes": {
+      "subject": "Últimos 10 minutos de trading!",
+      "title": "Depressa!",
+      "message": "Apenas 10 minutos restantes para fazer as suas negociações finais."
+    },
+    "results": {
+      "subject": "Resultados do Jogo",
+      "title": "Resultados Finais",
+      "message": "Aqui estão os resultados finais do jogo de mercado bolsista de startups."
+    }
+  }
+}
