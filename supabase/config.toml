@@ -49,14 +49,16 @@ site_url = "https://stox.games"
 additional_redirect_urls = ["https://127.0.0.1:3000", "https://stox.games"]
 jwt_expiry = 3600
 enable_signup = true
-enable_email_confirmations = false
+enable_email_confirmations = true
 enable_sms_confirmations = false
+password_min_length = 8
+enable_leaked_password_protection = true
 
 [functions.send-email]
-verify_jwt = false
+verify_jwt = true
 
 [functions.merge-accounts]
-verify_jwt = false
+verify_jwt = true
 
 [functions.fetch-website]
-verify_jwt = false
+verify_jwt = true
