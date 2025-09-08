@@ -57,3 +57,6 @@ verify_jwt = false
 
 [functions.merge-accounts]
 verify_jwt = false
+
+[functions.fetch-website]
+verify_jwt = false

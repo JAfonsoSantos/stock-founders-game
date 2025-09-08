@@ -33,6 +33,7 @@ export default function ManageStartups() {
   const [startups, setStartups] = useState<Startup[]>([]);
   const [loading, setLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
+  const [isScrapingLinkedIn, setIsScrapingLinkedIn] = useState(false);
   const [newStartup, setNewStartup] = useState({
     slug: "",
     name: "",
@@ -142,6 +143,90 @@ export default function ManageStartups() {
       });
     } finally {
       setIsCreating(false);
+    }
+  };
+
+  const handleAutoFillFromLinkedIn = async () => {
+    if (!newStartup.linkedin.trim()) {
+      toast({
+        variant: "destructive",
+        title: "No LinkedIn URL",
+        description: "Please enter a LinkedIn URL first",
+      });
+      return;
+    }
+
+    setIsScrapingLinkedIn(true);
+    
+    try {
+      // Use Supabase edge function to fetch LinkedIn content
+      const { data, error } = await supabase.functions.invoke('fetch-website', {
+        body: {
+          url: newStartup.linkedin,
+          formats: 'markdown'
+        }
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      const content = data.markdown || '';
+      
+      // Simple extraction logic for LinkedIn content
+      const lines = content.split('\n').filter(line => line.trim());
+      
+      let extractedName = '';
+      let extractedDescription = '';
+      
+      // Find company name (usually in the first few lines or as a heading)
+      for (let i = 0; i < Math.min(10, lines.length); i++) {
+        const line = lines[i].trim();
+        if (line.match(/^#+ /)) {
+          extractedName = line.replace(/^#+ /, '').trim();
+          break;
+        }
+        if (line && !line.startsWith('[') && !line.startsWith('http') && line.length < 100 && line.length > 3) {
+          extractedName = line;
+          break;
+        }
+      }
+      
+      // Find description (look for longer paragraphs)
+      for (const line of lines) {
+        if (line.length > 50 && line.length < 500 && !line.startsWith('[') && !line.startsWith('http')) {
+          extractedDescription = line.trim();
+          break;
+        }
+      }
+      
+      if (extractedName || extractedDescription) {
+        setNewStartup(prev => ({
+          ...prev,
+          name: extractedName || prev.name,
+          slug: extractedName ? generateSlug(extractedName) : prev.slug,
+          description: extractedDescription || prev.description
+        }));
+        
+        toast({
+          title: "Success",
+          description: "Startup information auto-filled from LinkedIn",
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "No data found",
+          description: "Could not extract startup information from LinkedIn. Please fill manually.",
+        });
+      }
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to fetch LinkedIn data: " + error.message,
+      });
+    } finally {
+      setIsScrapingLinkedIn(false);
     }
   };
 
@@ -258,12 +343,22 @@ export default function ManageStartups() {
                   </div>
                   <div>
                     <Label htmlFor="linkedin">LinkedIn</Label>
-                    <Input
-                      id="linkedin"
-                      value={newStartup.linkedin}
-                      onChange={(e) => setNewStartup(prev => ({ ...prev, linkedin: e.target.value }))}
-                      placeholder="https://linkedin.com/company/startup"
-                    />
+                    <div className="flex gap-2">
+                      <Input
+                        id="linkedin"
+                        value={newStartup.linkedin}
+                        onChange={(e) => setNewStartup(prev => ({ ...prev, linkedin: e.target.value }))}
+                        placeholder="https://linkedin.com/company/startup"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleAutoFillFromLinkedIn}
+                        disabled={isScrapingLinkedIn || !newStartup.linkedin.trim()}
+                      >
+                        {isScrapingLinkedIn ? "Fetching..." : "Auto-fill"}
+                      </Button>
+                    </div>
                   </div>
                   <div>
                     <Label htmlFor="shares">Total Shares</Label>
