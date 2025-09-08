@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { syncUserProfile } from '@/utils/syncUserProfile';
 
 interface UserProfile {
   id: string;
@@ -28,6 +29,9 @@ export function useUserProfile(user: User | null) {
     if (!user) return;
 
     try {
+      // First try to sync user profile from user_metadata (especially for Google OAuth users)
+      await syncUserProfile(user);
+
       const { data, error } = await supabase
         .from('users')
         .select('id, first_name, last_name, email, avatar_url')
@@ -45,40 +49,18 @@ export function useUserProfile(user: User | null) {
           avatar_url: user.user_metadata?.avatar_url || user.user_metadata?.picture || null
         });
       } else if (data) {
-        // Merge database profile with auth metadata for better coverage
-        setProfile({
-          id: data.id,
-          first_name: data.first_name || user.user_metadata?.first_name || user.user_metadata?.full_name?.split(' ')[0] || null,
-          last_name: data.last_name || user.user_metadata?.last_name || user.user_metadata?.full_name?.split(' ').slice(1).join(' ') || null,
-          email: data.email || user.email || null,
-          avatar_url: data.avatar_url || user.user_metadata?.avatar_url || user.user_metadata?.picture || null
-        });
+        // Use database profile (which should now be synced with Google data)
+        setProfile(data);
       } else {
-        // No profile found, create one from auth data
-        const newProfile = {
+        // This shouldn't happen after sync, but as a fallback
+        const fallbackProfile = {
           id: user.id,
           first_name: user.user_metadata?.first_name || user.user_metadata?.full_name?.split(' ')[0] || null,
           last_name: user.user_metadata?.last_name || user.user_metadata?.full_name?.split(' ').slice(1).join(' ') || null,
           email: user.email || null,
           avatar_url: user.user_metadata?.avatar_url || user.user_metadata?.picture || null
         };
-
-        // Try to create profile in database
-        try {
-          const { error: insertError } = await supabase
-            .from('users')
-            .insert([newProfile]);
-          
-          if (!insertError) {
-            setProfile(newProfile);
-          } else {
-            console.error('Error creating profile:', insertError);
-            setProfile(newProfile); // Still use the data even if insert failed
-          }
-        } catch (err) {
-          console.error('Error creating profile:', err);
-          setProfile(newProfile);
-        }
+        setProfile(fallbackProfile);
       }
     } catch (error) {
       console.error('Error in fetchProfile:', error);
