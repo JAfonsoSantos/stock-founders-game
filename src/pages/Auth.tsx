@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { PasswordStrengthIndicator } from "@/components/PasswordStrengthIndicator";
 
 export default function Auth() {
   const [email, setEmail] = useState("");
@@ -263,6 +264,7 @@ export default function Auth() {
                         )}
                       </Button>
                     </div>
+                    <PasswordStrengthIndicator password={password} className="mt-2" />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="confirm-new-password" className="text-sm font-medium">Confirmar Password</Label>
