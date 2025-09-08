@@ -80,15 +80,11 @@ const handler = async (req: Request): Promise<Response> => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Check if user exists
-    const { data: users, error: userError } = await supabase
-      .from('auth.users')
-      .select('id, email')
-      .eq('email', email)
-      .limit(1);
+    // Check if user exists using Admin API (avoid querying auth schema via REST)
+    const { data: userData, error: userError } = await supabase.auth.admin.getUserByEmail(email);
 
     if (userError) {
-      console.error('Error checking user:', userError);
+      console.error('Error checking user via Admin API:', userError);
       return new Response(
         JSON.stringify({ error: 'Failed to check user existence' }), 
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -96,7 +92,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // If user doesn't exist, let normal signup flow handle it
-    if (!users || users.length === 0) {
+    if (!userData || !userData.user) {
       return new Response(
         JSON.stringify({ userExists: false }), 
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -131,7 +127,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send email
     const { error: emailError } = await resend.emails.send({
-      from: 'Stox <noreply@stox.games>',
+      from: 'Stox <onboarding@resend.dev>',
       to: [email],
       subject: '🔐 Já tens conta no Stox - Link mágico para entrar',
       html: emailHtml,
