@@ -275,7 +275,7 @@ export default function Dashboard() {
       {/* Header */}
       <header className="border-b">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Startup Stock Market</h1>
+          <h1 className="text-2xl font-bold">Stox</h1>
           <div className="flex items-center gap-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -332,7 +332,7 @@ export default function Dashboard() {
                       Try our Demo Game!
                     </h4>
                     <p className="text-sm text-muted-foreground">
-                      Experience the full Startup Stock Market with pre-configured startups and demo data.
+                      Experience the full Stox with pre-configured startups and demo data.
                     </p>
                   </div>
                   <Button onClick={createDemoGame} className="shrink-0">

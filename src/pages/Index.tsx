@@ -160,7 +160,7 @@ export default function Index() {
       {/* Footer */}
       <footer className="container mx-auto px-4 py-12 border-t border-border/50">
         <div className="text-center">
-          <h3 className="text-2xl font-bold text-primary mb-4">Startup Stock Market</h3>
+          <h3 className="text-2xl font-bold text-primary mb-4">Stox</h3>
           <p className="text-muted-foreground mb-6">
             Transformando eventos em experiências de investimento memoráveis
           </p>

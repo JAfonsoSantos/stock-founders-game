@@ -160,7 +160,7 @@ export default function CreateGame() {
             <CardHeader>
               <CardTitle>Game Setup</CardTitle>
               <CardDescription>
-                Configure your startup stock market game
+                Configure your Stox game
               </CardDescription>
             </CardHeader>
             <CardContent>

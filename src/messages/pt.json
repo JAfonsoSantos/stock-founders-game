@@ -22,7 +22,7 @@
     "email": "Email",
     "signInWithEmail": "Entrar com email",
     "checkEmail": "Verifique o seu email para o link mágico!",
-    "welcome": "Bem-vindo ao Startup Stock Market"
+    "welcome": "Bem-vindo ao Stox"
   },
   "game": {
     "title": "Jogo",
@@ -99,7 +99,7 @@
   },
   "email": {
     "invite": {
-      "subject": "Foi convidado para se juntar ao Startup Stock Market",
+      "subject": "Foi convidado para se juntar ao Stox",
       "title": "Convite para o Jogo",
       "message": "Foi convidado para participar num jogo de mercado bolsista de startups.",
       "joinButton": "Juntar-se ao Jogo"

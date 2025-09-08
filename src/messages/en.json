@@ -22,7 +22,7 @@
     "email": "Email",
     "signInWithEmail": "Sign in with email",
     "checkEmail": "Check your email for the magic link!",
-    "welcome": "Welcome to Startup Stock Market"
+    "welcome": "Welcome to Stox"
   },
   "game": {
     "title": "Game",
@@ -99,7 +99,7 @@
   },
   "email": {
     "invite": {
-      "subject": "You're invited to join Startup Stock Market",
+      "subject": "You're invited to join Stox",
       "title": "Game Invitation",
       "message": "You've been invited to participate in a startup stock market game.",
       "joinButton": "Join Game"
