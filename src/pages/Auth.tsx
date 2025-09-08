@@ -141,6 +141,15 @@ export default function Auth() {
           title: "Conta criada",
           description: "Verifica o teu email para confirmar a conta. Se não encontrares, verifica o Spam.",
         });
+        
+        // Wait a bit and suggest login if no email received
+        setTimeout(() => {
+          toast({
+            title: "Não recebeste o email?",
+            description: "Se o email já estiver registado, usa 'Tenho password' para entrar.",
+            variant: "default",
+          });
+        }, 8000);
       }
     } catch (error) {
       toast({
