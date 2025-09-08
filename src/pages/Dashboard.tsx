@@ -29,7 +29,7 @@ interface Participation {
   games: Game;
 }
 
-import { MergeAccountsButton } from "@/components/MergeAccountsButton";
+import { mergeAccounts } from "@/utils/mergeAccounts";
 
 export default function Dashboard() {
   const { user, signOut } = useAuth();
@@ -41,9 +41,29 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (user) {
-      fetchData();
+      autoMergeAndFetchData();
     }
   }, [user]);
+
+  const autoMergeAndFetchData = async () => {
+    try {
+      // Silently merge accounts in background
+      if (user?.email) {
+        try {
+          await mergeAccounts(user.id, user.email);
+        } catch (error) {
+          // Silently fail - this is not critical
+          console.log("Auto-merge not needed or failed:", error);
+        }
+      }
+      
+      // Fetch data after merge
+      await fetchData();
+    } catch (error: any) {
+      toast.error("Failed to load data: " + error.message);
+      setLoading(false);
+    }
+  };
 
   const fetchData = async () => {
     try {
@@ -255,7 +275,6 @@ export default function Dashboard() {
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold">Startup Stock Market</h1>
           <div className="flex items-center gap-4">
-            <MergeAccountsButton />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="flex items-center gap-2 p-2">
