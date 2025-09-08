@@ -85,13 +85,13 @@ export default function Profile() {
       const filePath = `avatars/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
-        .from('startup-logos')
+        .from('avatars')
         .upload(filePath, avatarFile);
 
       if (uploadError) throw uploadError;
 
       const { data: { publicUrl } } = supabase.storage
-        .from('startup-logos')
+        .from('avatars')
         .getPublicUrl(filePath);
 
       return publicUrl;
