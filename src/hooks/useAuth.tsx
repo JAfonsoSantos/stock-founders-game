@@ -41,7 +41,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signIn = async (email: string) => {
-    const redirectUrl = `https://stox.games/`;
+    const redirectUrl = `${window.location.origin}/`;
     
     const { error } = await supabase.auth.signInWithOtp({
       email,
@@ -61,7 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signUp = async (email: string, password: string) => {
-    const redirectUrl = `https://stox.games/`;
+    const redirectUrl = `${window.location.origin}/`;
     
     const { error } = await supabase.auth.signUp({
       email,

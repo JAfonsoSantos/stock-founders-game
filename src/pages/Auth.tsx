@@ -10,6 +10,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { PasswordStrengthIndicator } from "@/components/PasswordStrengthIndicator";
+import { validateEmail } from "@/lib/validation";
 
 export default function Auth() {
   const [email, setEmail] = useState("");
@@ -26,6 +27,16 @@ export default function Auth() {
 
   const handleMagicLink = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!validateEmail(email)) {
+      toast({
+        variant: "destructive",
+        title: "Email inválido",
+        description: "Escreve um email completo (ex: nome@dominio.com).",
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -40,7 +51,7 @@ export default function Auth() {
       } else {
         toast({
           title: "Verifica o teu email",
-          description: "Enviámos-te um link mágico para entrares.",
+          description: "Enviámos-te um link mágico. Se não encontrares, verifica o Spam.",
         });
       }
     } catch (error) {
@@ -86,7 +97,24 @@ export default function Auth() {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+
+    if (!validateEmail(email)) {
+      toast({
+        variant: "destructive",
+        title: "Email inválido",
+        description: "Escreve um email completo (ex: nome@dominio.com).",
+      });
+      return;
+    }
+
+    if (password.length < 8) {
+      toast({
+        variant: "destructive",
+        title: "Password muito curta",
+        description: "A password deve ter pelo menos 8 caracteres.",
+      });
+      return;
+    }
 
     if (password !== confirmPassword) {
       toast({
@@ -94,9 +122,10 @@ export default function Auth() {
         title: "Erro",
         description: "As passwords não coincidem.",
       });
-      setLoading(false);
       return;
     }
+
+    setLoading(true);
 
     try {
       const { error } = await signUp(email, password);
@@ -110,7 +139,7 @@ export default function Auth() {
       } else {
         toast({
           title: "Conta criada",
-          description: "Verifica o teu email para confirmar a conta.",
+          description: "Verifica o teu email para confirmar a conta. Se não encontrares, verifica o Spam.",
         });
       }
     } catch (error) {
@@ -241,12 +270,12 @@ export default function Auth() {
                       <Input
                         id="new-password"
                         type={showPassword ? "text" : "password"}
-                        placeholder="Mínimo 6 caracteres"
+                        placeholder="Mínimo 8 caracteres"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         className="h-12 text-base pr-12"
                         required
-                        minLength={6}
+                        minLength={8}
                       />
                       <Button
                         type="button"
