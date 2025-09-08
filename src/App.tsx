@@ -5,9 +5,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { I18nProvider } from "@/hooks/useI18n";
+import { SettingsProvider } from "@/hooks/useSettings";
+import { ThemeProvider } from "next-themes";
 import Dashboard from "./pages/Dashboard";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
 import CreateGame from "./pages/CreateGame";
 import GameOrganizer from "./pages/GameOrganizer";
 import ManageParticipants from "./pages/ManageParticipants";
@@ -61,9 +64,11 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <I18nProvider>
-      <AuthProvider>
-        <TooltipProvider>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <I18nProvider>
+        <AuthProvider>
+          <SettingsProvider>
+            <TooltipProvider>
           <Toaster />
           <Sonner />
           <BrowserRouter>
@@ -85,7 +90,7 @@ const App = () => (
             } />
             <Route path="/settings" element={
               <ProtectedRoute>
-                <Profile />
+                <Settings />
               </ProtectedRoute>
             } />
             <Route path="/games/new" element={
@@ -142,11 +147,13 @@ const App = () => (
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
-  </I18nProvider>
-</QueryClientProvider>
+         </BrowserRouter>
+           </TooltipProvider>
+         </SettingsProvider>
+       </AuthProvider>
+     </I18nProvider>
+   </ThemeProvider>
+ </QueryClientProvider>
 );
 
 export default App;
