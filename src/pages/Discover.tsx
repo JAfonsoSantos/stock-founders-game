@@ -125,14 +125,14 @@ export default function Discover() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className="min-h-screen bg-background p-3 sm:p-6">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold">Discover Startups</h1>
-          <p className="text-muted-foreground mt-2">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold">Discover Startups</h1>
+          <p className="text-muted-foreground mt-2 text-sm sm:text-base">
             Browse and invest in promising startups
           </p>
-          <div className="mt-4 flex gap-2">
+          <div className="mt-4 flex flex-wrap gap-2">
             <Button 
               variant="outline"
               onClick={() => navigate(`/games/${gameId}/me`)}
@@ -157,7 +157,7 @@ export default function Discover() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {startups.map((startup) => (
             <Card key={startup.id} className="hover:shadow-lg transition-shadow">
               <CardHeader className="pb-3">

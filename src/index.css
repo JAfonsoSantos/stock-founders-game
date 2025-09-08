@@ -171,3 +171,32 @@ body.compact-mode .space-y-6 > * + * {
 body.compact-mode .space-y-8 > * + * {
   margin-top: 1.25rem;
 }
+
+/* Mobile-specific improvements */
+@media (max-width: 640px) {
+  .dialog-content {
+    margin: 0.75rem;
+    width: calc(100vw - 1.5rem);
+    max-width: none;
+  }
+  
+  /* Larger touch targets on mobile */
+  .mobile-touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Better spacing for mobile */
+  .mobile-card-spacing > * + * {
+    margin-top: 0.75rem;
+  }
+  
+  /* Hide scrollbars on mobile tables while keeping functionality */
+  .mobile-table-scroll::-webkit-scrollbar {
+    display: none;
+  }
+  .mobile-table-scroll {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}

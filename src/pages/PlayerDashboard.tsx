@@ -11,6 +11,7 @@ import { Loader2, Wallet, TrendingUp, DollarSign, Activity, ArrowUpDown, Zap } f
 import { useToast } from "@/components/ui/use-toast";
 import { SecondaryTradeModal } from "@/components/SecondaryTradeModal";
 import { NotificationCenter } from "@/components/NotificationCenter";
+import { MobileTable, MobilePositionCard, MobileTradeCard } from "@/components/ui/mobile-table";
 import { usePositionUpdates, useStartupPriceUpdates } from "@/hooks/useRealtime";
 
 export default function PlayerDashboard() {
@@ -181,14 +182,14 @@ export default function PlayerDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className="min-h-screen bg-background p-3 sm:p-6">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold">My Portfolio</h1>
-          <p className="text-muted-foreground mt-2">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold">My Portfolio</h1>
+          <p className="text-muted-foreground mt-2 text-sm sm:text-base">
             Track your investments and performance
           </p>
-          <div className="mt-4 flex gap-2">
+          <div className="mt-4 flex flex-wrap gap-2">
             <Button 
               variant="outline"
               onClick={() => navigate(`/games/${gameId}/discover`)}
@@ -214,7 +215,7 @@ export default function PlayerDashboard() {
           )}
 
           {/* Summary Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Cash Balance</CardTitle>
@@ -273,79 +274,100 @@ export default function PlayerDashboard() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Startup</TableHead>
-                      <TableHead>Shares</TableHead>
-                      <TableHead>Avg Cost</TableHead>
-                      <TableHead>Current Price</TableHead>
-                      <TableHead>Market Value</TableHead>
-                      <TableHead>P&L</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {positions.map((position) => {
-                      const pnl = getPositionPnL(position);
-                      const pnlPercent = position.avg_cost > 0 ? (pnl / (position.qty_total * position.avg_cost)) * 100 : 0;
-                      
-                      return (
-                        <TableRow key={position.id}>
-                          <TableCell className="font-medium">
-                            <Button
-                              variant="link"
-                              className="p-0 h-auto font-medium flex items-center gap-2"
-                              onClick={() => navigate(`/games/${gameId}/startup/${position.startups.slug}`)}
-                            >
-                              {position.startups.name}
-                              {portfolioUpdates[position.id] && (
-                                <Zap className="h-3 w-3 text-yellow-500 animate-pulse" />
-                              )}
-                            </Button>
-                          </TableCell>
-                          <TableCell>{position.qty_total}</TableCell>
-                          <TableCell>{formatCurrency(position.avg_cost)}</TableCell>
-                          <TableCell className={`transition-colors ${
-                            portfolioUpdates[position.id] ? 'text-green-600 font-semibold' : ''
-                          }`}>
-                            {position.startups.last_vwap_price 
-                              ? formatCurrency(position.startups.last_vwap_price)
-                              : "No trades"
-                            }
-                          </TableCell>
-                          <TableCell className={`transition-colors ${
-                            portfolioUpdates[position.id] ? 'text-green-600 font-semibold' : ''
-                          }`}>
-                            {formatCurrency(getPositionValue(position))}
-                          </TableCell>
-                          <TableCell>
-                            <div className={`flex items-center ${pnl >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {formatCurrency(pnl)}
-                              {pnl !== 0 && (
-                                <span className="ml-1 text-xs">
-                                  ({pnlPercent >= 0 ? '+' : ''}{pnlPercent.toFixed(1)}%)
-                                </span>
-                              )}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            {gameAllowsSecondary && position.qty_total > 0 && (
+                {/* Desktop Table */}
+                <div className="hidden sm:block">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Startup</TableHead>
+                        <TableHead>Shares</TableHead>
+                        <TableHead>Avg Cost</TableHead>
+                        <TableHead>Current Price</TableHead>
+                        <TableHead>Market Value</TableHead>
+                        <TableHead>P&L</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {positions.map((position) => {
+                        const pnl = getPositionPnL(position);
+                        const pnlPercent = position.avg_cost > 0 ? (pnl / (position.qty_total * position.avg_cost)) * 100 : 0;
+                        
+                        return (
+                          <TableRow key={position.id}>
+                            <TableCell className="font-medium">
                               <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleSellClick(position)}
+                                variant="link"
+                                className="p-0 h-auto font-medium flex items-center gap-2"
+                                onClick={() => navigate(`/games/${gameId}/startup/${position.startups.slug}`)}
                               >
-                                <ArrowUpDown className="h-3 w-3 mr-1" />
-                                Vender
+                                {position.startups.name}
+                                {portfolioUpdates[position.id] && (
+                                  <Zap className="h-3 w-3 text-yellow-500 animate-pulse" />
+                                )}
                               </Button>
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
+                            </TableCell>
+                            <TableCell>{position.qty_total}</TableCell>
+                            <TableCell>{formatCurrency(position.avg_cost)}</TableCell>
+                            <TableCell className={`transition-colors ${
+                              portfolioUpdates[position.id] ? 'text-green-600 font-semibold' : ''
+                            }`}>
+                              {position.startups.last_vwap_price 
+                                ? formatCurrency(position.startups.last_vwap_price)
+                                : "No trades"
+                              }
+                            </TableCell>
+                            <TableCell className={`transition-colors ${
+                              portfolioUpdates[position.id] ? 'text-green-600 font-semibold' : ''
+                            }`}>
+                              {formatCurrency(getPositionValue(position))}
+                            </TableCell>
+                            <TableCell>
+                              <div className={`flex items-center ${pnl >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                {formatCurrency(pnl)}
+                                {pnl !== 0 && (
+                                  <span className="ml-1 text-xs">
+                                    ({pnlPercent >= 0 ? '+' : ''}{pnlPercent.toFixed(1)}%)
+                                  </span>
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              {gameAllowsSecondary && position.qty_total > 0 && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleSellClick(position)}
+                                >
+                                  <ArrowUpDown className="h-3 w-3 mr-1" />
+                                  Vender
+                                </Button>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </div>
+
+                {/* Mobile Cards */}
+                <MobileTable
+                  data={positions}
+                  renderItem={(position) => (
+                    <MobilePositionCard
+                      position={position}
+                      gameId={gameId}
+                      onSellClick={handleSellClick}
+                      formatCurrency={formatCurrency}
+                      getPositionValue={getPositionValue}
+                      getPositionPnL={getPositionPnL}
+                      portfolioUpdates={portfolioUpdates}
+                      gameAllowsSecondary={gameAllowsSecondary}
+                      navigate={navigate}
+                    />
+                  )}
+                />
                 
                 {positions.length === 0 && (
                   <div className="text-center py-8">
@@ -372,44 +394,59 @@ export default function PlayerDashboard() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Startup</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Shares</TableHead>
-                      <TableHead>Price</TableHead>
-                      <TableHead>Total</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {trades.map((trade) => {
-                      const isBuy = trade.buyer_participant_id === participant.id;
-                      
-                      return (
-                        <TableRow key={trade.id}>
-                          <TableCell>
-                            {new Date(trade.created_at).toLocaleDateString()}
-                          </TableCell>
-                          <TableCell className="font-medium">
-                            {trade.startups?.name}
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant={isBuy ? "default" : "secondary"}>
-                              {isBuy ? "Buy" : "Sell"}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>{trade.qty}</TableCell>
-                          <TableCell>{formatCurrency(trade.price_per_share)}</TableCell>
-                          <TableCell>
-                            {formatCurrency(trade.qty * trade.price_per_share)}
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
+                {/* Desktop Table */}
+                <div className="hidden sm:block">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Startup</TableHead>
+                        <TableHead>Type</TableHead>
+                        <TableHead>Shares</TableHead>
+                        <TableHead>Price</TableHead>
+                        <TableHead>Total</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {trades.map((trade) => {
+                        const isBuy = trade.buyer_participant_id === participant.id;
+                        
+                        return (
+                          <TableRow key={trade.id}>
+                            <TableCell>
+                              {new Date(trade.created_at).toLocaleDateString()}
+                            </TableCell>
+                            <TableCell className="font-medium">
+                              {trade.startups?.name}
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant={isBuy ? "default" : "secondary"}>
+                                {isBuy ? "Buy" : "Sell"}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>{trade.qty}</TableCell>
+                            <TableCell>{formatCurrency(trade.price_per_share)}</TableCell>
+                            <TableCell>
+                              {formatCurrency(trade.qty * trade.price_per_share)}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </div>
+
+                {/* Mobile Cards */}
+                <MobileTable
+                  data={trades}
+                  renderItem={(trade) => (
+                    <MobileTradeCard
+                      trade={trade}
+                      participant={participant}
+                      formatCurrency={formatCurrency}
+                    />
+                  )}
+                />
                 
                 {trades.length === 0 && (
                   <div className="text-center py-8">

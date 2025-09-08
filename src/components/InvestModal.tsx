@@ -67,7 +67,7 @@ export default function InvestModal({ startup, participant, gameId, onClose, onS
 
   return (
     <Dialog open onOpenChange={() => onClose()}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto mx-3 sm:mx-0">
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
             <TrendingUp className="h-5 w-5" />
