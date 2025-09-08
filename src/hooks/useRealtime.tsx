@@ -1,64 +1,108 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
-export function useRealtimeGame(gameId: string) {
-  const [gameData, setGameData] = useState<any>(null);
+interface RealtimeConfig {
+  table: string;
+  gameId?: string;
+  onUpdate?: (payload: any) => void;
+  onInsert?: (payload: any) => void;
+  onDelete?: (payload: any) => void;
+}
+
+export function useRealtimeSubscription(config: RealtimeConfig) {
+  const channelRef = useRef<any>(null);
 
   useEffect(() => {
-    if (!gameId) return;
+    // Create unique channel name
+    const channelName = `${config.table}_${config.gameId || 'global'}_${Date.now()}`;
+    
+    console.log(`Setting up realtime subscription for ${config.table}`, { gameId: config.gameId });
 
     const channel = supabase
-      .channel(`game:${gameId}`)
+      .channel(channelName)
       .on(
         'postgres_changes',
         {
           event: '*',
           schema: 'public',
-          table: 'games',
-          filter: `id=eq.${gameId}`
+          table: config.table,
+          filter: config.gameId ? `game_id=eq.${config.gameId}` : undefined
         },
         (payload) => {
-          console.log('Game update:', payload);
-          if (payload.eventType === 'UPDATE') {
-            setGameData(payload.new);
+          console.log(`Real-time update for ${config.table}:`, payload);
+          
+          switch (payload.eventType) {
+            case 'INSERT':
+              config.onInsert?.(payload);
+              break;
+            case 'UPDATE':
+              config.onUpdate?.(payload);
+              break;
+            case 'DELETE':
+              config.onDelete?.(payload);
+              break;
           }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log(`Realtime subscription status for ${config.table}:`, status);
+      });
+
+    channelRef.current = channel;
 
     return () => {
-      supabase.removeChannel(channel);
+      console.log(`Cleaning up realtime subscription for ${config.table}`);
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+      }
     };
-  }, [gameId]);
+  }, [config.table, config.gameId]);
 
-  return gameData;
+  return channelRef.current;
 }
 
-export function useRealtimeStartups(gameId: string) {
-  const [startups, setStartups] = useState<any[]>([]);
+// Hook for startup price updates
+export function useStartupPriceUpdates(gameId: string, onPriceUpdate: (startup: any) => void) {
+  return useRealtimeSubscription({
+    table: 'startups',
+    gameId,
+    onUpdate: (payload) => {
+      // Only trigger if VWAP price changed
+      if (payload.new.last_vwap_price !== payload.old.last_vwap_price) {
+        onPriceUpdate(payload.new);
+      }
+    }
+  });
+}
 
+// Hook for new trades
+export function useTradeUpdates(gameId: string, onNewTrade: (trade: any) => void) {
+  return useRealtimeSubscription({
+    table: 'trades',
+    gameId,
+    onInsert: (payload) => {
+      onNewTrade(payload.new);
+    }
+  });
+}
+
+// Hook for portfolio updates
+export function usePositionUpdates(participantId: string, onPositionUpdate: (position: any) => void) {
   useEffect(() => {
-    if (!gameId) return;
-
     const channel = supabase
-      .channel(`startups:${gameId}`)
+      .channel(`positions_${participantId}`)
       .on(
         'postgres_changes',
         {
           event: '*',
           schema: 'public',
-          table: 'startups',
-          filter: `game_id=eq.${gameId}`
+          table: 'positions',
+          filter: `participant_id=eq.${participantId}`
         },
         (payload) => {
-          console.log('Startup update:', payload);
-          if (payload.eventType === 'UPDATE') {
-            setStartups(prev => prev.map(s => 
-              s.id === payload.new.id ? payload.new : s
-            ));
-          } else if (payload.eventType === 'INSERT') {
-            setStartups(prev => [...prev, payload.new]);
-          }
+          console.log('Position update:', payload);
+          onPositionUpdate(payload);
         }
       )
       .subscribe();
@@ -66,50 +110,26 @@ export function useRealtimeStartups(gameId: string) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [gameId]);
-
-  return { startups, setStartups };
+  }, [participantId, onPositionUpdate]);
 }
 
-export function useRealtimeTrades(gameId: string) {
-  const [trades, setTrades] = useState<any[]>([]);
-
-  useEffect(() => {
-    if (!gameId) return;
-
-    const channel = supabase
-      .channel(`trades:${gameId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'trades',
-          filter: `game_id=eq.${gameId}`
-        },
-        (payload) => {
-          console.log('New trade:', payload);
-          setTrades(prev => [payload.new, ...prev]);
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [gameId]);
-
-  return { trades, setTrades };
+// Hook for game status updates
+export function useGameUpdates(gameId: string, onGameUpdate: (game: any) => void) {
+  return useRealtimeSubscription({
+    table: 'games',
+    onUpdate: (payload) => {
+      if (payload.new.id === gameId) {
+        onGameUpdate(payload.new);
+      }
+    }
+  });
 }
 
-export function useRealtimeNotifications(participantId: string) {
-  const [notifications, setNotifications] = useState<any[]>([]);
-
+// Hook for notification updates
+export function useNotificationUpdates(participantId: string, onNotification: (notification: any) => void) {
   useEffect(() => {
-    if (!participantId) return;
-
     const channel = supabase
-      .channel(`notifications:${participantId}`)
+      .channel(`notifications_${participantId}`)
       .on(
         'postgres_changes',
         {
@@ -120,7 +140,7 @@ export function useRealtimeNotifications(participantId: string) {
         },
         (payload) => {
           console.log('New notification:', payload);
-          setNotifications(prev => [payload.new, ...prev]);
+          onNotification(payload.new);
         }
       )
       .subscribe();
@@ -128,7 +148,5 @@ export function useRealtimeNotifications(participantId: string) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [participantId]);
-
-  return { notifications, setNotifications };
+  }, [participantId, onNotification]);
 }

@@ -6,9 +6,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Loader2, TrendingUp, Building } from "lucide-react";
+import { Loader2, TrendingUp, Building, Zap } from "lucide-react";
 import { toast } from "sonner";
 import InvestModal from "@/components/InvestModal";
+import { useStartupPriceUpdates, useTradeUpdates } from "@/hooks/useRealtime";
 
 interface Startup {
   id: string;
@@ -29,6 +30,7 @@ export default function Discover() {
   const [loading, setLoading] = useState(true);
   const [selectedStartup, setSelectedStartup] = useState<Startup | null>(null);
   const [participant, setParticipant] = useState<any>(null);
+  const [priceUpdates, setPriceUpdates] = useState<{[key: string]: boolean}>({});
 
   useEffect(() => {
     if (!user || !gameId) return;
@@ -67,6 +69,42 @@ export default function Discover() {
 
     fetchData();
   }, [user, gameId, navigate]);
+
+  // Real-time price updates
+  useStartupPriceUpdates(gameId!, (updatedStartup) => {
+    setStartups(prev => 
+      prev.map(startup => 
+        startup.id === updatedStartup.id 
+          ? { ...startup, last_vwap_price: updatedStartup.last_vwap_price }
+          : startup
+      )
+    );
+    
+    // Show price update animation
+    setPriceUpdates(prev => ({ ...prev, [updatedStartup.id]: true }));
+    setTimeout(() => {
+      setPriceUpdates(prev => ({ ...prev, [updatedStartup.id]: false }));
+    }, 2000);
+    
+    toast.success(`${updatedStartup.name} price updated to ${formatPrice(updatedStartup.last_vwap_price)}`);
+  });
+
+  // Real-time trade updates
+  useTradeUpdates(gameId!, (newTrade) => {
+    // Update shares remaining for the startup
+    setStartups(prev => 
+      prev.map(startup => 
+        startup.id === newTrade.startup_id
+          ? { 
+              ...startup, 
+              primary_shares_remaining: newTrade.market_type === 'primary' 
+                ? Math.max(0, startup.primary_shares_remaining - newTrade.qty)
+                : startup.primary_shares_remaining
+            }
+          : startup
+      )
+    );
+  });
 
   const formatPrice = (price: number | null) => {
     if (!price) return "No trades yet";
@@ -113,8 +151,15 @@ export default function Discover() {
                     </div>
                   )}
                   <div>
-                    <CardTitle className="text-lg">{startup.name}</CardTitle>
-                    <CardDescription className="text-sm">
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      {startup.name}
+                      {priceUpdates[startup.id] && (
+                        <Zap className="h-4 w-4 text-yellow-500 animate-pulse" />
+                      )}
+                    </CardTitle>
+                    <CardDescription className={`text-sm transition-colors ${
+                      priceUpdates[startup.id] ? 'text-green-600 font-semibold' : ''
+                    }`}>
                       {formatPrice(startup.last_vwap_price)}
                     </CardDescription>
                   </div>

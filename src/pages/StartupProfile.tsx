@@ -8,9 +8,10 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
-import { Loader2, Building, TrendingUp, ExternalLink, Globe, Linkedin, CheckCircle, XCircle, Settings } from "lucide-react";
+import { Loader2, Building, TrendingUp, ExternalLink, Globe, Linkedin, CheckCircle, XCircle, Settings, Zap } from "lucide-react";
 import { toast } from "sonner";
 import InvestModal from "@/components/InvestModal";
+import { useStartupPriceUpdates, useTradeUpdates } from "@/hooks/useRealtime";
 
 export default function StartupProfile() {
   const { gameId, slug } = useParams();
@@ -24,6 +25,7 @@ export default function StartupProfile() {
   const [isFounder, setIsFounder] = useState(false);
   const [showInvestModal, setShowInvestModal] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [priceUpdate, setPriceUpdate] = useState(false);
 
   useEffect(() => {
     if (!user || !gameId || !slug) return;
@@ -104,6 +106,35 @@ export default function StartupProfile() {
 
     fetchData();
   }, [user, gameId, slug, navigate]);
+
+  // Real-time price updates for this startup
+  useStartupPriceUpdates(gameId!, (updatedStartup) => {
+    if (updatedStartup.slug === slug) {
+      setStartup(prev => prev ? { ...prev, last_vwap_price: updatedStartup.last_vwap_price } : null);
+      
+      // Show price update animation
+      setPriceUpdate(true);
+      setTimeout(() => setPriceUpdate(false), 2000);
+      
+      toast.success(`Price updated to ${formatCurrency(updatedStartup.last_vwap_price)}`);
+    }
+  });
+
+  // Real-time trade updates
+  useTradeUpdates(gameId!, (newTrade) => {
+    if (newTrade.startup_id === startup?.id) {
+      // Add new trade to the list
+      setTrades(prev => [newTrade, ...prev.slice(0, 9)]);
+      
+      // Update shares remaining for primary trades
+      if (newTrade.market_type === 'primary') {
+        setStartup(prev => prev ? {
+          ...prev,
+          primary_shares_remaining: Math.max(0, prev.primary_shares_remaining - newTrade.qty)
+        } : null);
+      }
+    }
+  });
 
   const handleOrderDecision = async (orderId: string, decision: 'accepted' | 'rejected') => {
     setActionLoading(orderId);
@@ -191,10 +222,17 @@ export default function StartupProfile() {
                 </div>
               )}
               <div>
-                <h1 className="text-3xl font-bold">{startup.name}</h1>
+                <h1 className="text-3xl font-bold flex items-center gap-3">
+                  {startup.name}
+                  {priceUpdate && (
+                    <Zap className="h-6 w-6 text-yellow-500 animate-pulse" />
+                  )}
+                </h1>
                 <div className="flex items-center space-x-4 mt-2">
                   {startup.last_vwap_price && (
-                    <Badge variant="secondary" className="text-lg px-3 py-1">
+                    <Badge variant="secondary" className={`text-lg px-3 py-1 transition-colors ${
+                      priceUpdate ? 'bg-green-100 text-green-800 border-green-300' : ''
+                    }`}>
                       {formatCurrency(startup.last_vwap_price)} per share
                     </Badge>
                   )}

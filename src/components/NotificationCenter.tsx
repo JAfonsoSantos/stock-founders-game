@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Bell, Check, X } from "lucide-react";
-import { useRealtimeNotifications } from "@/hooks/useRealtime";
+import { useNotificationUpdates } from "@/hooks/useRealtime";
 
 interface NotificationCenterProps {
   participantId: string;
@@ -16,7 +16,11 @@ export function NotificationCenter({ participantId, gameId }: NotificationCenter
   const [notifications, setNotifications] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const { notifications: realtimeNotifications } = useRealtimeNotifications(participantId);
+
+  // Real-time notifications
+  useNotificationUpdates(participantId, (newNotification) => {
+    setNotifications(prev => [newNotification, ...prev]);
+  });
 
   // Fetch existing notifications
   useEffect(() => {
@@ -40,13 +44,6 @@ export function NotificationCenter({ participantId, gameId }: NotificationCenter
       fetchNotifications();
     }
   }, [participantId]);
-
-  // Update with realtime notifications
-  useEffect(() => {
-    if (realtimeNotifications.length > 0) {
-      setNotifications(prev => [...realtimeNotifications, ...prev]);
-    }
-  }, [realtimeNotifications]);
 
   const handleAcceptTrade = async (notificationId: string) => {
     setIsLoading(true);

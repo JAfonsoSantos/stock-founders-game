@@ -7,10 +7,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Loader2, Wallet, TrendingUp, DollarSign, Activity, ArrowUpDown } from "lucide-react";
+import { Loader2, Wallet, TrendingUp, DollarSign, Activity, ArrowUpDown, Zap } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { SecondaryTradeModal } from "@/components/SecondaryTradeModal";
 import { NotificationCenter } from "@/components/NotificationCenter";
+import { usePositionUpdates, useStartupPriceUpdates } from "@/hooks/useRealtime";
 
 export default function PlayerDashboard() {
   const { gameId } = useParams();
@@ -25,6 +26,7 @@ export default function PlayerDashboard() {
   const [sellModalOpen, setSellModalOpen] = useState(false);
   const [selectedPosition, setSelectedPosition] = useState<any>(null);
   const [gameAllowsSecondary, setGameAllowsSecondary] = useState(false);
+  const [portfolioUpdates, setPortfolioUpdates] = useState<{[key: string]: boolean}>({});
 
   useEffect(() => {
     if (!user || !gameId) return;
@@ -106,6 +108,49 @@ export default function PlayerDashboard() {
 
     fetchData();
   }, [user, gameId, navigate]);
+
+  // Real-time startup price updates
+  useStartupPriceUpdates(gameId!, (updatedStartup) => {
+    // Update positions with new market values
+    setPositions(prev => 
+      prev.map(position => 
+        position.startup_id === updatedStartup.id
+          ? {
+              ...position,
+              startups: {
+                ...position.startups,
+                last_vwap_price: updatedStartup.last_vwap_price
+              }
+            }
+          : position
+      )
+    );
+
+    // Show update animation for affected positions
+    const affectedPosition = positions.find(p => p.startup_id === updatedStartup.id);
+    if (affectedPosition) {
+      setPortfolioUpdates(prev => ({ ...prev, [affectedPosition.id]: true }));
+      setTimeout(() => {
+        setPortfolioUpdates(prev => ({ ...prev, [affectedPosition.id]: false }));
+      }, 2000);
+    }
+  });
+
+  // Real-time position updates
+  usePositionUpdates(participant?.id, (positionPayload) => {
+    if (positionPayload.eventType === 'UPDATE') {
+      setPositions(prev =>
+        prev.map(position =>
+          position.id === positionPayload.new.id
+            ? { ...position, ...positionPayload.new }
+            : position
+        )
+      );
+    } else if (positionPayload.eventType === 'INSERT') {
+      // Refresh positions when new position is created
+      window.location.reload();
+    }
+  });
 
   const formatCurrency = (amount: number) => {
     return `$${amount.toLocaleString()}`;
@@ -236,21 +281,30 @@ export default function PlayerDashboard() {
                           <TableCell className="font-medium">
                             <Button
                               variant="link"
-                              className="p-0 h-auto font-medium"
+                              className="p-0 h-auto font-medium flex items-center gap-2"
                               onClick={() => navigate(`/games/${gameId}/startup/${position.startups.slug}`)}
                             >
                               {position.startups.name}
+                              {portfolioUpdates[position.id] && (
+                                <Zap className="h-3 w-3 text-yellow-500 animate-pulse" />
+                              )}
                             </Button>
                           </TableCell>
                           <TableCell>{position.qty_total}</TableCell>
                           <TableCell>{formatCurrency(position.avg_cost)}</TableCell>
-                          <TableCell>
+                          <TableCell className={`transition-colors ${
+                            portfolioUpdates[position.id] ? 'text-green-600 font-semibold' : ''
+                          }`}>
                             {position.startups.last_vwap_price 
                               ? formatCurrency(position.startups.last_vwap_price)
                               : "No trades"
                             }
                           </TableCell>
-                          <TableCell>{formatCurrency(getPositionValue(position))}</TableCell>
+                          <TableCell className={`transition-colors ${
+                            portfolioUpdates[position.id] ? 'text-green-600 font-semibold' : ''
+                          }`}>
+                            {formatCurrency(getPositionValue(position))}
+                          </TableCell>
                           <TableCell>
                             <div className={`flex items-center ${pnl >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                               {formatCurrency(pnl)}
