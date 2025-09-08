@@ -180,7 +180,7 @@ const handler = async (req: Request): Promise<Response> => {
         let qrCodeBase64 = '';
         try {
           const joinUrl = `https://stox.games/join/${emailRequest.gameId}`;
-          qrCodeBase64 = await QRCode.toDataURL(joinUrl, {
+          const qrDataUrl = await QRCode.toDataURL(joinUrl, {
             width: 200,
             margin: 2,
             color: {
@@ -188,6 +188,8 @@ const handler = async (req: Request): Promise<Response> => {
               light: '#FFFFFF'
             }
           });
+          // Ensure the data URL is properly formatted
+          qrCodeBase64 = qrDataUrl;
         } catch (qrError) {
           console.error('Error generating QR code:', qrError);
         }

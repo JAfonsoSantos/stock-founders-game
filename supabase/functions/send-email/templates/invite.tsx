@@ -87,24 +87,24 @@ export const InviteEmail = ({ gameName, gameId, joinUrl, locale, qrCodeBase64 }:
             </Button>
           </Section>
           
-          {qrCodeBase64 && (
-            <Section style={qrSection}>
-              <Text style={qrText}>
-                {isPortuguese 
-                  ? 'Ou escaneie este QR code:'
-                  : 'Or scan this QR code:'}
-              </Text>
-              <div style={{ textAlign: 'center' }}>
-                <Img
-                  src={qrCodeBase64}
-                  alt="QR Code para participar do jogo"
-                  width="200"
-                  height="200"
-                  style={qrImage}
-                />
-              </div>
-            </Section>
-          )}
+           {qrCodeBase64 && (
+             <Section style={qrSection}>
+               <Text style={qrText}>
+                 {isPortuguese 
+                   ? 'Ou escaneie este QR code:'
+                   : 'Or scan this QR code:'}
+               </Text>
+               <Section style={{textAlign: 'center'}}>
+                 <Img
+                   src={qrCodeBase64}
+                   alt={isPortuguese ? "QR Code para participar do jogo" : "QR Code to join the game"}
+                   width="200"
+                   height="200"
+                   style={qrImage}
+                 />
+               </Section>
+             </Section>
+           )}
           
           <Text style={smallText}>
             {isPortuguese 
