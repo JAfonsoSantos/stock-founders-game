@@ -81,6 +81,39 @@ export const InviteEmail = ({ gameName, gameId, joinUrl, locale, qrCodeBase64, q
               ? '• 📊 Acompanhar seu portfólio em tempo real'
               : '• 📊 Track your portfolio in real-time'}
           </Text>
+
+          <Section style={phaseSection}>
+            <Heading style={h2}>
+              {isPortuguese ? '📅 Como Funciona o Jogo' : '📅 How the Game Works'}
+            </Heading>
+            
+            <Text style={phaseTitle}>
+              {isPortuguese ? '🔸 Pre Market (Preparação)' : '🔸 Pre Market (Preparation)'}
+            </Text>
+            <Text style={phaseDescription}>
+              {isPortuguese 
+                ? 'Fase de preparação onde fundadores configuram suas startups. Ainda não há trading ativo.'
+                : 'Preparation phase where founders set up their startups. No active trading yet.'}
+            </Text>
+
+            <Text style={phaseTitle}>
+              {isPortuguese ? '🔸 Open Market (Mercado Ativo)' : '🔸 Open Market (Active Trading)'}
+            </Text>
+            <Text style={phaseDescription}>
+              {isPortuguese 
+                ? 'Mercado ativo! Invista nas startups e negocie ações. Preços calculados em tempo real.'
+                : 'Market is live! Invest in startups and trade shares. Prices calculated in real-time.'}
+            </Text>
+
+            <Text style={phaseTitle}>
+              {isPortuguese ? '🔸 Market Closed (Resultados)' : '🔸 Market Closed (Results)'}
+            </Text>
+            <Text style={phaseDescription}>
+              {isPortuguese 
+                ? 'Mercado fechado. Veja os resultados finais e leaderboards dos melhores investidores.'
+                : 'Market closed. View final results and leaderboards of top investors.'}
+            </Text>
+          </Section>
           
           <Section style={buttonSection}>
             <Button style={button} href={joinUrl}>
@@ -230,4 +263,35 @@ const qrText = {
 const qrImage = {
   border: "2px solid #e5e7eb",
   borderRadius: "8px",
+};
+
+const phaseSection = {
+  margin: "32px 32px",
+  padding: "24px",
+  backgroundColor: "#f8fafc",
+  borderRadius: "8px",
+  borderLeft: "4px solid #4f46e5",
+};
+
+const h2 = {
+  color: "#1f2937",
+  fontSize: "20px",
+  fontWeight: "bold",
+  margin: "0 0 16px 0",
+  padding: "0",
+};
+
+const phaseTitle = {
+  color: "#4f46e5",
+  fontSize: "16px",
+  fontWeight: "600",
+  margin: "16px 0 4px 0",
+  lineHeight: "24px",
+};
+
+const phaseDescription = {
+  color: "#6b7280",
+  fontSize: "14px",
+  lineHeight: "20px",
+  margin: "0 0 12px 0",
 };

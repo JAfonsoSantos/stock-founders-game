@@ -7,7 +7,7 @@ import QRCode from "npm:qrcode@1.5.4";
 import { InviteEmail } from "./templates/invite.tsx";
 import { MarketOpenEmail } from "./templates/market-open.tsx";
 import { LastMinutesEmail } from "./templates/last-minutes.tsx";
-import { ResultsEmail } from "./templates/results.tsx";
+import { StatusChangeEmail } from "./templates/status-change.tsx";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -18,7 +18,7 @@ const corsHeaders = {
 };
 
 interface EmailRequest {
-  type: 'invite' | 'market_open' | 'last_minutes' | 'results';
+  type: 'invite' | 'market_open' | 'last_minutes' | 'results' | 'status_change';
   to: string[];
   gameId: string;
   gameName: string;
@@ -249,6 +249,21 @@ const handler = async (req: Request): Promise<Response> => {
         subject = emailRequest.locale === 'pt' 
           ? `🏆 ${emailRequest.gameName} - Resultados Finais` 
           : `🏆 ${emailRequest.gameName} - Final Results`;
+        break;
+
+      case 'status_change':
+        template = React.createElement(StatusChangeEmail, {
+          gameName: emailRequest.gameName,
+          gameId: emailRequest.gameId,
+          locale: emailRequest.locale || 'en',
+          previousStatus: emailRequest.data?.previousStatus,
+          newStatus: emailRequest.data?.newStatus,
+          gameUrl: emailRequest.data?.gameUrl,
+          endsAt: emailRequest.data?.endsAt
+        });
+        subject = emailRequest.data?.subject || (emailRequest.locale === 'pt' 
+          ? `📢 ${emailRequest.gameName} - Status Atualizado` 
+          : `📢 ${emailRequest.gameName} - Status Updated`);
         break;
 
       default:

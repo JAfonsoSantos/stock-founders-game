@@ -89,6 +89,7 @@ export default function GameOrganizer() {
   const updateGameStatus = async (newStatus: "draft" | "pre_market" | "open" | "closed" | "results") => {
     if (!game) return;
     
+    const previousStatus = game.status;
     setActionLoading(`status-${newStatus}`);
     
     try {
@@ -102,10 +103,25 @@ export default function GameOrganizer() {
       setGame({ ...game, status: newStatus });
       toast.success(`Game status updated to ${newStatus.replace('_', ' ')}`);
       
-      // Send relevant emails
-      if (newStatus === 'open') {
-        // TODO: Get participant emails and send market open email
-        toast.success("Market open email notifications sent!");
+      // Send automatic status change notification emails
+      try {
+        const { error: notificationError } = await supabase.functions.invoke('notify-game-status-change', {
+          body: {
+            gameId: gameId,
+            previousStatus: previousStatus,
+            newStatus: newStatus
+          }
+        });
+
+        if (notificationError) {
+          console.error('Error sending status change notifications:', notificationError);
+          toast.warning("Status updated but email notifications failed to send");
+        } else {
+          toast.success("Status updated and participants notified by email!");
+        }
+      } catch (emailError) {
+        console.error('Failed to send status change notifications:', emailError);
+        toast.warning("Status updated but email notifications failed to send");
       }
     } catch (error: any) {
       toast.error("Failed to update game status: " + error.message);
