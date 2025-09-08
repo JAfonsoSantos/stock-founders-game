@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserProfile } from "@/hooks/useUserProfile";
 import { useI18n } from "@/hooks/useI18n";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -33,6 +34,7 @@ import { mergeAccounts } from "@/utils/mergeAccounts";
 
 export default function Dashboard() {
   const { user, signOut } = useAuth();
+  const { profile, displayName, initials } = useUserProfile(user);
   const { t } = useI18n();
   const [ownedGames, setOwnedGames] = useState<Game[]>([]);
   const [participations, setParticipations] = useState<Participation[]>([]);
@@ -279,15 +281,13 @@ export default function Dashboard() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="flex items-center gap-2 p-2">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={user?.user_metadata?.avatar_url} />
+                    <AvatarImage src={profile?.avatar_url || undefined} />
                     <AvatarFallback>
-                      <User className="h-4 w-4" />
+                      {initials || <User className="h-4 w-4" />}
                     </AvatarFallback>
                   </Avatar>
                   <span className="text-sm font-medium hidden md:block">
-                    {user?.user_metadata?.first_name && user?.user_metadata?.last_name 
-                      ? `${user.user_metadata.first_name} ${user.user_metadata.last_name}`
-                      : user?.email}
+                    {displayName || user?.email || "Usuário"}
                   </span>
                   <ChevronDown className="h-4 w-4" />
                 </Button>
