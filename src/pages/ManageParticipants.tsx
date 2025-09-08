@@ -40,8 +40,12 @@ export default function ManageParticipants() {
   const [selectedParticipant, setSelectedParticipant] = useState<any>(null);
   const [editParticipant, setEditParticipant] = useState({
     id: "",
+    user_id: "",
     role: "founder" as const,
-    budget: 0
+    budget: 0,
+    email: "",
+    first_name: "",
+    last_name: ""
   });
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [showQRCode, setShowQRCode] = useState(false);
@@ -235,8 +239,12 @@ export default function ManageParticipants() {
     setSelectedParticipant(participant);
     setEditParticipant({
       id: participant.id,
+      user_id: participant.user_id,
       role: participant.role,
-      budget: participant.initial_budget
+      budget: participant.initial_budget,
+      email: participant.email || participant.users?.email || "",
+      first_name: participant.users?.first_name || "",
+      last_name: participant.users?.last_name || ""
     });
     setShowEditModal(true);
   };
@@ -244,7 +252,20 @@ export default function ManageParticipants() {
   const saveEditParticipant = async () => {
     setActionLoading(editParticipant.id);
     try {
-      const { error } = await supabase
+      // Update user data
+      const { error: userError } = await supabase
+        .from("users")
+        .update({
+          email: editParticipant.email,
+          first_name: editParticipant.first_name,
+          last_name: editParticipant.last_name
+        })
+        .eq("id", editParticipant.user_id);
+
+      if (userError) throw userError;
+
+      // Update participant data
+      const { error: participantError } = await supabase
         .from("participants")
         .update({
           role: editParticipant.role,
@@ -253,7 +274,7 @@ export default function ManageParticipants() {
         })
         .eq("id", editParticipant.id);
 
-      if (error) throw error;
+      if (participantError) throw participantError;
 
       toast.success("Participant updated successfully!");
       setShowEditModal(false);
@@ -574,9 +595,33 @@ export default function ManageParticipants() {
             </DialogHeader>
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label>Participant</Label>
-                <div className="text-sm text-muted-foreground">
-                  {selectedParticipant?.users?.first_name || "Demo"} {selectedParticipant?.users?.last_name || "User"}
+                <Label htmlFor="editEmail">Email</Label>
+                <Input
+                  id="editEmail"
+                  type="email"
+                  placeholder="participant@example.com"
+                  value={editParticipant.email}
+                  onChange={(e) => setEditParticipant(prev => ({ ...prev, email: e.target.value }))}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="editFirstName">First Name</Label>
+                  <Input
+                    id="editFirstName"
+                    placeholder="John"
+                    value={editParticipant.first_name}
+                    onChange={(e) => setEditParticipant(prev => ({ ...prev, first_name: e.target.value }))}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="editLastName">Last Name</Label>
+                  <Input
+                    id="editLastName"
+                    placeholder="Doe"
+                    value={editParticipant.last_name}
+                    onChange={(e) => setEditParticipant(prev => ({ ...prev, last_name: e.target.value }))}
+                  />
                 </div>
               </div>
               <div className="space-y-2">
