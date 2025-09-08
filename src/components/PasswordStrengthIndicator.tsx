@@ -70,27 +70,24 @@ export function PasswordStrengthIndicator({ password, className }: PasswordStren
   if (!password) return null;
 
   return (
-    <div className={cn("space-y-2", className)}>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="relative w-full max-w-32">
-            <Progress value={strength.score} className="h-2" />
-            <div 
-              className={cn("absolute inset-0 h-2 rounded-full transition-all", strength.color)}
-              style={{ width: `${strength.score}%` }}
-            />
-          </div>
-          {strength.label && (
-            <span className={cn(
-              "text-xs font-medium",
-              strength.label === "weak" && "text-destructive",
-              strength.label === "medium" && "text-yellow-600 dark:text-yellow-500",
-              strength.label === "strong" && "text-green-600 dark:text-green-500"
-            )}>
-              {strength.label}
-            </span>
-          )}
+    <div className={cn("space-y-1", className)}>
+      <div className="flex items-center gap-3">
+        <div className="relative flex-1 h-2 bg-muted rounded-full overflow-hidden">
+          <div 
+            className={cn("h-full transition-all duration-300 rounded-full", strength.color)}
+            style={{ width: `${strength.score}%` }}
+          />
         </div>
+        {strength.label && (
+          <span className={cn(
+            "text-xs font-medium min-w-[3.5rem]",
+            strength.label === "weak" && "text-destructive",
+            strength.label === "medium" && "text-yellow-600 dark:text-yellow-500", 
+            strength.label === "strong" && "text-green-600 dark:text-green-500"
+          )}>
+            {strength.label}
+          </span>
+        )}
       </div>
     </div>
   );
