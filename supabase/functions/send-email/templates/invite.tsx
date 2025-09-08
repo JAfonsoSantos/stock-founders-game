@@ -19,9 +19,10 @@ interface InviteEmailProps {
   joinUrl: string;
   locale: string;
   qrCodeBase64?: string;
+  qrCid?: string;
 }
 
-export const InviteEmail = ({ gameName, gameId, joinUrl, locale, qrCodeBase64 }: InviteEmailProps) => {
+export const InviteEmail = ({ gameName, gameId, joinUrl, locale, qrCodeBase64, qrCid }: InviteEmailProps) => {
   const isPortuguese = locale === 'pt';
   
   return (
@@ -87,7 +88,7 @@ export const InviteEmail = ({ gameName, gameId, joinUrl, locale, qrCodeBase64 }:
             </Button>
           </Section>
           
-           {qrCodeBase64 && (
+           {(qrCid || qrCodeBase64) && (
              <Section style={qrSection}>
                <Text style={qrText}>
                  {isPortuguese 
@@ -96,7 +97,7 @@ export const InviteEmail = ({ gameName, gameId, joinUrl, locale, qrCodeBase64 }:
                </Text>
                <Section style={{textAlign: 'center'}}>
                  <Img
-                   src={qrCodeBase64}
+                   src={qrCid ? `cid:${qrCid}` : (qrCodeBase64 as string)}
                    alt={isPortuguese ? "QR Code para participar do jogo" : "QR Code to join the game"}
                    width="200"
                    height="200"

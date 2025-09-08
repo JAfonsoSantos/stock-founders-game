@@ -173,11 +173,13 @@ const handler = async (req: Request): Promise<Response> => {
 
     let template;
     let subject = '';
+    let attachments: Array<{ filename: string; content: string; content_id: string }> | undefined;
 
     switch (emailRequest.type) {
       case 'invite':
         // Generate QR code for invite with secure URL
         let qrCodeBase64 = '';
+        const qrCid = 'qr-code';
         try {
           const joinUrl = `https://stox.games/join/${emailRequest.gameId}`;
           const qrDataUrl = await QRCode.toDataURL(joinUrl, {
@@ -188,8 +190,13 @@ const handler = async (req: Request): Promise<Response> => {
               light: '#FFFFFF'
             }
           });
-          // Ensure the data URL is properly formatted
+          // Data URL for fallback rendering
           qrCodeBase64 = qrDataUrl;
+          // Inline attach image for robust email client support
+          const base64 = qrDataUrl.split(',')[1] || '';
+          if (base64) {
+            attachments = [{ filename: 'qr.png', content: base64, content_id: qrCid }];
+          }
         } catch (qrError) {
           console.error('Error generating QR code:', qrError);
         }
@@ -199,7 +206,8 @@ const handler = async (req: Request): Promise<Response> => {
           gameId: emailRequest.gameId,
           locale: emailRequest.locale || 'en',
           joinUrl: `https://stox.games/join/${emailRequest.gameId}`, // Override with secure URL
-          qrCodeBase64: qrCodeBase64
+          qrCodeBase64: qrCodeBase64,
+          qrCid
         });
         subject = emailRequest.locale === 'pt' 
           ? `Convite para ${emailRequest.gameName}` 
@@ -257,6 +265,7 @@ const handler = async (req: Request): Promise<Response> => {
       to: emailRequest.to,
       subject: subject,
       html: html,
+      attachments,
     });
 
     console.log("Email sent successfully:", emailResponse);
