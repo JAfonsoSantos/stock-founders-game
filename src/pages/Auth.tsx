@@ -153,9 +153,7 @@ export default function Auth() {
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 hover-scale">
             <Mail className="h-8 w-8 text-primary" />
           </div>
-          <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-            Stox
-          </CardTitle>
+          <CardTitle className="text-3xl font-extrabold tracking-tight text-foreground">Stox</CardTitle>
           <CardDescription className="text-base">
             {gameId ? "🎯 Junta-te ao jogo" : "Bem-vindo ao mercado de startups"}
           </CardDescription>

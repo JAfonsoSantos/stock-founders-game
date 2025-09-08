@@ -1,5 +1,4 @@
 import { useMemo } from "react";
-import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 
 interface PasswordStrengthIndicatorProps {
@@ -50,15 +49,15 @@ export function calculatePasswordStrength(password: string): PasswordStrength {
   } else if (satisfiedCount <= 3) {
     score = 60;
     label = "medium";
-    color = "bg-yellow-500";
+    color = "bg-chart-4";
   } else if (satisfiedCount <= 4) {
     score = 80;
     label = "medium";
-    color = "bg-yellow-500";
+    color = "bg-chart-4";
   } else {
     score = 100;
     label = "strong";
-    color = "bg-green-500";
+    color = "bg-chart-5";
   }
 
   return { score, label, color, requirements };
@@ -82,8 +81,8 @@ export function PasswordStrengthIndicator({ password, className }: PasswordStren
           <span className={cn(
             "text-xs font-medium min-w-[3.5rem]",
             strength.label === "weak" && "text-destructive",
-            strength.label === "medium" && "text-yellow-600 dark:text-yellow-500", 
-            strength.label === "strong" && "text-green-600 dark:text-green-500"
+            strength.label === "medium" && "text-chart-4", 
+            strength.label === "strong" && "text-chart-5"
           )}>
             {strength.label}
           </span>
