@@ -119,5 +119,42 @@
       "title": "Resultados Finais",
       "message": "Aqui estão os resultados finais do jogo de mercado bolsista de startups."
     }
+  },
+  "settings": {
+    "title": "Definições",
+    "description": "Gerir as suas preferências e aparência",
+    "language": {
+      "title": "Idioma e Região",
+      "description": "Escolha o seu idioma preferido para a interface da plataforma",
+      "interface": "Idioma da Interface",
+      "current": "Atualmente"
+    },
+    "appearance": {
+      "title": "Aparência",
+      "description": "Personalizar como a plataforma se parece e funciona",
+      "theme": {
+        "title": "Tema de Cor",
+        "description": "Escolha entre claro, escuro, ou preferência do sistema",
+        "light": "Claro",
+        "dark": "Escuro",
+        "system": "Sistema"
+      },
+      "compactMode": {
+        "title": "Modo Compacto",
+        "description": "Reduzir espaçamento e tornar a interface mais densa"
+      }
+    },
+    "preview": {
+      "title": "Pré-visualização",
+      "description": "Veja como as suas definições afetam a interface",
+      "sampleTitle": "Título do Jogo Exemplo",
+      "sampleDescription": "Assim é como o conteúdo aparecerá com as suas definições atuais",
+      "sampleButton": "Botão Exemplo",
+      "currentTheme": "Tema atual",
+      "language": "Idioma"
+    },
+    "saveSettings": "Guardar Definições",
+    "saving": "A guardar...",
+    "savedSuccess": "Definições guardadas com sucesso!"
   }
 }

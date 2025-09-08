@@ -113,5 +113,42 @@
     "name": "الاسم",
     "value": "القيمة",
     "return": "العائد"
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "description": "إدارة تفضيلاتك والمظهر",
+    "language": {
+      "title": "اللغة والمنطقة",
+      "description": "اختر لغتك المفضلة لواجهة المنصة",
+      "interface": "لغة الواجهة",
+      "current": "حالياً"
+    },
+    "appearance": {
+      "title": "المظهر",
+      "description": "تخصيص شكل ومظهر المنصة",
+      "theme": {
+        "title": "نمط الألوان",
+        "description": "اختر بين الفاتح والداكن أو تفضيل النظام",
+        "light": "فاتح",
+        "dark": "داكن",
+        "system": "النظام"
+      },
+      "compactMode": {
+        "title": "الوضع المضغوط",
+        "description": "تقليل المسافات وجعل الواجهة أكثر كثافة"
+      }
+    },
+    "preview": {
+      "title": "معاينة",
+      "description": "شاهد كيف تؤثر إعداداتك على الواجهة",
+      "sampleTitle": "عنوان اللعبة النموذجي",
+      "sampleDescription": "هذا كيف سيظهر المحتوى مع إعداداتك الحالية",
+      "sampleButton": "زر نموذجي",
+      "currentTheme": "النمط الحالي",
+      "language": "اللغة"
+    },
+    "saveSettings": "حفظ الإعدادات",
+    "saving": "جاري الحفظ...",
+    "savedSuccess": "تم حفظ الإعدادات بنجاح!"
   }
 }

@@ -113,5 +113,42 @@
     "name": "Name",
     "value": "Wert",
     "return": "Rendite"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "description": "Ihre Präferenzen und Erscheinungsbild verwalten",
+    "language": {
+      "title": "Sprache und Region",
+      "description": "Wählen Sie Ihre bevorzugte Sprache für die Plattform-Oberfläche",
+      "interface": "Oberflächensprache",
+      "current": "Aktuell"
+    },
+    "appearance": {
+      "title": "Erscheinungsbild",
+      "description": "Anpassen, wie die Plattform aussieht und sich anfühlt",
+      "theme": {
+        "title": "Farbthema",
+        "description": "Wählen zwischen hell, dunkel oder Systemeinstellung",
+        "light": "Hell",
+        "dark": "Dunkel",
+        "system": "System"
+      },
+      "compactMode": {
+        "title": "Kompaktmodus",
+        "description": "Abstände reduzieren und die Oberfläche dichter gestalten"
+      }
+    },
+    "preview": {
+      "title": "Vorschau",
+      "description": "Sehen Sie, wie sich Ihre Einstellungen auf die Oberfläche auswirken",
+      "sampleTitle": "Beispiel Spieltitel",
+      "sampleDescription": "So wird der Inhalt mit Ihren aktuellen Einstellungen angezeigt",
+      "sampleButton": "Beispielbutton",
+      "currentTheme": "Aktuelles Thema",
+      "language": "Sprache"
+    },
+    "saveSettings": "Einstellungen Speichern",
+    "saving": "Wird gespeichert...",
+    "savedSuccess": "Einstellungen erfolgreich gespeichert!"
   }
 }

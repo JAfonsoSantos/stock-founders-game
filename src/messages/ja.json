@@ -113,5 +113,42 @@
     "name": "名前",
     "value": "価値",
     "return": "リターン"
+  },
+  "settings": {
+    "title": "設定",
+    "description": "お好みと外観を管理",
+    "language": {
+      "title": "言語と地域",
+      "description": "プラットフォームインターフェースのお好みの言語を選択",
+      "interface": "インターフェース言語",
+      "current": "現在"
+    },
+    "appearance": {
+      "title": "外観",
+      "description": "プラットフォームの見た目と感触をカスタマイズ",
+      "theme": {
+        "title": "カラーテーマ",
+        "description": "ライト、ダーク、またはシステム設定を選択",
+        "light": "ライト",
+        "dark": "ダーク",
+        "system": "システム"
+      },
+      "compactMode": {
+        "title": "コンパクトモード",
+        "description": "間隔を減らし、インターフェースをより密にする"
+      }
+    },
+    "preview": {
+      "title": "プレビュー",
+      "description": "設定がインターフェースにどう影響するかを確認",
+      "sampleTitle": "サンプルゲームタイトル",
+      "sampleDescription": "これが現在の設定でコンテンツがどのように表示されるかです",
+      "sampleButton": "サンプルボタン",
+      "currentTheme": "現在のテーマ",
+      "language": "言語"
+    },
+    "saveSettings": "設定を保存",
+    "saving": "保存中...",
+    "savedSuccess": "設定が正常に保存されました！"
   }
 }

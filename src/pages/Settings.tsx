@@ -23,7 +23,7 @@ export default function Settings() {
     // Simulate save delay
     await new Promise(resolve => setTimeout(resolve, 500));
     
-    toast.success("Settings saved successfully!");
+    toast.success(t('settings.savedSuccess'));
     setIsSaving(false);
   };
 
@@ -53,11 +53,11 @@ export default function Settings() {
               className="gap-2"
             >
               <ArrowLeft className="h-4 w-4" />
-              Back
+              {t('common.back')}
             </Button>
             <div>
-              <h1 className="text-2xl font-bold">Settings</h1>
-              <p className="text-muted-foreground">Manage your preferences and appearance</p>
+              <h1 className="text-2xl font-bold">{t('settings.title')}</h1>
+              <p className="text-muted-foreground">{t('settings.description')}</p>
             </div>
           </div>
         </div>
@@ -71,20 +71,20 @@ export default function Settings() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Globe className="h-5 w-5 text-primary" />
-                Language & Region
+                {t('settings.language.title')}
               </CardTitle>
               <CardDescription>
-                Choose your preferred language for the platform interface
+                {t('settings.language.description')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label htmlFor="language" className="text-sm font-medium">
-                    Interface Language
+                    {t('settings.language.interface')}
                   </Label>
                   <div className="text-xs text-muted-foreground">
-                    Currently: {currentLocale?.flag} {currentLocale?.name}
+                    {t('settings.language.current')}: {currentLocale?.flag} {currentLocale?.name}
                   </div>
                 </div>
                 <Select value={locale} onValueChange={(value: any) => setLocale(value)}>
@@ -116,10 +116,10 @@ export default function Settings() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Palette className="h-5 w-5 text-primary" />
-                Appearance
+                {t('settings.appearance.title')}
               </CardTitle>
               <CardDescription>
-                Customize how the platform looks and feels
+                {t('settings.appearance.description')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -128,10 +128,10 @@ export default function Settings() {
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label htmlFor="theme" className="text-sm font-medium">
-                    Color Theme
+                    {t('settings.appearance.theme.title')}
                   </Label>
                   <div className="text-xs text-muted-foreground">
-                    Choose between light, dark, or system preference
+                    {t('settings.appearance.theme.description')}
                   </div>
                 </div>
                 <Select value={theme} onValueChange={setTheme}>
@@ -140,7 +140,9 @@ export default function Settings() {
                       <div className="flex items-center gap-2">
                         {getThemeIcon()}
                         <span className="capitalize">
-                          {theme === 'system' ? 'System' : theme}
+                          {theme === 'system' ? t('settings.appearance.theme.system') : 
+                           theme === 'light' ? t('settings.appearance.theme.light') : 
+                           t('settings.appearance.theme.dark')}
                         </span>
                       </div>
                     </SelectValue>
@@ -149,19 +151,19 @@ export default function Settings() {
                     <SelectItem value="light">
                       <div className="flex items-center gap-2">
                         <Sun className="h-4 w-4" />
-                        <span>Light</span>
+                        <span>{t('settings.appearance.theme.light')}</span>
                       </div>
                     </SelectItem>
                     <SelectItem value="dark">
                       <div className="flex items-center gap-2">
                         <Moon className="h-4 w-4" />
-                        <span>Dark</span>
+                        <span>{t('settings.appearance.theme.dark')}</span>
                       </div>
                     </SelectItem>
                     <SelectItem value="system">
                       <div className="flex items-center gap-2">
                         <Monitor className="h-4 w-4" />
-                        <span>System</span>
+                        <span>{t('settings.appearance.theme.system')}</span>
                       </div>
                     </SelectItem>
                   </SelectContent>
@@ -174,10 +176,10 @@ export default function Settings() {
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label htmlFor="compact-mode" className="text-sm font-medium">
-                    Compact Mode
+                    {t('settings.appearance.compactMode.title')}
                   </Label>
                   <div className="text-xs text-muted-foreground">
-                    Reduce spacing and make the interface more dense
+                    {t('settings.appearance.compactMode.description')}
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -195,9 +197,9 @@ export default function Settings() {
           {/* Display Settings Preview */}
           <Card>
             <CardHeader>
-              <CardTitle>Preview</CardTitle>
+              <CardTitle>{t('settings.preview.title')}</CardTitle>
               <CardDescription>
-                See how your settings affect the interface
+                {t('settings.preview.description')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -205,23 +207,23 @@ export default function Settings() {
                 <div className="flex items-center justify-between">
                   <div className={compactMode ? 'space-y-1' : 'space-y-2'}>
                     <h3 className={compactMode ? 'text-sm font-semibold' : 'text-base font-semibold'}>
-                      Sample Game Title
+                      {t('settings.preview.sampleTitle')}
                     </h3>
                     <p className={`text-muted-foreground ${compactMode ? 'text-xs' : 'text-sm'}`}>
-                      This is how content will appear with your current settings
+                      {t('settings.preview.sampleDescription')}
                     </p>
                   </div>
                   <Button size={compactMode ? "sm" : "default"} variant="outline">
-                    Sample Button
+                    {t('settings.preview.sampleButton')}
                   </Button>
                 </div>
                 
                 <div className="flex gap-2">
                   <div className={`bg-primary/10 border border-primary/20 rounded px-2 ${compactMode ? 'py-1 text-xs' : 'py-1.5 text-sm'}`}>
-                    Current theme: {resolvedTheme}
+                    {t('settings.preview.currentTheme')}: {resolvedTheme}
                   </div>
                   <div className={`bg-secondary border rounded px-2 ${compactMode ? 'py-1 text-xs' : 'py-1.5 text-sm'}`}>
-                    Language: {currentLocale?.name}
+                    {t('settings.preview.language')}: {currentLocale?.name}
                   </div>
                 </div>
               </div>
@@ -238,10 +240,10 @@ export default function Settings() {
               {isSaving ? (
                 <>
                   <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                  Saving...
+                  {t('settings.saving')}
                 </>
               ) : (
-                'Save Settings'
+                t('settings.saveSettings')
               )}
             </Button>
           </div>

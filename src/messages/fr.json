@@ -113,5 +113,42 @@
     "name": "Nom",
     "value": "Valeur",
     "return": "Retour"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "description": "Gérer vos préférences et apparence",
+    "language": {
+      "title": "Langue et Région",
+      "description": "Choisissez votre langue préférée pour l'interface de la plateforme",
+      "interface": "Langue de l'Interface",
+      "current": "Actuellement"
+    },
+    "appearance": {
+      "title": "Apparence",
+      "description": "Personnaliser l'apparence et le ressenti de la plateforme",
+      "theme": {
+        "title": "Thème de Couleur",
+        "description": "Choisir entre clair, sombre, ou préférence système",
+        "light": "Clair",
+        "dark": "Sombre",
+        "system": "Système"
+      },
+      "compactMode": {
+        "title": "Mode Compact",
+        "description": "Réduire l'espacement et rendre l'interface plus dense"
+      }
+    },
+    "preview": {
+      "title": "Aperçu",
+      "description": "Voir comment vos paramètres affectent l'interface",
+      "sampleTitle": "Titre du Jeu Exemple",
+      "sampleDescription": "Voici comment le contenu apparaîtra avec vos paramètres actuels",
+      "sampleButton": "Bouton Exemple",
+      "currentTheme": "Thème actuel",
+      "language": "Langue"
+    },
+    "saveSettings": "Enregistrer les Paramètres",
+    "saving": "Enregistrement...",
+    "savedSuccess": "Paramètres enregistrés avec succès!"
   }
 }

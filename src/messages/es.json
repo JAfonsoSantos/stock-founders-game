@@ -113,5 +113,42 @@
     "name": "Nombre",
     "value": "Valor",
     "return": "Retorno"
+  },
+  "settings": {
+    "title": "Configuración",
+    "description": "Gestionar sus preferencias y apariencia",
+    "language": {
+      "title": "Idioma y Región",
+      "description": "Elija su idioma preferido para la interfaz de la plataforma",
+      "interface": "Idioma de la Interfaz",
+      "current": "Actualmente"
+    },
+    "appearance": {
+      "title": "Apariencia",
+      "description": "Personalizar cómo se ve y se siente la plataforma",
+      "theme": {
+        "title": "Tema de Color",
+        "description": "Elija entre claro, oscuro, o preferencia del sistema",
+        "light": "Claro",
+        "dark": "Oscuro",
+        "system": "Sistema"
+      },
+      "compactMode": {
+        "title": "Modo Compacto",
+        "description": "Reducir espaciado y hacer la interfaz más densa"
+      }
+    },
+    "preview": {
+      "title": "Vista Previa",
+      "description": "Ve cómo sus configuraciones afectan la interfaz",
+      "sampleTitle": "Título del Juego Ejemplo",
+      "sampleDescription": "Así es como aparecerá el contenido con sus configuraciones actuales",
+      "sampleButton": "Botón Ejemplo",
+      "currentTheme": "Tema actual",
+      "language": "Idioma"
+    },
+    "saveSettings": "Guardar Configuración",
+    "saving": "Guardando...",
+    "savedSuccess": "¡Configuración guardada exitosamente!"
   }
 }

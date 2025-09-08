@@ -119,5 +119,42 @@
       "title": "Final Results",
       "message": "Here are the final results of the startup stock market game."
     }
+  },
+  "settings": {
+    "title": "Settings",
+    "description": "Manage your preferences and appearance",
+    "language": {
+      "title": "Language & Region",
+      "description": "Choose your preferred language for the platform interface",
+      "interface": "Interface Language",
+      "current": "Currently"
+    },
+    "appearance": {
+      "title": "Appearance",
+      "description": "Customize how the platform looks and feels",
+      "theme": {
+        "title": "Color Theme",
+        "description": "Choose between light, dark, or system preference",
+        "light": "Light",
+        "dark": "Dark",
+        "system": "System"
+      },
+      "compactMode": {
+        "title": "Compact Mode",
+        "description": "Reduce spacing and make the interface more dense"
+      }
+    },
+    "preview": {
+      "title": "Preview",
+      "description": "See how your settings affect the interface",
+      "sampleTitle": "Sample Game Title",
+      "sampleDescription": "This is how content will appear with your current settings",
+      "sampleButton": "Sample Button",
+      "currentTheme": "Current theme",
+      "language": "Language"
+    },
+    "saveSettings": "Save Settings",
+    "saving": "Saving...",
+    "savedSuccess": "Settings saved successfully!"
   }
 }

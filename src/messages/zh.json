@@ -113,5 +113,42 @@
     "name": "名称",
     "value": "价值",
     "return": "回报"
+  },
+  "settings": {
+    "title": "设置",
+    "description": "管理您的偏好和外观",
+    "language": {
+      "title": "语言和地区",
+      "description": "选择您偏好的平台界面语言",
+      "interface": "界面语言",
+      "current": "当前"
+    },
+    "appearance": {
+      "title": "外观",
+      "description": "自定义平台的外观和感觉",
+      "theme": {
+        "title": "颜色主题",
+        "description": "在浅色、深色或系统偏好之间选择",
+        "light": "浅色",
+        "dark": "深色",
+        "system": "系统"
+      },
+      "compactMode": {
+        "title": "紧凑模式",
+        "description": "减少间距，使界面更密集"
+      }
+    },
+    "preview": {
+      "title": "预览",
+      "description": "查看您的设置如何影响界面",
+      "sampleTitle": "示例游戏标题",
+      "sampleDescription": "这是内容在您当前设置下的显示方式",
+      "sampleButton": "示例按钮",
+      "currentTheme": "当前主题",
+      "language": "语言"
+    },
+    "saveSettings": "保存设置",
+    "saving": "正在保存...",
+    "savedSuccess": "设置保存成功！"
   }
 }
