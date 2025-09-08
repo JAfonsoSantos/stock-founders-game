@@ -304,7 +304,7 @@ export default function Auth() {
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         className="h-12 text-base pr-12"
                         required
-                        minLength={6}
+                        minLength={8}
                       />
                       <Button
                         type="button"
@@ -319,9 +319,22 @@ export default function Auth() {
                           <Eye className="h-4 w-4 text-muted-foreground" />
                         )}
                       </Button>
-                    </div>
-                  </div>
-                </div>
+                     </div>
+                     {confirmPassword && (
+                       <div className="mt-1">
+                         {password === confirmPassword ? (
+                           <p className="text-xs text-green-500 flex items-center gap-1">
+                             ✓ Passwords coincidem
+                           </p>
+                         ) : (
+                           <p className="text-xs text-red-500 flex items-center gap-1">
+                             ✗ Passwords não coincidem
+                           </p>
+                         )}
+                       </div>
+                     )}
+                   </div>
+                 </div>
                 <Button 
                   type="submit" 
                   className="w-full h-12 text-base font-medium" 
