@@ -46,6 +46,37 @@ export default function ManageParticipants() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [showQRCode, setShowQRCode] = useState(false);
 
+  // Helper function to fetch and format participants
+  const fetchParticipants = async () => {
+    const { data: participantsData } = await supabase
+      .from("participants")
+      .select("*")
+      .eq("game_id", gameId)
+      .order("created_at", { ascending: false });
+    
+    // Get user data separately for each participant
+    if (participantsData) {
+      const participantsWithUserData = await Promise.all(
+        participantsData.map(async (participant) => {
+          const { data: userData } = await supabase
+            .from("users")
+            .select("first_name, last_name, email")
+            .eq("id", participant.user_id)
+            .single();
+
+          return {
+            ...participant,
+            users: userData,
+            email: userData?.email || '—'
+          };
+        })
+      );
+      setParticipants(participantsWithUserData);
+    } else {
+      setParticipants([]);
+    }
+  };
+
   useEffect(() => {
     if (!user || !gameId) return;
     
@@ -81,35 +112,7 @@ export default function ManageParticipants() {
       }
       
       // Fetch participants without JOIN to avoid RLS issues
-      const { data: participantsData } = await supabase
-        .from("participants")
-        .select("*")
-        .eq("game_id", gameId)
-        .order("created_at", { ascending: false });
-
-      // Get user data separately for each participant
-      if (participantsData) {
-        const participantsWithUserData = await Promise.all(
-          participantsData.map(async (participant) => {
-            const { data: userData } = await supabase
-              .from("users")
-              .select("first_name, last_name, email")
-              .eq("id", participant.user_id)
-              .single();
-
-            return {
-              ...participant,
-              users: userData,
-              email: userData?.email || '—'
-            };
-          })
-        );
-        setParticipants(participantsWithUserData);
-      }
-      
-      else {
-        setParticipants([]);
-      }
+      await fetchParticipants();
       setLoading(false);
     };
 
@@ -175,33 +178,7 @@ export default function ManageParticipants() {
       });
 
       // Refresh participants
-      const { data: participantsData } = await supabase
-        .from("participants")
-        .select("*")
-        .eq("game_id", gameId)
-        .order("created_at", { ascending: false });
-      
-      // Get user data separately for each participant
-      if (participantsData) {
-        const participantsWithUserData = await Promise.all(
-          participantsData.map(async (participant) => {
-            const { data: userData } = await supabase
-              .from("users")
-              .select("first_name, last_name, email")
-              .eq("id", participant.user_id)
-              .single();
-
-            return {
-              ...participant,
-              users: userData,
-              email: userData?.email || '—'
-            };
-          })
-        );
-        setParticipants(participantsWithUserData);
-      } else {
-        setParticipants([]);
-      }
+      await fetchParticipants();
     } catch (error) {
       toast.error("Failed to add participant");
     } finally {
@@ -282,33 +259,7 @@ export default function ManageParticipants() {
       setShowEditModal(false);
       
       // Refresh participants list
-      const { data: participantsData } = await supabase
-        .from("participants")
-        .select("*")
-        .eq("game_id", gameId)
-        .order("created_at", { ascending: false });
-      
-      // Get user data separately for each participant
-      if (participantsData) {
-        const participantsWithUserData = await Promise.all(
-          participantsData.map(async (participant) => {
-            const { data: userData } = await supabase
-              .from("users")
-              .select("first_name, last_name, email")
-              .eq("id", participant.user_id)
-              .single();
-
-            return {
-              ...participant,
-              users: userData,
-              email: userData?.email || '—'
-            };
-          })
-        );
-        setParticipants(participantsWithUserData);
-      } else {
-        setParticipants([]);
-      }
+      await fetchParticipants();
     } catch (error: any) {
       toast.error("Failed to update participant: " + error.message);
     } finally {
@@ -344,33 +295,7 @@ export default function ManageParticipants() {
       setShowDeleteDialog(false);
       
       // Refresh participants list
-      const { data: participantsData } = await supabase
-        .from("participants")
-        .select("*")
-        .eq("game_id", gameId)
-        .order("created_at", { ascending: false });
-      
-      // Get user data separately for each participant
-      if (participantsData) {
-        const participantsWithUserData = await Promise.all(
-          participantsData.map(async (participant) => {
-            const { data: userData } = await supabase
-              .from("users")
-              .select("first_name, last_name, email")
-              .eq("id", participant.user_id)
-              .single();
-
-            return {
-              ...participant,
-              users: userData,
-              email: userData?.email || '—'
-            };
-          })
-        );
-        setParticipants(participantsWithUserData);
-      } else {
-        setParticipants([]);
-      }
+      await fetchParticipants();
     } catch (error: any) {
       toast.error("Failed to delete participant: " + error.message);
     } finally {
@@ -431,36 +356,7 @@ export default function ManageParticipants() {
                   gameRoles={gameRoles}
                   onImportComplete={() => {
                     // Refresh participants
-                    const refreshData = async () => {
-                      const { data: participantsData } = await supabase
-                        .from("participants")
-                        .select("*")
-                        .eq("game_id", gameId)
-                        .order("created_at", { ascending: false });
-                      
-                      // Get user data separately for each participant
-                      if (participantsData) {
-                        const participantsWithUserData = await Promise.all(
-                          participantsData.map(async (participant) => {
-                            const { data: userData } = await supabase
-                              .from("users")
-                              .select("first_name, last_name, email")
-                              .eq("id", participant.user_id)
-                              .single();
-
-                            return {
-                              ...participant,
-                              users: userData,
-                              email: userData?.email || '—'
-                            };
-                          })
-                        );
-                        setParticipants(participantsWithUserData);
-                      } else {
-                        setParticipants([]);
-                      }
-                    };
-                    refreshData();
+                    fetchParticipants();
                   }}
                 />
                 
@@ -604,8 +500,14 @@ export default function ManageParticipants() {
                     <TableCell>{formatCurrency(participant.initial_budget)}</TableCell>
                     <TableCell>{formatCurrency(participant.current_cash)}</TableCell>
                     <TableCell>
-                      <Badge variant={participant.is_suspended ? "destructive" : "outline"}>
-                        {participant.is_suspended ? "Suspended" : "Active"}
+                      <Badge variant={
+                        participant.status === 'pending' ? "secondary" :
+                        participant.status === 'suspended' ? "destructive" : 
+                        "default"
+                      }>
+                        {participant.status === 'pending' ? "Pending" :
+                         participant.status === 'suspended' ? "Suspended" :
+                         "Active"}
                       </Badge>
                     </TableCell>
                     <TableCell>

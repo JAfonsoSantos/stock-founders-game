@@ -53,12 +53,20 @@ export default function Join() {
     
     const { data } = await supabase
       .from("participants")
-      .select("id, role")
+      .select("id, role, status")
       .eq("game_id", gameId)
       .eq("user_id", user.id)
       .single();
     
     if (data) {
+      // Activate participant status on first login
+      if (data.status === 'pending') {
+        await supabase
+          .from("participants")
+          .update({ status: 'active' })
+          .eq("id", data.id);
+      }
+
       // If founder, check if they have a startup or need onboarding
       if (data.role === 'founder') {
         const { data: founderData } = await supabase

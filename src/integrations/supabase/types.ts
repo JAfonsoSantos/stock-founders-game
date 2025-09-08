@@ -277,6 +277,7 @@ export type Database = {
           initial_budget: number
           is_suspended: boolean
           role: Database["public"]["Enums"]["participant_role"]
+          status: Database["public"]["Enums"]["participant_status"]
           updated_at: string
           user_id: string
         }
@@ -288,6 +289,7 @@ export type Database = {
           initial_budget: number
           is_suspended?: boolean
           role: Database["public"]["Enums"]["participant_role"]
+          status?: Database["public"]["Enums"]["participant_status"]
           updated_at?: string
           user_id: string
         }
@@ -299,6 +301,7 @@ export type Database = {
           initial_budget?: number
           is_suspended?: boolean
           role?: Database["public"]["Enums"]["participant_role"]
+          status?: Database["public"]["Enums"]["participant_status"]
           updated_at?: string
           user_id?: string
         }
@@ -653,6 +656,7 @@ export type Database = {
       market_type: "primary" | "secondary"
       order_status: "pending" | "accepted" | "rejected" | "canceled" | "expired"
       participant_role: "founder" | "angel" | "vc" | "organizer"
+      participant_status: "pending" | "active" | "suspended"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -785,6 +789,7 @@ export const Constants = {
       market_type: ["primary", "secondary"],
       order_status: ["pending", "accepted", "rejected", "canceled", "expired"],
       participant_role: ["founder", "angel", "vc", "organizer"],
+      participant_status: ["pending", "active", "suspended"],
     },
   },
 } as const
