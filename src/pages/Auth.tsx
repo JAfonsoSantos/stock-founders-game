@@ -11,6 +11,7 @@ import { toast } from "@/hooks/use-toast";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { PasswordStrengthIndicator } from "@/components/PasswordStrengthIndicator";
 import { validateEmail } from "@/lib/validation";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Auth() {
   const [email, setEmail] = useState("");
@@ -128,6 +129,21 @@ export default function Auth() {
     setLoading(true);
 
     try {
+      // First check if user already exists and handle accordingly
+      const { data: signupCheck } = await supabase.functions.invoke('handle-signup-attempt', {
+        body: { email }
+      });
+
+      if (signupCheck?.userExists) {
+        toast({
+          title: "✉️ Email já registado",
+          description: "Enviámos-te um link mágico para entrar. Verifica o email (e o Spam).",
+        });
+        setLoading(false);
+        return;
+      }
+
+      // If user doesn't exist, proceed with normal signup
       const { error } = await signUp(email, password);
       
       if (error) {
@@ -141,17 +157,9 @@ export default function Auth() {
           title: "Conta criada",
           description: "Verifica o teu email para confirmar a conta. Se não encontrares, verifica o Spam.",
         });
-        
-        // Wait a bit and suggest login if no email received
-        setTimeout(() => {
-          toast({
-            title: "Não recebeste o email?",
-            description: "Se o email já estiver registado, usa 'Tenho password' para entrar.",
-            variant: "default",
-          });
-        }, 8000);
       }
     } catch (error) {
+      console.error('Signup error:', error);
       toast({
         variant: "destructive",
         title: "Erro",

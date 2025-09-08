@@ -65,3 +65,6 @@ verify_jwt = true
 
 [functions.notify-game-status-change]
 verify_jwt = false
+
+[functions.handle-signup-attempt]
+verify_jwt = false
