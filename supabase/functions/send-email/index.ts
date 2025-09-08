@@ -143,29 +143,32 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Validate recipients are participants in the game
-    const { data: participants, error: participantsError } = await supabaseUser
-      .from('participants')
-      .select('user_id, users!inner(email)')
-      .eq('game_id', emailRequest.gameId);
+    // For invite emails, skip participant validation (we're inviting new people)
+    // For other email types, validate recipients are participants in the game
+    if (emailRequest.type !== 'invite') {
+      const { data: participants, error: participantsError } = await supabaseUser
+        .from('participants')
+        .select('user_id, users!inner(email)')
+        .eq('game_id', emailRequest.gameId);
 
-    if (participantsError) {
-      console.error('Error fetching participants:', participantsError);
-      return new Response(
-        JSON.stringify({ error: 'Failed to validate recipients' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
-      );
-    }
+      if (participantsError) {
+        console.error('Error fetching participants:', participantsError);
+        return new Response(
+          JSON.stringify({ error: 'Failed to validate recipients' }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+        );
+      }
 
-    const validEmails = participants?.map(p => (p.users as any)?.email).filter(Boolean) || [];
-    const invalidRecipients = emailRequest.to.filter(email => !validEmails.includes(email));
-    
-    if (invalidRecipients.length > 0) {
-      console.error('Invalid recipients:', invalidRecipients);
-      return new Response(
-        JSON.stringify({ error: `Invalid recipients: ${invalidRecipients.join(', ')}` }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
-      );
+      const validEmails = participants?.map(p => (p.users as any)?.email).filter(Boolean) || [];
+      const invalidRecipients = emailRequest.to.filter(email => !validEmails.includes(email));
+      
+      if (invalidRecipients.length > 0) {
+        console.error('Invalid recipients:', invalidRecipients);
+        return new Response(
+          JSON.stringify({ error: `Invalid recipients: ${invalidRecipients.join(', ')}` }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+        );
+      }
     }
 
     let template;
