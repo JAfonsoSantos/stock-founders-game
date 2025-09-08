@@ -77,7 +77,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `https://stox.games/`
+        redirectTo: `${window.location.origin}/`
       }
     });
     return { error };
