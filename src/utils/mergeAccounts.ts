@@ -1,12 +1,14 @@
 import { supabase } from "@/integrations/supabase/client";
 
-export async function mergeAccounts(oldUserId: string, newUserId: string, email: string) {
+// Merges any demo/CSV-created profile rows for the given email into the current auth user.
+// If oldUserId is provided, merges that specific profile.
+export async function mergeAccounts(newUserId: string, email: string, oldUserId?: string) {
   try {
     const { data, error } = await supabase.functions.invoke('merge-accounts', {
       body: {
-        oldUserId,
         newUserId,
-        email
+        email,
+        oldUserId,
       }
     });
 

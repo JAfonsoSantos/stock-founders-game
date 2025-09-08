@@ -20,45 +20,76 @@ Deno.serve(async (req) => {
 
     const { oldUserId, newUserId, email } = await req.json();
 
-    console.log(`Merging accounts: ${oldUserId} -> ${newUserId} (${email})`);
+    if (!newUserId || !email) {
+      return new Response(
+        JSON.stringify({ error: 'newUserId and email are required' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      );
+    }
 
-    // Update the new user with the email
+    console.log(`Merging accounts for email ${email} into user ${newUserId}${oldUserId ? ` (explicit old user ${oldUserId})` : ''}`);
+
+    // Ensure the new user record has the email stored (used by organizer tools)
     const { error: userError } = await supabase
       .from('users')
-      .update({ email })
-      .eq('id', newUserId);
+      .upsert({ id: newUserId, email }, { onConflict: 'id' });
 
     if (userError) {
-      console.error('Error updating user:', userError);
+      console.error('Error upserting user email:', userError);
       throw userError;
     }
 
-    // Move all participations from old user to new user
-    const { error: participantError } = await supabase
-      .from('participants')
-      .update({ user_id: newUserId })
-      .eq('user_id', oldUserId);
+    let mergedCount = 0;
 
-    if (participantError) {
-      console.error('Error updating participants:', participantError);
-      throw participantError;
+    // Helper to move participations and delete an old profile row
+    const mergeFromOld = async (oldId: string) => {
+      if (oldId === newUserId) return;
+
+      const { error: participantError } = await supabase
+        .from('participants')
+        .update({ user_id: newUserId })
+        .eq('user_id', oldId);
+
+      if (participantError) {
+        console.error('Error updating participants:', participantError);
+        throw participantError;
+      }
+
+      const { error: deleteError } = await supabase
+        .from('users')
+        .delete()
+        .eq('id', oldId);
+
+      if (deleteError) {
+        console.warn('Error deleting old user (non-fatal):', deleteError);
+      }
+
+      mergedCount += 1;
+    };
+
+    if (oldUserId) {
+      await mergeFromOld(oldUserId);
+    } else {
+      // Find any profile rows with the same email (created via CSV or demo) and merge them
+      const { data: dupUsers, error: dupErr } = await supabase
+        .from('users')
+        .select('id')
+        .eq('email', email);
+
+      if (dupErr) {
+        console.error('Error fetching duplicate users:', dupErr);
+        throw dupErr;
+      }
+
+      for (const u of dupUsers || []) {
+        await mergeFromOld(u.id as string);
+      }
     }
 
-    // Delete the old user record
-    const { error: deleteError } = await supabase
-      .from('users')
-      .delete()
-      .eq('id', oldUserId);
-
-    if (deleteError) {
-      console.error('Error deleting old user:', deleteError);
-      // Don't throw here, just log the error
-    }
-
-    console.log('Account merge completed successfully');
+    console.log('Account merge completed. Merged profiles:', mergedCount);
 
     return new Response(
-      JSON.stringify({ success: true }),
+      JSON.stringify({ success: true, mergedCount }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200 
