@@ -47,17 +47,32 @@ export default function Join() {
     }
   }, [user, gameId]);
 
+  // Check if user is already a participant and redirect accordingly
   const checkParticipation = async () => {
     if (!user || !gameId) return;
     
     const { data } = await supabase
       .from("participants")
-      .select("id")
+      .select("id, role")
       .eq("game_id", gameId)
       .eq("user_id", user.id)
       .single();
     
     if (data) {
+      // If founder, check if they have a startup or need onboarding
+      if (data.role === 'founder') {
+        const { data: founderData } = await supabase
+          .from("founder_members")
+          .select("id")
+          .eq("participant_id", data.id)
+          .maybeSingle();
+        
+        if (!founderData) {
+          navigate(`/games/${gameId}/founder-onboarding`);
+          return;
+        }
+      }
+      
       navigate(`/games/${gameId}/discover`);
     }
   };

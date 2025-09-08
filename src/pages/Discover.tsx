@@ -132,6 +132,29 @@ export default function Discover() {
           <p className="text-muted-foreground mt-2">
             Browse and invest in promising startups
           </p>
+          <div className="mt-4 flex gap-2">
+            <Button 
+              variant="outline"
+              onClick={() => navigate(`/games/${gameId}/me`)}
+            >
+              My Dashboard
+            </Button>
+            <Button 
+              variant="outline"
+              onClick={() => navigate(`/games/${gameId}/leaderboard`)}
+            >
+              Leaderboard
+            </Button>
+            {participant?.role === 'founder' && (
+              <Button 
+                variant="outline"
+                onClick={() => navigate(`/games/${gameId}/founder-onboarding`)}
+              >
+                <Building className="h-4 w-4 mr-2" />
+                Manage Startup
+              </Button>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

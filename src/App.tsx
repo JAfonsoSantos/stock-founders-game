@@ -22,6 +22,7 @@ import PlayerDashboard from "./pages/PlayerDashboard";
 import StartupProfile from "./pages/StartupProfile";
 import StartupAdmin from "./pages/StartupAdmin";
 import Leaderboard from "./pages/Leaderboard";
+import FounderOnboarding from "./pages/FounderOnboarding";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -142,6 +143,11 @@ const App = () => (
             <Route path="/games/:gameId/leaderboard" element={
               <ProtectedRoute>
                 <Leaderboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/games/:gameId/founder-onboarding" element={
+              <ProtectedRoute>
+                <FounderOnboarding />
               </ProtectedRoute>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

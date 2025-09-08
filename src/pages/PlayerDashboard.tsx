@@ -188,6 +188,20 @@ export default function PlayerDashboard() {
           <p className="text-muted-foreground mt-2">
             Track your investments and performance
           </p>
+          <div className="mt-4 flex gap-2">
+            <Button 
+              variant="outline"
+              onClick={() => navigate(`/games/${gameId}/discover`)}
+            >
+              Discover Startups
+            </Button>
+            <Button 
+              variant="outline"
+              onClick={() => navigate(`/games/${gameId}/leaderboard`)}
+            >
+              Leaderboard
+            </Button>
+          </div>
         </div>
 
         <div className="space-y-6">
