@@ -248,7 +248,7 @@ const handler = async (req: Request): Promise<Response> => {
     const html = await renderAsync(template);
 
     const emailResponse = await resend.emails.send({
-      from: "Stox <onboarding@resend.dev>",
+      from: "Stox <noreply@stox.games>",
       to: emailRequest.to,
       subject: subject,
       html: html,
