@@ -255,7 +255,7 @@ export default function Auth() {
           {/* Form Content */}
           <div className="space-y-4">
             {/* Social Sign In Buttons - First */}
-            <div className="space-y-3">
+            <div className="space-y-4">
               <Button
                 onClick={handleLinkedInSignIn}
                 variant="outline"
@@ -309,7 +309,7 @@ export default function Auth() {
             </div>
 
             {/* Email input */}
-            <div className="space-y-2">
+            <div className="space-y-4">
               <Input
                 id="primary-email"
                 type="email"
@@ -319,10 +319,8 @@ export default function Auth() {
                 className="h-14 text-base bg-white border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all duration-200"
                 required
               />
-            </div>
 
-            {/* Password field - always show */}
-            <div className="space-y-2">
+              {/* Password field - always show */}
               <div className="relative">
                 <Input
                   id="password"
@@ -349,59 +347,12 @@ export default function Auth() {
               </div>
             </div>
 
-            {/* Confirm Password field - only for signup */}
-            {authMode === 'signup' && (
-              <>
-                <PasswordStrengthIndicator password={password} />
-                <div className="space-y-2">
-                  <div className="relative">
-                    <Input
-                      id="confirm-new-password"
-                      type={showConfirmPassword ? "text" : "password"}
-                      placeholder="Confirm your password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="h-14 text-base pr-12 bg-white border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all duration-200"
-                      required
-                      minLength={8}
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="absolute right-0 top-0 h-14 w-12 hover:bg-transparent"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    >
-                      {showConfirmPassword ? (
-                        <EyeOff className="h-4 w-4 text-gray-400" />
-                      ) : (
-                        <Eye className="h-4 w-4 text-gray-400" />
-                      )}
-                    </Button>
-                  </div>
-                  {confirmPassword && (
-                    <div className="mt-1">
-                      {password === confirmPassword ? (
-                        <p className="text-xs text-green-500 flex items-center gap-1">
-                          ✓ Passwords match
-                        </p>
-                      ) : (
-                        <p className="text-xs text-red-500 flex items-center gap-1">
-                          ✗ Passwords don't match
-                        </p>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </>
-            )}
-
-            {/* Forgot Password Link - always show */}
-            <div className="text-left">
+            {/* Forgot Password Link - always show, aligned right */}
+            <div className="text-right">
               <Button
                 type="button"
                 variant="link"
-                className="p-0 h-auto text-sm text-gray-500 hover:text-orange-600 transition-colors"
+                className="p-0 h-auto text-xs text-gray-400 hover:text-orange-600 transition-colors"
                 onClick={() => setAuthMode('magic')}
               >
                 Forgot your password?
