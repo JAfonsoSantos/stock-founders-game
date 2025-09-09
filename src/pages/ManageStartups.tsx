@@ -185,29 +185,68 @@ export default function ManageStartups() {
       
       // Extract logo from HTML - look for company logo patterns in LinkedIn
       if (htmlContent) {
-        // Look for common LinkedIn logo patterns
+        // Look for common LinkedIn logo patterns - updated with more comprehensive patterns
         const logoPatterns = [
+          // Standard company logo patterns
           /class="[^"]*company-logo[^"]*"[^>]*src="([^"]+)"/i,
           /class="[^"]*org-top-card-primary-content__logo[^"]*"[^>]*src="([^"]+)"/i,
+          /class="[^"]*org-top-card-primary-content__logo[^"]*"[^>]*>\s*<img[^>]*src="([^"]+)"/i,
+          
+          // Data attribute patterns
           /data-delayed-url="([^"]+)"[^>]*class="[^"]*company-logo/i,
+          /data-delayed-url="([^"]+)"[^>]*class="[^"]*logo/i,
+          
+          // Generic image patterns that might contain logos
+          /<img[^>]*src="([^"]*company[^"]*logo[^"]*)"[^>]*>/i,
+          /<img[^>]*src="([^"]*logo[^"]*company[^"]*)"[^>]*>/i,
+          /<img[^>]*src="([^"]*\/company\/[^"]*)"[^>]*>/i,
+          
+          // LinkedIn-specific patterns
+          /<img[^>]*src="([^"]*media\.licdn\.com[^"]*company[^"]*)"[^>]*>/i,
+          /<img[^>]*src="([^"]*media\.licdn\.com[^"]*logo[^"]*)"[^>]*>/i,
+          /<img[^>]*src="([^"]*licdn\.com[^"]*dms[^"]*image[^"]*)"[^>]*>/i,
+          
+          // Profile and avatar patterns (fallback)
           /<img[^>]*src="([^"]*profile-displayphoto[^"]*)"[^>]*>/i,
-          /<img[^>]*src="([^"]*company.*logo[^"]*)"[^>]*>/i
+          /<img[^>]*src="([^"]*avatar[^"]*)"[^>]*>/i,
+          
+          // General patterns for any image that might be a logo
+          /<img[^>]*class="[^"]*logo[^"]*"[^>]*src="([^"]+)"/i,
+          /src="([^"]*)"[^>]*class="[^"]*logo[^"]*"/i
         ];
         
         for (const pattern of logoPatterns) {
           const match = htmlContent.match(pattern);
           if (match && match[1]) {
-            // Clean up the URL
             let logoUrl = match[1];
+            
+            // Clean up the URL
             if (logoUrl.startsWith('//')) {
               logoUrl = 'https:' + logoUrl;
             }
-            // Avoid low quality or generic images
-            if (logoUrl.includes('profile-displayphoto') || 
-                logoUrl.includes('company') || 
-                logoUrl.includes('logo')) {
+            
+            // Skip obviously bad URLs
+            if (logoUrl.includes('data:') || 
+                logoUrl.includes('blob:') || 
+                logoUrl.length < 10 ||
+                logoUrl.includes('generic') ||
+                logoUrl.includes('default')) {
+              continue;
+            }
+            
+            // Prefer higher quality images
+            if (logoUrl.includes('media.licdn.com') && 
+                (logoUrl.includes('company') || logoUrl.includes('logo'))) {
               extractedLogoUrl = logoUrl;
               break;
+            }
+            
+            // Accept any reasonable logo URL if we haven't found a better one
+            if (!extractedLogoUrl && 
+                (logoUrl.includes('logo') || 
+                 logoUrl.includes('company') || 
+                 logoUrl.includes('profile-displayphoto'))) {
+              extractedLogoUrl = logoUrl;
             }
           }
         }
