@@ -433,16 +433,6 @@ export default function Auth() {
 
           {/* Auth mode switcher */}
           <div className="flex justify-center gap-4 text-sm pt-4">
-            {authMode !== 'password' && (
-              <Button
-                type="button"
-                variant="link"
-                className="p-0 h-auto text-muted-foreground"
-                onClick={() => setAuthMode('password')}
-              >
-                Use password
-              </Button>
-            )}
             {authMode !== 'magic' && (
               <Button
                 type="button"
