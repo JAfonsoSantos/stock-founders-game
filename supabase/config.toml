@@ -63,6 +63,9 @@ verify_jwt = true
 [functions.fetch-website]
 verify_jwt = true
 
+[functions.linkedin-organization-lookup]
+verify_jwt = true
+
 [functions.notify-game-status-change]
 verify_jwt = false
 

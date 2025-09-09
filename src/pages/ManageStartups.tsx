@@ -164,420 +164,80 @@ export default function ManageStartups() {
     setIsScrapingLinkedIn(true);
     
     try {
-      console.log('Calling fetch-website edge function...');
-      // Use Supabase edge function to fetch LinkedIn content including HTML for logo extraction
-      const { data, error } = await supabase.functions.invoke('fetch-website', {
+      // Extract vanity name from LinkedIn URL
+      let vanityName = newStartup.linkedin;
+      if (newStartup.linkedin.includes('linkedin.com/company/')) {
+        const match = newStartup.linkedin.match(/linkedin\.com\/company\/([^/?]+)/);
+        if (match) {
+          vanityName = match[1];
+        }
+      }
+
+      console.log('Using LinkedIn Organization Lookup API with vanity name:', vanityName);
+      
+      // Call our new LinkedIn Organization Lookup edge function
+      const { data, error } = await supabase.functions.invoke('linkedin-organization-lookup', {
         body: {
-          url: newStartup.linkedin,
-          formats: 'markdown,html'
+          vanityName: vanityName
         }
       });
 
-      console.log('Fetch-website response:', { data, error });
+      console.log('LinkedIn Organization API response:', { data, error });
 
       if (error) {
-        console.error('Edge function error:', error);
+        console.error('LinkedIn Organization API error:', error);
         throw new Error(error.message);
       }
 
-      const content = data.markdown || '';
-      const htmlContent = data.html || '';
-      
-      console.log('LinkedIn data received:', {
-        markdownLength: content?.length || 0,
-        htmlLength: htmlContent?.length || 0,
-        hasMarkdown: !!data.markdown,
-        hasHtml: !!data.html,
-        fullData: data // Add full data for debugging
-      });
-      
-      // Simple extraction logic for LinkedIn content
-      const lines = content.split('\n').filter(line => line.trim());
-      
-      let extractedName = '';
-      let extractedDescription = '';
-      let extractedLogoUrl = '';
-      let extractedWebsite = '';
-      
-      // Extract logo from HTML - look for company logo patterns in LinkedIn
-      if (htmlContent) {
-        console.log('HTML content length:', htmlContent.length);
-        console.log('HTML snippet (first 500 chars):', htmlContent.substring(0, 500));
-        
-        // More comprehensive logo extraction patterns based on LinkedIn API structure
-        const logoPatterns = [
-          // LinkedIn API specific fields (from structured data)
-          /"square-logo-url":\s*"([^"]+)"/i,
-          /"squareLogoUrl":\s*"([^"]+)"/i,
-          /"logo_url":\s*"([^"]+)"/i,
-          /"logoUrl":\s*"([^"]+)"/i,
-          
-          // LinkedIn specific patterns - updated for current structure
-          /img[^>]*class="[^"]*EntityPhoto-square-[^"]*"[^>]*src="([^"]+)"/i,
-          /img[^>]*class="[^"]*org-top-card-summary-info-list__logo[^"]*"[^>]*src="([^"]+)"/i,
-          /img[^>]*class="[^"]*org-top-card-primary-content__logo[^"]*"[^>]*src="([^"]+)"/i,
-          /img[^>]*class="[^"]*company-logo[^"]*"[^>]*src="([^"]+)"/i,
-          /img[^>]*class="[^"]*profile-photo-edit__preview[^"]*"[^>]*src="([^"]+)"/i,
-          /img[^>]*class="[^"]*org-[^"]*logo[^"]*"[^>]*src="([^"]+)"/i,
-          
-          // Generic patterns for images that might be logos
-          /img[^>]*alt="[^"]*logo[^"]*"[^>]*src="([^"]+)"/i,
-          /img[^>]*src="([^"]*)"[^>]*alt="[^"]*logo[^"]*"/i,
-          /img[^>]*class="[^"]*logo[^"]*"[^>]*src="([^"]+)"/i,
-          /img[^>]*src="([^"]*)"[^>]*class="[^"]*logo[^"]*"/i,
-          
-          // Media.licdn.com patterns (most reliable for LinkedIn)
-          /img[^>]*src="(https:\/\/media\.licdn\.com\/dms\/image\/[A-Z0-9-_]+\/company-logo_[^"]*)"[^>]*/i,
-          /src="(https:\/\/media\.licdn\.com\/dms\/image\/[^"]*company[^"]*)"[^>]*/i,
-          /img[^>]*src="([^"]*media\.licdn\.com[^"]*)"[^>]*>/i,
-          
-          // Company specific patterns - look for images with company or organization
-          /img[^>]*src="([^"]*company[^"]*)"[^>]*>/i,
-          /img[^>]*alt="[^"]*company[^"]*"[^>]*src="([^"]+)"/i,
-          /img[^>]*alt="[^"]*organization[^"]*"[^>]*src="([^"]+)"/i,
-          
-          // Kevel specific (for this case)
-          /img[^>]*src="([^"]*)"[^>]*alt="[^"]*Kevel[^"]*"/i,
-          /img[^>]*alt="[^"]*Kevel[^"]*"[^>]*src="([^"]+)"/i,
-          
-          // Fallback patterns for any reasonable image
-          /src="(https:\/\/[^"]*\.(?:jpg|jpeg|png|gif|webp|svg))"[^>]*>/i,
-          /img[^>]*src="(https:\/\/[^"]*\.(?:jpg|jpeg|png|gif|webp|svg))"/i
-        ];
-        
-        let foundLogos = [];
-        for (const pattern of logoPatterns) {
-          const matches = htmlContent.matchAll(new RegExp(pattern.source, pattern.flags + 'g'));
-          for (const match of matches) {
-            if (match[1]) {
-              foundLogos.push({
-                url: match[1],
-                pattern: pattern.source.substring(0, 50) + '...'
-              });
-            }
-          }
-        }
-        
-        console.log('Found potential logos:', foundLogos);
-        console.log('HTML content sample (chars 1000-2000):', htmlContent.substring(1000, 2000));
-        
-        // Select the best logo with priority order
-        const priorityOrder = [
-          (logo) => logo.url.includes('media.licdn.com') && logo.url.includes('company-logo'),
-          (logo) => logo.url.includes('media.licdn.com'),
-          (logo) => logo.url.includes('kevel') || logo.url.includes('Kevel'),
-          (logo) => logo.url.match(/\.(jpg|jpeg|png|gif|webp|svg)(\?|$)/i)
-        ];
-        
-        for (const priorityCheck of priorityOrder) {
-          const priorityLogo = foundLogos.find(priorityCheck);
-          if (priorityLogo) {
-            let logoUrl = priorityLogo.url;
-            
-            // Clean up the URL
-            if (logoUrl.startsWith('//')) {
-              logoUrl = 'https:' + logoUrl;
-            }
-            
-            // Fix LinkedIn URLs with HTML entities
-            logoUrl = logoUrl.replace(/&amp;/g, '&');
-            
-            // Skip obviously bad URLs
-            if (logoUrl.includes('data:') || 
-                logoUrl.includes('blob:') || 
-                logoUrl.length < 10 ||
-                logoUrl.includes('generic') ||
-                logoUrl.includes('default') ||
-                logoUrl.includes('icon-') ||
-                logoUrl.includes('sprite')) {
-              continue;
-            }
-            
-            // Test if the URL is accessible (simple validation)
-            try {
-              new URL(logoUrl);
-              extractedLogoUrl = logoUrl;
-              console.log('Selected logo with priority:', logoUrl, 'Pattern:', priorityLogo.pattern);
-              break;
-            } catch (e) {
-              console.log('Invalid logo URL:', logoUrl, e);
-              continue;
-            }
-          }
-        }
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to lookup organization');
+      }
 
-      // Extract website from HTML and markdown based on LinkedIn API structure
-      const websitePatterns = [
-        // LinkedIn API specific fields (from structured data)
-        /"website-url":\s*"([^"]+)"/i,
-        /"websiteUrl":\s*"([^"]+)"/i,
-        /"website":\s*"([^"]+)"/i,
-        /"companyWebsite":\s*"([^"]+)"/i,
-        
-        // LinkedIn specific website patterns from HTML
-        /href="([^"]*)"[^>]*data-tracking-control-name="organization_website"/i,
-        /data-tracking-control-name="organization_website"[^>]*href="([^"]+)"/i,
-        /class="[^"]*org-about-us-organization-description__website[^"]*"[^>]*href="([^"]+)"/i,
-        
-        // Generic website patterns from HTML
-        /href="(https?:\/\/[^"]*)"[^>]*>Website<\/a>/i,
-        /href="(https?:\/\/[^"]*)"[^>]*>\s*Site\s*<\/a>/i,
-        /href="(https?:\/\/[^"]*)"[^>]*>\s*Website\s*<\/a>/i,
-        /href="(https?:\/\/[^"]*)"[^>]*>\s*www\./i,
-        
-        // From markdown - look for website mentions
-        /Website:\s*(https?:\/\/[^\s\]]+)/i,
-        /Site:\s*(https?:\/\/[^\s\]]+)/i,
-        /\[Website\]\((https?:\/\/[^)]+)\)/i,
-        /\[Site\]\((https?:\/\/[^)]+)\)/i,
-        
-        // JSON-LD or structured data
-        /"url":\s*"(https?:\/\/[^"]*)"/i,
-        
-        // Meta tags
-        /<meta[^>]*property="og:url"[^>]*content="([^"]+)"/i,
-        /<link[^>]*rel="canonical"[^>]*href="([^"]+)"/i,
-        
-        // Look for kevel.co specifically (for this case)
-        /(https?:\/\/(?:www\.)?kevel\.co[^\s\]"]*)/i,
-        /(https?:\/\/[^.\s"]*\.(?:com|co|net|org|io)[^\s\]"]*)/i
-      ];
-        
-        let foundWebsites = [];
-        
-        // Search in both HTML and markdown content
-        const contentToSearch = [
-          { content: htmlContent, type: 'HTML' },
-          { content: content, type: 'Markdown' }
-        ];
-        
-        for (const { content: searchContent, type } of contentToSearch) {
-          if (!searchContent) continue;
-          
-          for (const pattern of websitePatterns) {
-            const matches = searchContent.matchAll(new RegExp(pattern.source, pattern.flags + 'g'));
-            for (const match of matches) {
-              if (match[1]) {
-                foundWebsites.push({
-                  url: match[1],
-                  pattern: pattern.source.substring(0, 50) + '...',
-                  source: type
-                });
-              }
-            }
-          }
-        }
-        
-        console.log('Found potential websites:', foundWebsites);
-        console.log('First 1000 chars of markdown content:', content.substring(0, 1000));
-        console.log('Searching for LinkedIn API fields in content...');
-        
-        // Check for JSON-LD or structured data with LinkedIn API fields, but exclude schema.org metadata
-        const jsonLdMatches = htmlContent.match(/<script[^>]*type="application\/ld\+json"[^>]*>([^<]*)<\/script>/gi);
-        if (jsonLdMatches) {
-          console.log('Found JSON-LD scripts:', jsonLdMatches.length);
-          for (const match of jsonLdMatches) {
-            try {
-              const jsonContent = match.replace(/<[^>]*>/g, '');
-              console.log('JSON-LD content sample:', jsonContent.substring(0, 200));
-              
-              // Skip schema.org Organization data as it's not the company website
-              if (jsonContent.includes('"@type":"Organization"') && jsonContent.includes('schema.org')) {
-                console.log('Skipping schema.org Organization data');
-                continue;
-              }
-              
-              const websiteUrlMatch = jsonContent.match(/"website-url":\s*"([^"]+)"/i) || 
-                                    jsonContent.match(/"websiteUrl":\s*"([^"]+)"/i) ||
-                                    jsonContent.match(/"website":\s*"([^"]+)"/i);
-              if (websiteUrlMatch && !extractedWebsite) {
-                const url = websiteUrlMatch[1];
-                if (!url.includes('linkedin.com') && !url.includes('schema.org')) {
-                  extractedWebsite = url;
-                  console.log('Found website from JSON-LD:', url);
-                }
-              }
-              
-              const logoUrlMatch = jsonContent.match(/"square-logo-url":\s*"([^"]+)"/i) ||
-                                 jsonContent.match(/"squareLogoUrl":\s*"([^"]+)"/i) ||
-                                 jsonContent.match(/"logo_url":\s*"([^"]+)"/i);
-              if (logoUrlMatch && !extractedLogoUrl) {
-                const logoUrl = logoUrlMatch[1];
-                if (!logoUrl.includes('schema.org') && logoUrl.includes('media.licdn.com')) {
-                  extractedLogoUrl = logoUrl;
-                  console.log('Found logo from JSON-LD:', extractedLogoUrl);
-                }
-              }
-            } catch (e) {
-              console.log('Error parsing JSON-LD:', e);
-            }
-          }
-        }
-        
-        for (const websiteInfo of foundWebsites) {
-          let websiteUrl = websiteInfo.url;
-          
-          console.log('Processing website URL:', websiteUrl, 'from', websiteInfo.source);
-          
-          // Skip LinkedIn URLs
-          if (websiteUrl.includes('linkedin.com')) {
-            console.log('Skipping LinkedIn URL:', websiteUrl);
-            continue;
-          }
-          
-          // Clean LinkedIn redirect URLs
-          if (websiteUrl.includes('/redir/redirect')) {
-            const urlMatch = websiteUrl.match(/url=([^&]*)/);
-            if (urlMatch) {
-              websiteUrl = decodeURIComponent(urlMatch[1]);
-            }
-          }
-          
-          // Fix HTML entities
-          websiteUrl = websiteUrl.replace(/&amp;/g, '&');
-          
-          // Validate URL format
-          try {
-            new URL(websiteUrl);
-            extractedWebsite = websiteUrl;
-            console.log('Selected website:', websiteUrl);
-            break;
-          } catch (e) {
-            console.log('Invalid website URL:', websiteUrl, e);
-            continue;
-          }
-        }
-        
-        // If no website found from patterns, try to extract from markdown content directly
-        if (!extractedWebsite && content) {
-          console.log('Trying to extract website from markdown content...');
-          
-          // Look for common website patterns in the content, but exclude schema.org and LinkedIn
-          const directWebsiteMatches = content.match(/(https?:\/\/(?:www\.)?[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,})/g);
-          if (directWebsiteMatches) {
-            console.log('Direct website matches found:', directWebsiteMatches);
-            
-            for (const url of directWebsiteMatches) {
-              if (!url.includes('linkedin.com') && 
-                  !url.includes('facebook.com') && 
-                  !url.includes('twitter.com') &&
-                  !url.includes('schema.org') &&
-                  !url.includes('cookie') &&
-                  url.length > 10) {
-                try {
-                  new URL(url);
-                  extractedWebsite = url;
-                  console.log('Selected website from direct match:', url);
-                  break;
-                } catch (e) {
-                  continue;
-                }
-              }
-            }
-          }
-          
-          // Try to find kevel.co specifically in the content
-          if (!extractedWebsite) {
-            const kevelMatch = content.match(/(https?:\/\/(?:www\.)?kevel\.co[^\s]*)/i);
-            if (kevelMatch) {
-              extractedWebsite = kevelMatch[1];
-              console.log('Found Kevel website:', extractedWebsite);
-            }
-          }
-        }
+      const orgData = data.data;
+      console.log('Organization data received:', orgData);
+
+      // Convert logoV2 URN to actual URL if needed
+      let logoUrl = orgData.logoUrl;
+      if (logoUrl && logoUrl.startsWith('urn:li:digitalmediaAsset:')) {
+        // LinkedIn media URNs need special handling
+        // For now, we'll skip these and try the fallback method
+        logoUrl = null;
+        console.log('LinkedIn media URN detected, using fallback method for logo');
       }
-      
-      // Find company name (usually in the first few lines or as a heading)
-      let companyNameFromMarkdown = '';
-      for (let i = 0; i < Math.min(10, lines.length); i++) {
-        const line = lines[i].trim();
-        
-        // Skip LinkedIn standard text and cookie disclaimers
-        if (line.includes('LinkedIn') || 
-            line.includes('cookie') || 
-            line.includes('Cookie Policy') ||
-            line.includes('essential and non-essential') ||
-            line.length < 3 ||
-            line.startsWith('[') ||
-            line.startsWith('http')) {
-          continue;
-        }
-        
-        if (line.match(/^#+ /)) {
-          extractedName = line.replace(/^#+ /, '').trim();
-          break;
-        }
-        if (line && line.length < 100 && line.length > 3) {
-          companyNameFromMarkdown = line;
-          if (!line.includes('|') && !line.includes('respects your privacy')) {
-            extractedName = line;
-            break;
-          }
-        }
-      }
-      
-      // Clean up extracted name - remove "| LinkedIn" suffix
-      if (extractedName) {
-        extractedName = extractedName.replace(/\s*\|\s*LinkedIn\s*$/i, '').trim();
-      }
-      
-      // Find description (look for longer paragraphs that are not cookie/disclaimer text)
-      for (const line of lines) {
-        // Skip LinkedIn disclaimer text and cookie policies
-        if (line.includes('LinkedIn') && line.includes('cookie') ||
-            line.includes('Cookie Policy') ||
-            line.includes('essential and non-essential') ||
-            line.includes('respects your privacy') ||
-            line.includes('3rd parties use') ||
-            line.startsWith('[') || 
-            line.startsWith('http') ||
-            line.length < 30) {
-          continue;
-        }
-        
-        // Look for actual company descriptions
-        if (line.length > 50 && line.length < 500 && 
-            !line.includes('cookies') && 
-            !line.includes('privacy') &&
-            !line.includes('Learn more in our')) {
-          extractedDescription = line.trim();
-          break;
-        }
-      }
-      
-      if (extractedName || extractedDescription || extractedLogoUrl || extractedWebsite) {
-        console.log('Final extracted data:', {
-          name: extractedName,
-          logoUrl: extractedLogoUrl,
-          website: extractedWebsite,
-          description: extractedDescription?.substring(0, 100) + '...'
+
+      if (orgData.name || orgData.description || logoUrl || orgData.website) {
+        console.log('Final extracted data from LinkedIn API:', {
+          name: orgData.name,
+          logoUrl: logoUrl,
+          website: orgData.website,
+          description: orgData.description?.substring(0, 100) + '...'
         });
         
         setNewStartup(prev => ({
           ...prev,
-          name: extractedName || prev.name,
-          slug: extractedName ? generateSlug(extractedName) : prev.slug,
-          description: extractedDescription || prev.description,
-          website: extractedWebsite || prev.website,
-          logo_url: extractedLogoUrl || prev.logo_url
+          name: orgData.name || prev.name,
+          slug: orgData.name ? generateSlug(orgData.name) : prev.slug,
+          description: orgData.description || prev.description,
+          website: orgData.website || prev.website,
+          logo_url: logoUrl || prev.logo_url
         }));
         
         const extractedItems = [];
-        if (extractedName) extractedItems.push('nome');
-        if (extractedDescription) extractedItems.push('descrição');
-        if (extractedWebsite) extractedItems.push('website');
-        if (extractedLogoUrl) extractedItems.push('logo');
+        if (orgData.name) extractedItems.push('nome');
+        if (orgData.description) extractedItems.push('descrição');
+        if (orgData.website) extractedItems.push('website');
+        if (logoUrl) extractedItems.push('logo');
         
         toast({
           title: "Sucesso",
           description: `Informações extraídas do LinkedIn: ${extractedItems.join(', ')}`,
         });
       } else {
-        console.log('No data extracted from LinkedIn');
+        console.log('No data extracted from LinkedIn API');
         toast({
           variant: "destructive",
           title: "Nenhum dado encontrado",
-          description: "Não foi possível extrair informações da startup do LinkedIn. Preencha manualmente.",
+          description: "Não foi possível extrair informações da startup do LinkedIn. Verifique se o perfil da empresa existe e é público.",
         });
       }
     } catch (error: any) {
@@ -587,11 +247,27 @@ export default function ManageStartups() {
         stack: error.stack,
         name: error.name
       });
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to fetch LinkedIn data: " + error.message,
-      });
+      
+      // If API fails, show a more helpful message
+      if (error.message.includes('LinkedIn access token')) {
+        toast({
+          variant: "destructive",
+          title: "Configuração necessária",
+          description: "O token de acesso do LinkedIn não está configurado. Entre em contacto com o administrador.",
+        });
+      } else if (error.message.includes('Organization not found')) {
+        toast({
+          variant: "destructive",
+          title: "Empresa não encontrada",
+          description: "Não foi possível encontrar esta empresa no LinkedIn. Verifique o URL e tente novamente.",
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Erro",
+          description: "Falha ao buscar dados do LinkedIn: " + error.message,
+        });
+      }
     } finally {
       setIsScrapingLinkedIn(false);
     }
