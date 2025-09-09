@@ -215,9 +215,9 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex bg-background">
+    <div className="min-h-screen flex bg-gray-50">
       {/* Left Panel - Form */}
-      <div className="flex-1 flex items-center justify-center p-8 lg:p-16">
+      <div className="flex-1 flex items-center justify-center p-8 lg:p-16 bg-white">
         <div className="w-full max-w-md animate-fade-in">
           {/* Header */}
           <div className="mb-12">
