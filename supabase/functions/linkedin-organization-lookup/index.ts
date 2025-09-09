@@ -14,6 +14,12 @@ interface LinkedInOrganizationResponse {
   logoV2?: {
     cropped?: string;
     original?: string;
+    cropInfo?: {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+    };
   };
   website?: {
     localized?: {
@@ -26,6 +32,15 @@ interface LinkedInOrganizationResponse {
     };
   };
   localizedDescription?: string;
+  name?: {
+    localized?: {
+      [key: string]: string;
+    };
+    preferredLocale?: {
+      country: string;
+      language: string;
+    };
+  };
 }
 
 serve(async (req) => {
@@ -105,62 +120,109 @@ serve(async (req) => {
       let description = '';
       let logoUrl = '';
 
-      // Extract company name from title or h1
+      // Extract company name from title or h1 - more comprehensive patterns
       const namePatterns = [
-        /<title>([^|]+)\s*\|\s*LinkedIn<\/title>/i,
+        /<title>([^|]+?)\s*\|\s*LinkedIn<\/title>/i,
+        /<h1[^>]*class="[^"]*org-top-card-summary-info-list__title[^"]*"[^>]*>([^<]+)<\/h1>/i,
+        /<h1[^>]*class="[^"]*top-card-layout__title[^"]*"[^>]*>([^<]+)<\/h1>/i,
         /<h1[^>]*>([^<]+)<\/h1>/i,
-        /"name":\s*"([^"]+)"/i
+        /"name":\s*"([^"]+)"/i,
+        /"localizedName":\s*"([^"]+)"/i
       ];
 
       for (const pattern of namePatterns) {
         const match = html.match(pattern);
-        if (match && match[1] && !match[1].includes('LinkedIn')) {
+        if (match && match[1] && !match[1].includes('LinkedIn') && match[1].trim().length > 1) {
           name = match[1].trim();
+          console.log('Found name via pattern:', pattern.source.substring(0, 30), '→', name);
           break;
         }
       }
 
-      // Extract website
+      // Extract website - improved patterns
       const websitePatterns = [
         /href="([^"]*)"[^>]*data-tracking-control-name="organization_website"/i,
+        /data-tracking-control-name="organization_website"[^>]*href="([^"]+)"/i,
+        /"localizedWebsite":\s*"([^"]+)"/i,
         /"website":\s*"([^"]+)"/i,
-        /Website[^>]*href="([^"]+)"/i
+        /class="[^"]*org-about-us-organization-description__website[^"]*"[^>]*href="([^"]+)"/i,
+        /Website[^>]*?href="([^"]+)"/i,
+        /Visit website[^>]*?href="([^"]+)"/i
       ];
 
       for (const pattern of websitePatterns) {
         const match = html.match(pattern);
-        if (match && match[1] && !match[1].includes('linkedin.com')) {
-          website = match[1].trim();
-          break;
+        if (match && match[1] && !match[1].includes('linkedin.com') && !match[1].includes('javascript:')) {
+          let url = match[1].trim();
+          
+          // Handle LinkedIn redirects
+          if (url.includes('/redir/redirect')) {
+            const redirectMatch = url.match(/url=([^&]+)/);
+            if (redirectMatch) {
+              url = decodeURIComponent(redirectMatch[1]);
+            }
+          }
+          
+          // Validate URL
+          try {
+            new URL(url);
+            website = url;
+            console.log('Found website via pattern:', pattern.source.substring(0, 30), '→', website);
+            break;
+          } catch (e) {
+            continue;
+          }
         }
       }
 
-      // Extract description
+      // Extract description - improved patterns
       const descriptionPatterns = [
+        /"localizedDescription":\s*"([^"]+)"/i,
         /"description":\s*"([^"]+)"/i,
         /<meta[^>]*name="description"[^>]*content="([^"]+)"/i,
+        /<meta[^>]*property="og:description"[^>]*content="([^"]+)"/i,
+        /<p[^>]*class="[^"]*org-top-card-summary-info-list__headline[^"]*"[^>]*>([^<]+)<\/p>/i,
         /<p[^>]*class="[^"]*description[^"]*"[^>]*>([^<]+)<\/p>/i
       ];
 
       for (const pattern of descriptionPatterns) {
         const match = html.match(pattern);
-        if (match && match[1] && !match[1].includes('LinkedIn')) {
+        if (match && match[1] && !match[1].includes('LinkedIn') && match[1].trim().length > 10) {
           description = match[1].trim();
+          console.log('Found description via pattern:', pattern.source.substring(0, 30), '→', description.substring(0, 50) + '...');
           break;
         }
       }
 
-      // Extract logo
+      // Extract logo - improved patterns for LinkedIn media URLs
       const logoPatterns = [
-        /img[^>]*src="(https:\/\/media\.licdn\.com\/dms\/image\/[^"]*company[^"]*)"[^>]*/i,
-        /"logo":\s*"([^"]+)"/i,
+        /img[^>]*src="(https:\/\/media\.licdn\.com\/dms\/image\/[^"]*\/company-logo_[^"]*)"[^>]*/i,
+        /img[^>]*src="(https:\/\/media\.licdn\.com\/dms\/image\/[^"]*)"[^>]*alt="[^"]*logo[^"]*"/i,
+        /"original":\s*"(urn:li:digitalmediaAsset:[^"]+)"/i,
+        /"cropped":\s*"(urn:li:digitalmediaAsset:[^"]+)"/i,
+        /img[^>]*class="[^"]*org-top-card-primary-content__logo[^"]*"[^>]*src="([^"]+)"/i,
+        /img[^>]*class="[^"]*EntityPhoto-square[^"]*"[^>]*src="([^"]+)"/i,
         /img[^>]*class="[^"]*logo[^"]*"[^>]*src="([^"]+)"/i
       ];
 
       for (const pattern of logoPatterns) {
         const match = html.match(pattern);
         if (match && match[1]) {
-          logoUrl = match[1].trim();
+          let url = match[1].trim();
+          
+          // Handle LinkedIn URNs
+          if (url.startsWith('urn:li:digitalmediaAsset:')) {
+            const assetId = url.replace('urn:li:digitalmediaAsset:', '');
+            url = `https://media.licdn.com/dms/image/${assetId}/company-logo_200_200/0/`;
+          }
+          
+          // Clean up URL
+          if (url.startsWith('//')) {
+            url = 'https:' + url;
+          }
+          
+          logoUrl = url;
+          console.log('Found logo via pattern:', pattern.source.substring(0, 30), '→', logoUrl);
           break;
         }
       }
@@ -266,22 +328,49 @@ serve(async (req) => {
 
     const organization: LinkedInOrganizationResponse = linkedinData.elements[0];
 
-    // Extract the information we need
+    // Extract the information we need - following the structure from your example
+    const name = organization.localizedName || 
+                 organization.name?.localized?.en_US ||
+                 organization.name?.localized?.[Object.keys(organization.name?.localized || {})[0]];
+
+    const website = organization.localizedWebsite || 
+                   organization.website?.localized?.en_US ||
+                   organization.website?.localized?.[Object.keys(organization.website?.localized || {})[0]];
+
+    const description = organization.localizedDescription ||
+                       organization.description?.localized?.en_US ||
+                       organization.description?.localized?.[Object.keys(organization.description?.localized || {})[0]];
+
+    // Handle LinkedIn logoV2 URNs - convert to usable URLs if possible
+    let logoUrl = '';
+    if (organization.logoV2?.original) {
+      const logoUrn = organization.logoV2.original;
+      // LinkedIn URNs like "urn:li:digitalmediaAsset:C4D0BAQE6V6rj_w1yVQ" 
+      // can be converted to URLs using LinkedIn's image API
+      if (logoUrn.startsWith('urn:li:digitalmediaAsset:')) {
+        const assetId = logoUrn.replace('urn:li:digitalmediaAsset:', '');
+        // LinkedIn public image URL format
+        logoUrl = `https://media.licdn.com/dms/image/${assetId}/company-logo_200_200/0/`;
+      }
+    } else if (organization.logoV2?.cropped) {
+      const logoUrn = organization.logoV2.cropped;
+      if (logoUrn.startsWith('urn:li:digitalmediaAsset:')) {
+        const assetId = logoUrn.replace('urn:li:digitalmediaAsset:', '');
+        logoUrl = `https://media.licdn.com/dms/image/${assetId}/company-logo_200_200/0/`;
+      }
+    }
+
     const result = {
-      name: organization.localizedName,
-      website: organization.localizedWebsite || 
-               organization.website?.localized?.en_US ||
-               organization.website?.localized?.[Object.keys(organization.website?.localized || {})[0]],
-      description: organization.localizedDescription ||
-                  organization.description?.localized?.en_US ||
-                  organization.description?.localized?.[Object.keys(organization.description?.localized || {})[0]],
-      logoUrl: organization.logoV2?.original || organization.logoV2?.cropped,
+      name: name || 'Unknown',
+      website: website || '',
+      description: description || '',
+      logoUrl: logoUrl,
       vanityName: organization.vanityName,
       id: organization.id,
       source: 'linkedin_api'
     };
 
-    console.log('Extracted organization data:', result);
+    console.log('Extracted organization data from LinkedIn API:', result);
 
     return new Response(
       JSON.stringify({ 
