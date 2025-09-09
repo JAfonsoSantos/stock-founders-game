@@ -182,23 +182,25 @@ export default function PlayerDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-3 sm:p-6">
+    <div className="min-h-screen bg-gray-50 p-3 sm:p-6">
       <div className="max-w-7xl mx-auto">
         <div className="mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold">My Portfolio</h1>
-          <p className="text-muted-foreground mt-2 text-sm sm:text-base">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">My Portfolio</h1>
+          <p className="text-gray-600 mt-2 text-sm sm:text-base">
             Track your investments and performance
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
             <Button 
               variant="outline"
               onClick={() => navigate(`/games/${gameId}/discover`)}
+              className="border-gray-200 text-gray-700 hover:bg-gray-50"
             >
               Discover Startups
             </Button>
             <Button 
               variant="outline"
               onClick={() => navigate(`/games/${gameId}/leaderboard`)}
+              className="border-gray-200 text-gray-700 hover:bg-gray-50"
             >
               Leaderboard
             </Button>
@@ -216,13 +218,13 @@ export default function PlayerDashboard() {
 
           {/* Summary Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
-          <Card>
+          <Card className="bg-white border-gray-200 shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Cash Balance</CardTitle>
-              <Wallet className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium text-gray-700">Cash Balance</CardTitle>
+              <Wallet className="h-4 w-4 text-gray-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{formatCurrency(participant?.current_cash || 0)}</div>
+              <div className="text-2xl font-bold text-gray-900">{formatCurrency(participant?.current_cash || 0)}</div>
             </CardContent>
           </Card>
 

@@ -5,38 +5,42 @@ import { ArrowRight, BarChart3, Building2, TrendingUp, Users, Zap, Globe, Trophy
 
 export default function Index() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10">
+    <div className="min-h-screen bg-gray-100">
       {/* Hero Section */}
-      <div className="relative overflow-hidden">
+      <div className="relative overflow-hidden bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600">
         {/* Background Pattern */}
-        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-transparent to-info/20"></div>
+        <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
+        <div className="absolute inset-0">
+          {/* Organic shapes */}
+          <div className="absolute top-20 right-20 w-96 h-96 bg-gradient-to-br from-white/20 to-transparent rounded-full blur-3xl"></div>
+          <div className="absolute bottom-32 left-16 w-80 h-80 bg-gradient-to-tr from-orange-300/30 to-transparent rounded-full blur-2xl"></div>
+        </div>
         
         <div className="relative container mx-auto px-4 py-20">
           <div className="text-center max-w-4xl mx-auto">
-            <div className="inline-flex items-center px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8">
-              <Zap className="w-4 h-4 mr-2 text-primary" />
-              <span className="text-sm font-medium text-primary">Future of Startup Trading</span>
+            <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/20 border border-white/30 mb-8">
+              <Zap className="w-4 h-4 mr-2 text-white" />
+              <span className="text-sm font-medium text-white">Future of Startup Trading</span>
             </div>
             
-            <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-foreground via-primary to-info bg-clip-text text-transparent mb-6 leading-tight">
+            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
               Startup Stock
               <br />
-              <span className="text-primary">Market</span>
+              <span className="text-white/90">Market</span>
             </h1>
             
-            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto leading-relaxed">
               A revolucionária plataforma de trading para eventos onde fundadores vendem ações das suas startups a investidores anjos e VCs num mercado dinâmico e interativo.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 px-8 py-6 text-lg">
+              <Button asChild size="lg" className="bg-white text-orange-600 hover:bg-gray-50 px-8 py-6 text-lg h-14 font-semibold shadow-lg">
                 <Link to="/auth">
                   Começar Agora
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="px-8 py-6 text-lg border-primary/20 hover:bg-primary/5">
+              <Button asChild size="lg" variant="outline" className="px-8 py-6 text-lg h-14 border-white/30 text-white hover:bg-white/10">
                 <Link to="/auth">
                   Entrar na Plataforma
                 </Link>
@@ -47,24 +51,24 @@ export default function Index() {
       </div>
 
       {/* Features Section */}
-      <div className="container mx-auto px-4 py-20">
+      <div className="container mx-auto px-4 py-20 bg-gray-50">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            O Futuro do <span className="text-primary">Investment Gaming</span>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">
+            O Futuro do <span className="text-orange-600">Investment Gaming</span>
           </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+          <p className="text-gray-600 text-lg max-w-2xl mx-auto">
             Uma experiência imersiva que combina networking, investimento e gamificação num ambiente controlado e educativo.
           </p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <Card className="bg-gradient-to-br from-card to-card/50 border-primary/10 hover:border-primary/30 transition-all duration-300">
+          <Card className="bg-white border-gray-200 hover:border-orange-300 hover:shadow-lg transition-all duration-300">
             <CardContent className="p-8">
-              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-6">
-                <BarChart3 className="w-6 h-6 text-primary" />
+              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-6">
+                <BarChart3 className="w-6 h-6 text-orange-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">Trading em Tempo Real</h3>
-              <p className="text-muted-foreground">
+              <h3 className="text-xl font-semibold mb-3 text-gray-900">Trading em Tempo Real</h3>
+              <p className="text-gray-600">
                 Mercado primário e secundário com preços calculados por VWAP das últimas 3 transações, simulando condições reais de mercado.
               </p>
             </CardContent>

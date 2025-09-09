@@ -139,27 +139,27 @@ export default function CreateGame() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b">
+    <div className="min-h-screen bg-gray-50">
+      <header className="border-b border-gray-200 bg-white shadow-sm">
         <div className="container mx-auto px-4 py-4">
           <Button 
             variant="ghost" 
             onClick={() => navigate("/")}
-            className="mb-4"
+            className="mb-4 text-gray-600 hover:text-gray-900"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Dashboard
           </Button>
-          <h1 className="text-2xl font-bold">Create New Game</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Create New Game</h1>
         </div>
       </header>
 
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto">
-          <Card>
+          <Card className="bg-white border-gray-200 shadow-sm">
             <CardHeader>
-              <CardTitle>Game Setup</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-gray-900">Game Setup</CardTitle>
+              <CardDescription className="text-gray-600">
                 Configure your Stox game
               </CardDescription>
             </CardHeader>
@@ -168,12 +168,13 @@ export default function CreateGame() {
                 {/* Basic Info */}
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="name">Game Name</Label>
+                    <Label htmlFor="name" className="text-gray-700">Game Name</Label>
                     <Input
                       id="name"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       placeholder="e.g., Tech Summit 2024"
+                      className="h-12 bg-white border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
                       required
                     />
                   </div>
@@ -372,7 +373,7 @@ export default function CreateGame() {
                   </div>
                 </div>
 
-                <Button type="submit" className="w-full" disabled={loading}>
+                <Button type="submit" className="w-full h-12 bg-[#FF6B35] hover:bg-[#E55A2B] text-white font-semibold" disabled={loading}>
                   {loading ? "Creating..." : "Create Game"}
                 </Button>
               </form>

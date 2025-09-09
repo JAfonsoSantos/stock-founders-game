@@ -271,11 +271,11 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="border-b">
+      <header className="border-b border-gray-200 bg-white shadow-sm">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Stox</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Stox</h1>
           <div className="flex items-center gap-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -315,27 +315,27 @@ export default function Dashboard() {
       <div className="container mx-auto px-4 py-8">
         {/* Welcome Section */}
         <div className="mb-8">
-          <h2 className="text-3xl font-bold mb-2">
+          <h2 className="text-3xl font-bold mb-2 text-gray-900">
             Welcome back! 👋
           </h2>
-          <p className="text-muted-foreground mb-4">
+          <p className="text-gray-600 mb-4">
             Manage your games and track your investments in the startup ecosystem
           </p>
           
           {ownedGames.length === 0 && participations.length === 0 && (
-            <Card className="bg-gradient-to-r from-primary/10 to-secondary/10 border-primary/20">
+            <Card className="bg-gradient-to-r from-orange-50 to-orange-100 border-orange-200 shadow-sm">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="font-semibold mb-2 flex items-center">
-                      <Crown className="h-5 w-5 mr-2 text-primary" />
+                    <h4 className="font-semibold mb-2 flex items-center text-gray-900">
+                      <Crown className="h-5 w-5 mr-2 text-orange-600" />
                       Try our Demo Game!
                     </h4>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-gray-600">
                       Experience the full Stox with pre-configured startups and demo data.
                     </p>
                   </div>
-                  <Button onClick={createDemoGame} className="shrink-0">
+                  <Button onClick={createDemoGame} className="shrink-0 bg-[#FF6B35] hover:bg-[#E55A2B] text-white">
                     <Sparkles className="h-4 w-4 mr-2" />
                     Create Demo
                   </Button>
@@ -349,8 +349,8 @@ export default function Dashboard() {
           {/* Owned Games */}
           <div>
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-semibold">Your Games</h3>
-              <Button onClick={() => navigate("/games/new")}>
+              <h3 className="text-xl font-semibold text-gray-900">Your Games</h3>
+              <Button onClick={() => navigate("/games/new")} className="bg-[#FF6B35] hover:bg-[#E55A2B] text-white">
                 <Plus className="h-4 w-4 mr-2" />
                 New Game
               </Button>
@@ -358,18 +358,18 @@ export default function Dashboard() {
             
             <div className="space-y-4">
               {ownedGames.length === 0 ? (
-                <Card>
+                <Card className="bg-white border-gray-200 shadow-sm">
                   <CardContent className="p-6 text-center">
-                    <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                    <p className="text-muted-foreground mb-4">
+                    <Users className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+                    <p className="text-gray-600 mb-4">
                       You haven't created any games yet.
                     </p>
                     <div className="flex gap-2 justify-center">
-                      <Button onClick={() => navigate("/games/new")}>
+                      <Button onClick={() => navigate("/games/new")} className="bg-[#FF6B35] hover:bg-[#E55A2B] text-white">
                         <Plus className="h-4 w-4 mr-2" />
                         Create Game
                       </Button>
-                      <Button variant="outline" onClick={createDemoGame}>
+                      <Button variant="outline" onClick={createDemoGame} className="border-gray-200 text-gray-700 hover:bg-gray-50">
                         <Sparkles className="h-4 w-4 mr-2" />
                         Try Demo
                       </Button>
@@ -378,17 +378,17 @@ export default function Dashboard() {
                 </Card>
               ) : (
                 ownedGames.map((game) => (
-                  <Card key={game.id} className="hover:shadow-lg transition-all duration-200 hover:scale-[1.02] group">
+                  <Card key={game.id} className="hover:shadow-lg transition-all duration-200 hover:scale-[1.02] group bg-white border-gray-200">
                     <CardHeader>
                       <div className="flex justify-between items-start">
                         <div>
-                          <CardTitle className="text-lg flex items-center group-hover:text-primary transition-colors">
+                          <CardTitle className="text-lg flex items-center group-hover:text-orange-600 transition-colors text-gray-900">
                             {game.name}
                             {game.name.includes("Demo") && (
-                              <Sparkles className="h-4 w-4 ml-2 text-primary animate-pulse" />
+                              <Sparkles className="h-4 w-4 ml-2 text-orange-600 animate-pulse" />
                             )}
                           </CardTitle>
-                          <CardDescription>
+                          <CardDescription className="text-gray-600">
                             {new Date(game.starts_at).toLocaleDateString()} - {new Date(game.ends_at).toLocaleDateString()}
                           </CardDescription>
                         </div>
@@ -400,8 +400,8 @@ export default function Dashboard() {
                     <CardContent>
                       <div className="flex justify-between items-center">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm text-muted-foreground">Currency:</span>
-                          <span className="font-mono px-2 py-1 bg-muted rounded text-sm font-medium">
+                          <span className="text-sm text-gray-600">Currency:</span>
+                          <span className="font-mono px-2 py-1 bg-gray-100 rounded text-sm font-medium text-gray-700">
                             {game.currency}
                           </span>
                         </div>
@@ -421,7 +421,7 @@ export default function Dashboard() {
                             variant="outline" 
                             size="sm"
                             onClick={() => navigate(`/games/${game.id}/organizer`)}
-                            className="hover:bg-muted"
+                            className="hover:bg-gray-50 border-gray-200 text-gray-700"
                           >
                             <Settings className="h-4 w-4 mr-2" />
                             Manage

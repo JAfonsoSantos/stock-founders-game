@@ -231,47 +231,47 @@ export default function Profile() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted">
+    <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center gap-4 mb-8">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => navigate(-1)}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
           >
             <ArrowLeft className="h-4 w-4" />
             Voltar
           </Button>
-          <h1 className="text-3xl font-bold">Meu Perfil</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Meu Perfil</h1>
         </div>
 
         <div className="max-w-4xl mx-auto">
           <Tabs defaultValue="profile" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="profile" className="flex items-center gap-2">
+            <TabsList className="grid w-full grid-cols-4 bg-white border border-gray-200">
+              <TabsTrigger value="profile" className="flex items-center gap-2 text-gray-600 data-[state=active]:text-orange-600 data-[state=active]:bg-orange-50">
                 <User className="h-4 w-4" />
                 Perfil
               </TabsTrigger>
-              <TabsTrigger value="security" className="flex items-center gap-2">
+              <TabsTrigger value="security" className="flex items-center gap-2 text-gray-600 data-[state=active]:text-orange-600 data-[state=active]:bg-orange-50">
                 <Lock className="h-4 w-4" />
                 Segurança
               </TabsTrigger>
-              <TabsTrigger value="connections" className="flex items-center gap-2">
+              <TabsTrigger value="connections" className="flex items-center gap-2 text-gray-600 data-[state=active]:text-orange-600 data-[state=active]:bg-orange-50">
                 <Link2 className="h-4 w-4" />
                 Conexões
               </TabsTrigger>
-              <TabsTrigger value="preferences" className="flex items-center gap-2">
+              <TabsTrigger value="preferences" className="flex items-center gap-2 text-gray-600 data-[state=active]:text-orange-600 data-[state=active]:bg-orange-50">
                 <Globe className="h-4 w-4" />
                 Preferências
               </TabsTrigger>
             </TabsList>
 
             <TabsContent value="profile">
-              <Card>
+              <Card className="bg-white border-gray-200 shadow-sm">
                 <CardHeader>
-                  <CardTitle>Informações Pessoais</CardTitle>
-                  <CardDescription>
+                  <CardTitle className="text-gray-900">Informações Pessoais</CardTitle>
+                  <CardDescription className="text-gray-600">
                     Atualize suas informações pessoais e foto de perfil.
                   </CardDescription>
                 </CardHeader>
@@ -348,7 +348,7 @@ export default function Profile() {
                       </p>
                     </div>
 
-                    <Button type="submit" disabled={loading}>
+                    <Button type="submit" disabled={loading} className="bg-[#FF6B35] hover:bg-[#E55A2B] text-white">
                       {loading ? "Salvando..." : "Salvar Alterações"}
                     </Button>
                   </form>

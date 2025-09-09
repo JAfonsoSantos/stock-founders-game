@@ -194,20 +194,20 @@ export default function GameOrganizer() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b">
+    <div className="min-h-screen bg-gray-50">
+      <header className="border-b border-gray-200 bg-white shadow-sm">
         <div className="container mx-auto px-4 py-4">
           <Button 
             variant="ghost" 
             onClick={() => navigate("/")}
-            className="mb-4"
+            className="mb-4 text-gray-600 hover:text-gray-900"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Dashboard
           </Button>
           <div>
-            <h1 className="text-2xl font-bold">{game.name}</h1>
-            <p className="text-muted-foreground">Game Organizer Dashboard</p>
+            <h1 className="text-2xl font-bold text-gray-900">{game.name}</h1>
+            <p className="text-gray-600">Game Organizer Dashboard</p>
           </div>
         </div>
       </header>
@@ -215,16 +215,16 @@ export default function GameOrganizer() {
       <div className="container mx-auto px-4 py-8">
         <div className="grid gap-6">
           {/* Game Status */}
-          <Card>
+          <Card className="bg-white border-gray-200 shadow-sm">
             <CardHeader>
-              <CardTitle>Game Status & Controls</CardTitle>
-              <CardDescription>Current status: {game.status}</CardDescription>
+              <CardTitle className="text-gray-900">Game Status & Controls</CardTitle>
+              <CardDescription className="text-gray-600">Current status: {game.status}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <div>
-                  <p className="text-sm font-medium">Start Date</p>
-                  <p className="text-muted-foreground">
+                  <p className="text-sm font-medium text-gray-700">Start Date</p>
+                  <p className="text-gray-600">
                     {new Date(game.starts_at).toLocaleDateString()}
                   </p>
                 </div>
@@ -253,6 +253,7 @@ export default function GameOrganizer() {
                       <Button 
                         onClick={() => updateGameStatus('pre_market')}
                         disabled={actionLoading === 'status-pre_market'}
+                        className="bg-[#FF6B35] hover:bg-[#E55A2B] text-white"
                       >
                         <Play className="h-4 w-4 mr-2" />
                         Start Pre-Market
@@ -262,6 +263,7 @@ export default function GameOrganizer() {
                       <Button 
                         onClick={() => updateGameStatus('open')}
                         disabled={actionLoading === 'status-open'}
+                        className="bg-[#FF6B35] hover:bg-[#E55A2B] text-white"
                       >
                         <TrendingUp className="h-4 w-4 mr-2" />
                         Open Market
@@ -281,6 +283,7 @@ export default function GameOrganizer() {
                       <Button 
                         onClick={() => updateGameStatus('results')}
                         disabled={actionLoading === 'status-results'}
+                        className="bg-[#FF6B35] hover:bg-[#E55A2B] text-white"
                       >
                         <BarChart3 className="h-4 w-4 mr-2" />
                         Show Results
@@ -329,13 +332,13 @@ export default function GameOrganizer() {
               onKeyDown={(e) => {
                 if (e.key === "Enter") navigate(`/games/${gameId}/participants`);
               }}
-              className="cursor-pointer hover:bg-accent/50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+              className="cursor-pointer hover:bg-orange-50 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white border-gray-200 shadow-sm"
               aria-label="Manage Participants"
             >
               <CardContent className="flex flex-col items-center justify-center p-6">
-                <Users className="h-8 w-8 mb-2 text-primary" />
-                <h3 className="font-semibold">Manage Participants</h3>
-                <p className="text-sm text-muted-foreground text-center">
+                <Users className="h-8 w-8 mb-2 text-orange-600" />
+                <h3 className="font-semibold text-gray-900">Manage Participants</h3>
+                <p className="text-sm text-gray-600 text-center">
                   Add and manage game participants
                 </p>
               </CardContent>
@@ -348,13 +351,13 @@ export default function GameOrganizer() {
               onKeyDown={(e) => {
                 if (e.key === "Enter") navigate(`/games/${gameId}/startups`);
               }}
-              className="cursor-pointer hover:bg-accent/50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+              className="cursor-pointer hover:bg-orange-50 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white border-gray-200 shadow-sm"
               aria-label="Manage Startups"
             >
               <CardContent className="flex flex-col items-center justify-center p-6">
-                <Building2 className="h-8 w-8 mb-2 text-primary" />
-                <h3 className="font-semibold">Manage Startups</h3>
-                <p className="text-sm text-muted-foreground text-center">
+                <Building2 className="h-8 w-8 mb-2 text-orange-600" />
+                <h3 className="font-semibold text-gray-900">Manage Startups</h3>
+                <p className="text-sm text-gray-600 text-center">
                   Add and configure startups
                 </p>
               </CardContent>
@@ -367,13 +370,13 @@ export default function GameOrganizer() {
               onKeyDown={(e) => {
                 if (e.key === "Enter") navigate(`/games/${gameId}/settings`);
               }}
-              className="cursor-pointer hover:bg-accent/50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+              className="cursor-pointer hover:bg-orange-50 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white border-gray-200 shadow-sm"
               aria-label="Game Settings"
             >
               <CardContent className="flex flex-col items-center justify-center p-6">
-                <Settings className="h-8 w-8 mb-2 text-primary" />
-                <h3 className="font-semibold">Game Settings</h3>
-                <p className="text-sm text-muted-foreground text-center">
+                <Settings className="h-8 w-8 mb-2 text-orange-600" />
+                <h3 className="font-semibold text-gray-900">Game Settings</h3>
+                <p className="text-sm text-gray-600 text-center">
                   Configure game parameters
                 </p>
               </CardContent>
@@ -386,13 +389,13 @@ export default function GameOrganizer() {
               onKeyDown={(e) => {
                 if (e.key === "Enter") navigate(`/games/${gameId}/discover`);
               }}
-              className="cursor-pointer hover:bg-accent/50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+              className="cursor-pointer hover:bg-orange-50 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white border-gray-200 shadow-sm"
               aria-label="View Game"
             >
               <CardContent className="flex flex-col items-center justify-center p-6">
-                <Play className="h-8 w-8 mb-2 text-primary" />
-                <h3 className="font-semibold">View Game</h3>
-                <p className="text-sm text-muted-foreground text-center">
+                <Play className="h-8 w-8 mb-2 text-orange-600" />
+                <h3 className="font-semibold text-gray-900">View Game</h3>
+                <p className="text-sm text-gray-600 text-center">
                   {game.status === "open" ? "Game is live!" : `Status: ${game.status}`}
                 </p>
               </CardContent>
@@ -401,52 +404,52 @@ export default function GameOrganizer() {
 
           {/* Game Overview */}
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            <Card>
+            <Card className="bg-white border-gray-200 shadow-sm">
               <CardHeader>
-                <CardTitle>Participants</CardTitle>
+                <CardTitle className="text-gray-900">Participants</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stats.participants}</div>
-                <p className="text-muted-foreground">
+                <div className="text-2xl font-bold text-gray-900">{stats.participants}</div>
+                <p className="text-gray-600">
                   {stats.participants === 0 ? "No participants yet" : "Active participants"}
                 </p>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="bg-white border-gray-200 shadow-sm">
               <CardHeader>
-                <CardTitle>Startups</CardTitle>
+                <CardTitle className="text-gray-900">Startups</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stats.startups}</div>
-                <p className="text-muted-foreground">
+                <div className="text-2xl font-bold text-gray-900">{stats.startups}</div>
+                <p className="text-gray-600">
                   {stats.startups === 0 ? "No startups added" : "Available startups"}
                 </p>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="bg-white border-gray-200 shadow-sm">
               <CardHeader>
-                <CardTitle>Total Volume</CardTitle>
+                <CardTitle className="text-gray-900">Total Volume</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{game.currency} {stats.totalVolume.toLocaleString()}</div>
-                <p className="text-muted-foreground">
+                <div className="text-2xl font-bold text-gray-900">{game.currency} {stats.totalVolume.toLocaleString()}</div>
+                <p className="text-gray-600">
                   {stats.activeTrades} trades executed
                 </p>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="bg-white border-gray-200 shadow-sm">
               <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
+                <CardTitle className="text-gray-900">Quick Actions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 <Button 
                   variant="outline" 
                   size="sm" 
                   onClick={() => navigate(`/games/${gameId}/participants`)}
-                  className="w-full"
+                  className="w-full border-gray-200 text-gray-700 hover:bg-gray-50"
                 >
                   <Mail className="h-4 w-4 mr-2" />
                   Send Invites
@@ -455,7 +458,7 @@ export default function GameOrganizer() {
                   variant="outline" 
                   size="sm" 
                   onClick={() => navigate(`/games/${gameId}/leaderboard`)}
-                  className="w-full"
+                  className="w-full border-gray-200 text-gray-700 hover:bg-gray-50"
                 >
                   <BarChart3 className="h-4 w-4 mr-2" />
                   Leaderboard

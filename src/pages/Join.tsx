@@ -114,43 +114,66 @@ export default function Join() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Join Game</CardTitle>
-          <CardDescription>
-            You're invited to join <strong>{gameInfo?.name}</strong>
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
+    <div className="min-h-screen flex bg-gray-100">
+      {/* Left Panel - Form */}
+      <div className="flex-1 flex items-center justify-center p-8 lg:p-16 bg-gray-50">
+        <div className="w-full max-w-md animate-fade-in">
+          {/* Header */}
+          <div className="mb-12">
+            <div className="text-2xl font-bold text-gray-700 mb-8">
+              stox
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900 mb-2">
+                Join Game
+              </h1>
+              <p className="text-gray-600">
+                You're invited to join <strong>{gameInfo?.name}</strong>
+              </p>
+            </div>
+          </div>
+
+          {/* Form Content */}
+          <div className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <Input
                 type="email"
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                className="h-14 text-base bg-white border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all duration-200"
                 required
                 disabled={loading}
               />
-            </div>
-            <Button 
-              type="submit" 
-              className="w-full" 
-              disabled={loading || !email.trim()}
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Sending...
-                </>
-              ) : (
-                "Join Game"
-              )}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+              
+              <Button 
+                type="submit" 
+                className="w-full h-14 text-base font-semibold bg-[#FF6B35] hover:bg-[#E55A2B] text-white border-0 rounded-lg shadow-sm transition-all duration-200" 
+                disabled={loading || !email.trim()}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  "Join Game"
+                )}
+              </Button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Panel - Visual */}
+      <div className="hidden lg:flex flex-1 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600">
+          {/* Organic shapes */}
+          <div className="absolute top-20 right-20 w-96 h-96 bg-gradient-to-br from-white/20 to-transparent rounded-full blur-3xl"></div>
+          <div className="absolute bottom-32 left-16 w-80 h-80 bg-gradient-to-tr from-orange-300/30 to-transparent rounded-full blur-2xl"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-orange-300/20 to-orange-600/20 rounded-full blur-3xl"></div>
+        </div>
+      </div>
     </div>
   );
 }
