@@ -158,9 +158,11 @@ export default function ManageStartups() {
       return;
     }
 
+    console.log('Starting LinkedIn auto-fill with URL:', newStartup.linkedin);
     setIsScrapingLinkedIn(true);
     
     try {
+      console.log('Calling fetch-website edge function...');
       // Use Supabase edge function to fetch LinkedIn content including HTML for logo extraction
       const { data, error } = await supabase.functions.invoke('fetch-website', {
         body: {
@@ -169,7 +171,10 @@ export default function ManageStartups() {
         }
       });
 
+      console.log('Fetch-website response:', { data, error });
+
       if (error) {
+        console.error('Edge function error:', error);
         throw new Error(error.message);
       }
 
@@ -193,95 +198,146 @@ export default function ManageStartups() {
       
       // Extract logo from HTML - look for company logo patterns in LinkedIn
       if (htmlContent) {
-        // Look for common LinkedIn logo patterns - updated with more comprehensive patterns
+        console.log('HTML content length:', htmlContent.length);
+        console.log('HTML snippet (first 500 chars):', htmlContent.substring(0, 500));
+        
+        // More comprehensive logo extraction patterns
         const logoPatterns = [
-          // Standard company logo patterns
-          /class="[^"]*company-logo[^"]*"[^>]*src="([^"]+)"/i,
+          // LinkedIn specific patterns
+          /class="[^"]*org-top-card-summary-info-list__logo[^"]*"[^>]*src="([^"]+)"/i,
           /class="[^"]*org-top-card-primary-content__logo[^"]*"[^>]*src="([^"]+)"/i,
-          /class="[^"]*org-top-card-primary-content__logo[^"]*"[^>]*>\s*<img[^>]*src="([^"]+)"/i,
+          /class="[^"]*company-logo[^"]*"[^>]*src="([^"]+)"/i,
+          /class="[^"]*profile-photo-edit__preview[^"]*"[^>]*src="([^"]+)"/i,
           
-          // Data attribute patterns
-          /data-delayed-url="([^"]+)"[^>]*class="[^"]*company-logo/i,
-          /data-delayed-url="([^"]+)"[^>]*class="[^"]*logo/i,
-          
-          // Generic image patterns that might contain logos
-          /<img[^>]*src="([^"]*company[^"]*logo[^"]*)"[^>]*>/i,
-          /<img[^>]*src="([^"]*logo[^"]*company[^"]*)"[^>]*>/i,
-          /<img[^>]*src="([^"]*\/company\/[^"]*)"[^>]*>/i,
-          
-          // LinkedIn-specific patterns
-          /<img[^>]*src="([^"]*media\.licdn\.com[^"]*company[^"]*)"[^>]*>/i,
-          /<img[^>]*src="([^"]*media\.licdn\.com[^"]*logo[^"]*)"[^>]*>/i,
-          /<img[^>]*src="([^"]*licdn\.com[^"]*dms[^"]*image[^"]*)"[^>]*>/i,
-          
-          // Profile and avatar patterns (fallback)
-          /<img[^>]*src="([^"]*profile-displayphoto[^"]*)"[^>]*>/i,
-          /<img[^>]*src="([^"]*avatar[^"]*)"[^>]*>/i,
-          
-          // General patterns for any image that might be a logo
+          // Generic patterns for images that might be logos
+          /<img[^>]*alt="[^"]*logo[^"]*"[^>]*src="([^"]+)"/i,
+          /<img[^>]*src="([^"]*)"[^>]*alt="[^"]*logo[^"]*"/i,
           /<img[^>]*class="[^"]*logo[^"]*"[^>]*src="([^"]+)"/i,
-          /src="([^"]*)"[^>]*class="[^"]*logo[^"]*"/i
+          /<img[^>]*src="([^"]*)"[^>]*class="[^"]*logo[^"]*"/i,
+          
+          // Media.licdn.com patterns
+          /<img[^>]*src="(https:\/\/media\.licdn\.com\/dms\/image\/[^"]*)"[^>]*>/i,
+          /<img[^>]*src="([^"]*media\.licdn\.com[^"]*)"[^>]*>/i,
+          
+          // Company specific patterns
+          /<img[^>]*src="([^"]*company[^"]*)"[^>]*>/i,
+          /<img[^>]*alt="[^"]*company[^"]*"[^>]*src="([^"]+)"/i,
+          
+          // Fallback patterns
+          /src="(https:\/\/[^"]*\.(?:jpg|jpeg|png|gif|webp|svg))"[^>]*>/i
         ];
         
+        let foundLogos = [];
         for (const pattern of logoPatterns) {
-          const match = htmlContent.match(pattern);
-          if (match && match[1]) {
-            let logoUrl = match[1];
-            
-            // Clean up the URL
-            if (logoUrl.startsWith('//')) {
-              logoUrl = 'https:' + logoUrl;
-            }
-            
-            // Skip obviously bad URLs
-            if (logoUrl.includes('data:') || 
-                logoUrl.includes('blob:') || 
-                logoUrl.length < 10 ||
-                logoUrl.includes('generic') ||
-                logoUrl.includes('default')) {
-              continue;
-            }
-            
-            // Prefer higher quality images
-            if (logoUrl.includes('media.licdn.com') && 
-                (logoUrl.includes('company') || logoUrl.includes('logo'))) {
-              extractedLogoUrl = logoUrl;
-              break;
-            }
-            
-            // Accept any reasonable logo URL if we haven't found a better one
-            if (!extractedLogoUrl && 
-                (logoUrl.includes('logo') || 
-                 logoUrl.includes('company') || 
-                 logoUrl.includes('profile-displayphoto'))) {
-              extractedLogoUrl = logoUrl;
+          const matches = htmlContent.matchAll(new RegExp(pattern.source, pattern.flags + 'g'));
+          for (const match of matches) {
+            if (match[1]) {
+              foundLogos.push({
+                url: match[1],
+                pattern: pattern.source.substring(0, 50) + '...'
+              });
             }
           }
         }
+        
+        console.log('Found potential logos:', foundLogos);
+        
+        // Select the best logo
+        for (const logoInfo of foundLogos) {
+          let logoUrl = logoInfo.url;
+          
+          // Clean up the URL
+          if (logoUrl.startsWith('//')) {
+            logoUrl = 'https:' + logoUrl;
+          }
+          
+          // Skip obviously bad URLs
+          if (logoUrl.includes('data:') || 
+              logoUrl.includes('blob:') || 
+              logoUrl.length < 10 ||
+              logoUrl.includes('generic') ||
+              logoUrl.includes('default') ||
+              logoUrl.includes('icon-') ||
+              logoUrl.includes('sprite')) {
+            continue;
+          }
+          
+          // Prefer media.licdn.com URLs
+          if (logoUrl.includes('media.licdn.com')) {
+            extractedLogoUrl = logoUrl;
+            console.log('Selected logo (media.licdn.com):', logoUrl);
+            break;
+          }
+          
+          // Accept any reasonable logo URL if we haven't found a better one
+          if (!extractedLogoUrl && logoUrl.match(/\.(jpg|jpeg|png|gif|webp|svg)(\?|$)/i)) {
+            extractedLogoUrl = logoUrl;
+            console.log('Selected logo (fallback):', logoUrl);
+          }
+        }
 
-        // Extract website from HTML - look for website links
+        // Extract website from HTML - more comprehensive patterns
         const websitePatterns = [
-          /href="(https?:\/\/[^"]*)"[^>]*>Website</i,
-          /href="(https?:\/\/[^"]*)"[^>]*>\s*Site\s*</i,
-          /href="(https?:\/\/[^"]*)"[^>]*>\s*Website\s*</i,
-          /"website":\s*"(https?:\/\/[^"]*)"/i,
+          // LinkedIn specific website patterns
+          /href="([^"]*)"[^>]*data-tracking-control-name="organization_website"/i,
           /data-tracking-control-name="organization_website"[^>]*href="([^"]+)"/i,
-          /class="[^"]*website[^"]*"[^>]*href="([^"]+)"/i
+          /class="[^"]*org-about-us-organization-description__website[^"]*"[^>]*href="([^"]+)"/i,
+          
+          // Generic website patterns
+          /href="(https?:\/\/[^"]*)"[^>]*>Website<\/a>/i,
+          /href="(https?:\/\/[^"]*)"[^>]*>\s*Site\s*<\/a>/i,
+          /href="(https?:\/\/[^"]*)"[^>]*>\s*Website\s*<\/a>/i,
+          /href="(https?:\/\/[^"]*)"[^>]*>\s*www\./i,
+          
+          // JSON-LD or structured data
+          /"website":\s*"(https?:\/\/[^"]*)"/i,
+          /"url":\s*"(https?:\/\/[^"]*)"/i,
+          
+          // Meta tags
+          /<meta[^>]*property="og:url"[^>]*content="([^"]+)"/i,
+          /<link[^>]*rel="canonical"[^>]*href="([^"]+)"/i
         ];
         
+        let foundWebsites = [];
         for (const pattern of websitePatterns) {
-          const match = htmlContent.match(pattern);
-          if (match && match[1]) {
-            let websiteUrl = match[1];
-            // Clean LinkedIn redirect URLs
-            if (websiteUrl.includes('linkedin.com/redir/')) {
-              const urlMatch = websiteUrl.match(/url=([^&]*)/);
-              if (urlMatch) {
-                websiteUrl = decodeURIComponent(urlMatch[1]);
-              }
+          const matches = htmlContent.matchAll(new RegExp(pattern.source, pattern.flags + 'g'));
+          for (const match of matches) {
+            if (match[1]) {
+              foundWebsites.push({
+                url: match[1],
+                pattern: pattern.source.substring(0, 50) + '...'
+              });
             }
+          }
+        }
+        
+        console.log('Found potential websites:', foundWebsites);
+        
+        for (const websiteInfo of foundWebsites) {
+          let websiteUrl = websiteInfo.url;
+          
+          // Skip LinkedIn URLs
+          if (websiteUrl.includes('linkedin.com')) {
+            continue;
+          }
+          
+          // Clean LinkedIn redirect URLs
+          if (websiteUrl.includes('/redir/redirect')) {
+            const urlMatch = websiteUrl.match(/url=([^&]*)/);
+            if (urlMatch) {
+              websiteUrl = decodeURIComponent(urlMatch[1]);
+            }
+          }
+          
+          // Validate URL format
+          try {
+            new URL(websiteUrl);
             extractedWebsite = websiteUrl;
+            console.log('Selected website:', websiteUrl);
             break;
+          } catch (e) {
+            console.log('Invalid website URL:', websiteUrl);
+            continue;
           }
         }
       }
@@ -340,6 +396,12 @@ export default function ManageStartups() {
         });
       }
     } catch (error: any) {
+      console.error('Error in LinkedIn auto-fill:', error);
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
       toast({
         variant: "destructive",
         title: "Error",
