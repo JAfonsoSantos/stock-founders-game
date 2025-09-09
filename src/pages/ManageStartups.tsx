@@ -279,6 +279,9 @@ export default function ManageStartups() {
               logoUrl = 'https:' + logoUrl;
             }
             
+            // Fix LinkedIn URLs with HTML entities
+            logoUrl = logoUrl.replace(/&amp;/g, '&');
+            
             // Skip obviously bad URLs
             if (logoUrl.includes('data:') || 
                 logoUrl.includes('blob:') || 
@@ -290,9 +293,16 @@ export default function ManageStartups() {
               continue;
             }
             
-            extractedLogoUrl = logoUrl;
-            console.log('Selected logo with priority:', logoUrl, 'Pattern:', priorityLogo.pattern);
-            break;
+            // Test if the URL is accessible (simple validation)
+            try {
+              new URL(logoUrl);
+              extractedLogoUrl = logoUrl;
+              console.log('Selected logo with priority:', logoUrl, 'Pattern:', priorityLogo.pattern);
+              break;
+            } catch (e) {
+              console.log('Invalid logo URL:', logoUrl, e);
+              continue;
+            }
           }
         }
 
@@ -398,8 +408,11 @@ export default function ManageStartups() {
         for (const websiteInfo of foundWebsites) {
           let websiteUrl = websiteInfo.url;
           
+          console.log('Processing website URL:', websiteUrl, 'from', websiteInfo.source);
+          
           // Skip LinkedIn URLs
           if (websiteUrl.includes('linkedin.com')) {
+            console.log('Skipping LinkedIn URL:', websiteUrl);
             continue;
           }
           
@@ -411,6 +424,9 @@ export default function ManageStartups() {
             }
           }
           
+          // Fix HTML entities
+          websiteUrl = websiteUrl.replace(/&amp;/g, '&');
+          
           // Validate URL format
           try {
             new URL(websiteUrl);
@@ -418,8 +434,32 @@ export default function ManageStartups() {
             console.log('Selected website:', websiteUrl);
             break;
           } catch (e) {
-            console.log('Invalid website URL:', websiteUrl);
+            console.log('Invalid website URL:', websiteUrl, e);
             continue;
+          }
+        }
+        
+        // If no website found from patterns, try to extract from markdown content directly
+        if (!extractedWebsite && content) {
+          console.log('Trying to extract website from markdown content...');
+          
+          // Look for common website patterns in the content
+          const directWebsiteMatches = content.match(/(https?:\/\/(?:www\.)?[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,})/g);
+          if (directWebsiteMatches) {
+            console.log('Direct website matches found:', directWebsiteMatches);
+            
+            for (const url of directWebsiteMatches) {
+              if (!url.includes('linkedin.com') && !url.includes('facebook.com') && !url.includes('twitter.com')) {
+                try {
+                  new URL(url);
+                  extractedWebsite = url;
+                  console.log('Selected website from direct match:', url);
+                  break;
+                } catch (e) {
+                  continue;
+                }
+              }
+            }
           }
         }
       }
@@ -451,6 +491,13 @@ export default function ManageStartups() {
       }
       
       if (extractedName || extractedDescription || extractedLogoUrl || extractedWebsite) {
+        console.log('Final extracted data:', {
+          name: extractedName,
+          logoUrl: extractedLogoUrl,
+          website: extractedWebsite,
+          description: extractedDescription?.substring(0, 100) + '...'
+        });
+        
         setNewStartup(prev => ({
           ...prev,
           name: extractedName || prev.name,
@@ -471,6 +518,7 @@ export default function ManageStartups() {
           description: `Informações extraídas do LinkedIn: ${extractedItems.join(', ')}`,
         });
       } else {
+        console.log('No data extracted from LinkedIn');
         toast({
           variant: "destructive",
           title: "Nenhum dado encontrado",
