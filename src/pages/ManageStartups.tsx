@@ -540,6 +540,7 @@ export default function ManageStartups() {
                   <div>
                     <LogoUpload
                       startupSlug={newStartup.slug}
+                      currentLogoUrl={newStartup.logo_url}
                       onLogoUploaded={(url) => setNewStartup({ ...newStartup, logo_url: url })}
                     />
                   </div>
@@ -619,6 +620,7 @@ export default function ManageStartups() {
                   <Table>
                     <TableHeader>
                       <TableRow>
+                        <TableHead>Logo</TableHead>
                         <TableHead>Name</TableHead>
                         <TableHead>Slug</TableHead>
                         <TableHead>Description</TableHead>
@@ -633,6 +635,19 @@ export default function ManageStartups() {
                     <TableBody>
                       {startups.map((startup) => (
                         <TableRow key={startup.id}>
+                          <TableCell>
+                            {startup.logo_url ? (
+                              <img 
+                                src={startup.logo_url} 
+                                alt={`${startup.name} logo`} 
+                                className="w-8 h-8 rounded object-cover"
+                              />
+                            ) : (
+                              <div className="w-8 h-8 rounded bg-muted flex items-center justify-center">
+                                <Building2 className="h-4 w-4 text-muted-foreground" />
+                              </div>
+                            )}
+                          </TableCell>
                           <TableCell className="font-medium">
                             {editingStartup === startup.id ? (
                               <Input

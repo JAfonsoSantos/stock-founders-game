@@ -74,46 +74,44 @@ export function LogoUpload({ startupSlug, currentLogoUrl, onLogoUploaded }: Logo
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-4">
-        {currentLogoUrl && (
-          <div className="w-16 h-16 rounded border overflow-hidden">
-            <img 
-              src={currentLogoUrl} 
-              alt="Current logo" 
-              className="w-full h-full object-cover"
-            />
-          </div>
-        )}
-        <div className="flex-1">
-          <Label htmlFor="logo-upload">Logo da Startup</Label>
-          <div className="flex gap-2 mt-1">
-            <Input
-              id="logo-upload"
-              type="file"
-              accept="image/*"
-              onChange={handleUpload}
-              disabled={uploading}
-              className="flex-1"
-            />
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              disabled={uploading}
-              onClick={() => document.getElementById('logo-upload')?.click()}
-            >
-              {uploading ? (
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
-              ) : (
-                <Upload className="h-4 w-4" />
-              )}
-            </Button>
-          </div>
-          <p className="text-xs text-muted-foreground mt-1">
-            PNG, JPG, WebP ou SVG. Max 5MB.
-          </p>
+      <Label htmlFor="logo-upload">Logo da Startup</Label>
+      
+      {currentLogoUrl && (
+        <div className="w-24 h-24 rounded border overflow-hidden bg-muted">
+          <img 
+            src={currentLogoUrl} 
+            alt="Current logo" 
+            className="w-full h-full object-cover"
+          />
         </div>
+      )}
+      
+      <div className="flex gap-2">
+        <Input
+          id="logo-upload"
+          type="file"
+          accept="image/*"
+          onChange={handleUpload}
+          disabled={uploading}
+          className="flex-1"
+        />
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          disabled={uploading}
+          onClick={() => document.getElementById('logo-upload')?.click()}
+        >
+          {uploading ? (
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+          ) : (
+            <Upload className="h-4 w-4" />
+          )}
+        </Button>
       </div>
+      <p className="text-xs text-muted-foreground">
+        PNG, JPG, WebP ou SVG. Max 5MB.
+      </p>
     </div>
   );
 }
