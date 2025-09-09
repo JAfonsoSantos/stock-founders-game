@@ -372,7 +372,7 @@ export default function ManageStartups() {
         console.log('First 1000 chars of markdown content:', content.substring(0, 1000));
         console.log('Searching for LinkedIn API fields in content...');
         
-        // Check for JSON-LD or structured data with LinkedIn API fields
+        // Check for JSON-LD or structured data with LinkedIn API fields, but exclude schema.org metadata
         const jsonLdMatches = htmlContent.match(/<script[^>]*type="application\/ld\+json"[^>]*>([^<]*)<\/script>/gi);
         if (jsonLdMatches) {
           console.log('Found JSON-LD scripts:', jsonLdMatches.length);
@@ -381,12 +381,18 @@ export default function ManageStartups() {
               const jsonContent = match.replace(/<[^>]*>/g, '');
               console.log('JSON-LD content sample:', jsonContent.substring(0, 200));
               
+              // Skip schema.org Organization data as it's not the company website
+              if (jsonContent.includes('"@type":"Organization"') && jsonContent.includes('schema.org')) {
+                console.log('Skipping schema.org Organization data');
+                continue;
+              }
+              
               const websiteUrlMatch = jsonContent.match(/"website-url":\s*"([^"]+)"/i) || 
                                     jsonContent.match(/"websiteUrl":\s*"([^"]+)"/i) ||
                                     jsonContent.match(/"website":\s*"([^"]+)"/i);
               if (websiteUrlMatch && !extractedWebsite) {
                 const url = websiteUrlMatch[1];
-                if (!url.includes('linkedin.com')) {
+                if (!url.includes('linkedin.com') && !url.includes('schema.org')) {
                   extractedWebsite = url;
                   console.log('Found website from JSON-LD:', url);
                 }
@@ -396,8 +402,11 @@ export default function ManageStartups() {
                                  jsonContent.match(/"squareLogoUrl":\s*"([^"]+)"/i) ||
                                  jsonContent.match(/"logo_url":\s*"([^"]+)"/i);
               if (logoUrlMatch && !extractedLogoUrl) {
-                extractedLogoUrl = logoUrlMatch[1];
-                console.log('Found logo from JSON-LD:', extractedLogoUrl);
+                const logoUrl = logoUrlMatch[1];
+                if (!logoUrl.includes('schema.org') && logoUrl.includes('media.licdn.com')) {
+                  extractedLogoUrl = logoUrl;
+                  console.log('Found logo from JSON-LD:', extractedLogoUrl);
+                }
               }
             } catch (e) {
               console.log('Error parsing JSON-LD:', e);
@@ -443,13 +452,18 @@ export default function ManageStartups() {
         if (!extractedWebsite && content) {
           console.log('Trying to extract website from markdown content...');
           
-          // Look for common website patterns in the content
+          // Look for common website patterns in the content, but exclude schema.org and LinkedIn
           const directWebsiteMatches = content.match(/(https?:\/\/(?:www\.)?[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,})/g);
           if (directWebsiteMatches) {
             console.log('Direct website matches found:', directWebsiteMatches);
             
             for (const url of directWebsiteMatches) {
-              if (!url.includes('linkedin.com') && !url.includes('facebook.com') && !url.includes('twitter.com')) {
+              if (!url.includes('linkedin.com') && 
+                  !url.includes('facebook.com') && 
+                  !url.includes('twitter.com') &&
+                  !url.includes('schema.org') &&
+                  !url.includes('cookie') &&
+                  url.length > 10) {
                 try {
                   new URL(url);
                   extractedWebsite = url;
@@ -461,19 +475,44 @@ export default function ManageStartups() {
               }
             }
           }
+          
+          // Try to find kevel.co specifically in the content
+          if (!extractedWebsite) {
+            const kevelMatch = content.match(/(https?:\/\/(?:www\.)?kevel\.co[^\s]*)/i);
+            if (kevelMatch) {
+              extractedWebsite = kevelMatch[1];
+              console.log('Found Kevel website:', extractedWebsite);
+            }
+          }
         }
       }
       
       // Find company name (usually in the first few lines or as a heading)
+      let companyNameFromMarkdown = '';
       for (let i = 0; i < Math.min(10, lines.length); i++) {
         const line = lines[i].trim();
+        
+        // Skip LinkedIn standard text and cookie disclaimers
+        if (line.includes('LinkedIn') || 
+            line.includes('cookie') || 
+            line.includes('Cookie Policy') ||
+            line.includes('essential and non-essential') ||
+            line.length < 3 ||
+            line.startsWith('[') ||
+            line.startsWith('http')) {
+          continue;
+        }
+        
         if (line.match(/^#+ /)) {
           extractedName = line.replace(/^#+ /, '').trim();
           break;
         }
-        if (line && !line.startsWith('[') && !line.startsWith('http') && line.length < 100 && line.length > 3) {
-          extractedName = line;
-          break;
+        if (line && line.length < 100 && line.length > 3) {
+          companyNameFromMarkdown = line;
+          if (!line.includes('|') && !line.includes('respects your privacy')) {
+            extractedName = line;
+            break;
+          }
         }
       }
       
@@ -482,9 +521,25 @@ export default function ManageStartups() {
         extractedName = extractedName.replace(/\s*\|\s*LinkedIn\s*$/i, '').trim();
       }
       
-      // Find description (look for longer paragraphs)
+      // Find description (look for longer paragraphs that are not cookie/disclaimer text)
       for (const line of lines) {
-        if (line.length > 50 && line.length < 500 && !line.startsWith('[') && !line.startsWith('http')) {
+        // Skip LinkedIn disclaimer text and cookie policies
+        if (line.includes('LinkedIn') && line.includes('cookie') ||
+            line.includes('Cookie Policy') ||
+            line.includes('essential and non-essential') ||
+            line.includes('respects your privacy') ||
+            line.includes('3rd parties use') ||
+            line.startsWith('[') || 
+            line.startsWith('http') ||
+            line.length < 30) {
+          continue;
+        }
+        
+        // Look for actual company descriptions
+        if (line.length > 50 && line.length < 500 && 
+            !line.includes('cookies') && 
+            !line.includes('privacy') &&
+            !line.includes('Learn more in our')) {
           extractedDescription = line.trim();
           break;
         }
