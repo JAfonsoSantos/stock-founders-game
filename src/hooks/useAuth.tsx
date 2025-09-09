@@ -10,6 +10,7 @@ interface AuthContextType {
   signInWithPassword: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string) => Promise<{ error: any }>;
   signInWithGoogle: () => Promise<{ error: any }>;
+  signInWithLinkedIn: () => Promise<{ error: any }>;
   signOut: () => Promise<void>;
 }
 
@@ -83,12 +84,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { error };
   };
 
+  const signInWithLinkedIn = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'linkedin_oidc',
+      options: {
+        redirectTo: `${window.location.origin}/`
+      }
+    });
+    return { error };
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signIn, signInWithPassword, signUp, signInWithGoogle, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading, signIn, signInWithPassword, signUp, signInWithGoogle, signInWithLinkedIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );
