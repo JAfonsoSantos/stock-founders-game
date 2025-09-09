@@ -176,12 +176,20 @@ export default function ManageStartups() {
       const content = data.markdown || '';
       const htmlContent = data.html || '';
       
+      console.log('LinkedIn data received:', {
+        markdownLength: content?.length || 0,
+        htmlLength: htmlContent?.length || 0,
+        hasMarkdown: !!data.markdown,
+        hasHtml: !!data.html
+      });
+      
       // Simple extraction logic for LinkedIn content
       const lines = content.split('\n').filter(line => line.trim());
       
       let extractedName = '';
       let extractedDescription = '';
       let extractedLogoUrl = '';
+      let extractedWebsite = '';
       
       // Extract logo from HTML - look for company logo patterns in LinkedIn
       if (htmlContent) {
@@ -250,6 +258,32 @@ export default function ManageStartups() {
             }
           }
         }
+
+        // Extract website from HTML - look for website links
+        const websitePatterns = [
+          /href="(https?:\/\/[^"]*)"[^>]*>Website</i,
+          /href="(https?:\/\/[^"]*)"[^>]*>\s*Site\s*</i,
+          /href="(https?:\/\/[^"]*)"[^>]*>\s*Website\s*</i,
+          /"website":\s*"(https?:\/\/[^"]*)"/i,
+          /data-tracking-control-name="organization_website"[^>]*href="([^"]+)"/i,
+          /class="[^"]*website[^"]*"[^>]*href="([^"]+)"/i
+        ];
+        
+        for (const pattern of websitePatterns) {
+          const match = htmlContent.match(pattern);
+          if (match && match[1]) {
+            let websiteUrl = match[1];
+            // Clean LinkedIn redirect URLs
+            if (websiteUrl.includes('linkedin.com/redir/')) {
+              const urlMatch = websiteUrl.match(/url=([^&]*)/);
+              if (urlMatch) {
+                websiteUrl = decodeURIComponent(urlMatch[1]);
+              }
+            }
+            extractedWebsite = websiteUrl;
+            break;
+          }
+        }
       }
       
       // Find company name (usually in the first few lines or as a heading)
@@ -265,6 +299,11 @@ export default function ManageStartups() {
         }
       }
       
+      // Clean up extracted name - remove "| LinkedIn" suffix
+      if (extractedName) {
+        extractedName = extractedName.replace(/\s*\|\s*LinkedIn\s*$/i, '').trim();
+      }
+      
       // Find description (look for longer paragraphs)
       for (const line of lines) {
         if (line.length > 50 && line.length < 500 && !line.startsWith('[') && !line.startsWith('http')) {
@@ -273,18 +312,20 @@ export default function ManageStartups() {
         }
       }
       
-      if (extractedName || extractedDescription || extractedLogoUrl) {
+      if (extractedName || extractedDescription || extractedLogoUrl || extractedWebsite) {
         setNewStartup(prev => ({
           ...prev,
           name: extractedName || prev.name,
           slug: extractedName ? generateSlug(extractedName) : prev.slug,
           description: extractedDescription || prev.description,
+          website: extractedWebsite || prev.website,
           logo_url: extractedLogoUrl || prev.logo_url
         }));
         
         const extractedItems = [];
         if (extractedName) extractedItems.push('nome');
         if (extractedDescription) extractedItems.push('descrição');
+        if (extractedWebsite) extractedItems.push('website');
         if (extractedLogoUrl) extractedItems.push('logo');
         
         toast({

@@ -126,6 +126,7 @@ serve(async (req) => {
     }
 
     console.log(`Fetching website: ${url} for user ${user.id}`);
+    console.log(`Requested formats: ${formats}`);
 
     // Create abort controller for timeout
     const controller = new AbortController();
@@ -153,6 +154,7 @@ serve(async (req) => {
       }
 
       const html = await response.text();
+      console.log(`Fetched HTML content: ${html?.length || 0} characters`);
       
       // Additional size check after reading
       if (html.length > 1024 * 1024) {
@@ -180,6 +182,8 @@ serve(async (req) => {
       if (markdown.length > 50000) {
         markdown = markdown.substring(0, 50000) + '... [truncated]';
       }
+
+      console.log(`Converting to markdown: ${markdown?.length || 0} characters`);
 
       return new Response(
         JSON.stringify({
