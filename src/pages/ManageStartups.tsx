@@ -261,6 +261,12 @@ export default function ManageStartups() {
           title: "Empresa não encontrada",
           description: "Não foi possível encontrar esta empresa no LinkedIn. Verifique o URL e tente novamente.",
         });
+      } else if (error.message.includes('Failed to fetch LinkedIn page')) {
+        toast({
+          variant: "destructive",
+          title: "Erro de acesso",
+          description: "Não foi possível aceder à página do LinkedIn. Tente novamente mais tarde.",
+        });
       } else {
         toast({
           variant: "destructive",
