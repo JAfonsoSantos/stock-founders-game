@@ -34,6 +34,8 @@ export default function ManageStartups() {
   const [loading, setLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
   const [isScrapingLinkedIn, setIsScrapingLinkedIn] = useState(false);
+  const [editingStartup, setEditingStartup] = useState<string | null>(null);
+  const [editData, setEditData] = useState<Partial<Startup>>({});
   const [newStartup, setNewStartup] = useState({
     slug: "",
     name: "",
@@ -292,6 +294,49 @@ export default function ManageStartups() {
     }
   };
 
+  const startEditing = (startup: Startup) => {
+    setEditingStartup(startup.id);
+    setEditData({
+      name: startup.name,
+      slug: startup.slug,
+      description: startup.description,
+      website: startup.website,
+      linkedin: startup.linkedin,
+      total_shares: startup.total_shares
+    });
+  };
+
+  const cancelEditing = () => {
+    setEditingStartup(null);
+    setEditData({});
+  };
+
+  const saveEdit = async (startupId: string) => {
+    try {
+      const { error } = await supabase
+        .from("startups")
+        .update(editData)
+        .eq("id", startupId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Startup updated successfully",
+      });
+
+      setEditingStartup(null);
+      setEditData({});
+      fetchStartups();
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message,
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -444,9 +489,38 @@ export default function ManageStartups() {
                   <TableBody>
                     {startups.map((startup) => (
                       <TableRow key={startup.id}>
-                        <TableCell className="font-medium">{startup.name}</TableCell>
-                        <TableCell className="text-muted-foreground">{startup.slug}</TableCell>
-                        <TableCell>{startup.total_shares}</TableCell>
+                        <TableCell className="font-medium">
+                          {editingStartup === startup.id ? (
+                            <Input
+                              value={editData.name || ''}
+                              onChange={(e) => setEditData(prev => ({ ...prev, name: e.target.value }))}
+                            />
+                          ) : (
+                            startup.name
+                          )}
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {editingStartup === startup.id ? (
+                            <Input
+                              value={editData.slug || ''}
+                              onChange={(e) => setEditData(prev => ({ ...prev, slug: e.target.value }))}
+                            />
+                          ) : (
+                            startup.slug
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {editingStartup === startup.id ? (
+                            <Input
+                              type="number"
+                              min="1"
+                              value={editData.total_shares || ''}
+                              onChange={(e) => setEditData(prev => ({ ...prev, total_shares: Number(e.target.value) }))}
+                            />
+                          ) : (
+                            startup.total_shares
+                          )}
+                        </TableCell>
                         <TableCell>{startup.primary_shares_remaining}</TableCell>
                         <TableCell>
                           {startup.last_vwap_price ? `$${startup.last_vwap_price.toFixed(2)}` : '-'}
@@ -471,16 +545,41 @@ export default function ManageStartups() {
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-2">
-                            <Button variant="ghost" size="sm">
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="sm"
-                              onClick={() => deleteStartup(startup.id)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
+                            {editingStartup === startup.id ? (
+                              <>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm"
+                                  onClick={() => saveEdit(startup.id)}
+                                >
+                                  Save
+                                </Button>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm"
+                                  onClick={cancelEditing}
+                                >
+                                  Cancel
+                                </Button>
+                              </>
+                            ) : (
+                              <>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm"
+                                  onClick={() => startEditing(startup)}
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm"
+                                  onClick={() => deleteStartup(startup.id)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </>
+                            )}
                           </div>
                         </TableCell>
                       </TableRow>
