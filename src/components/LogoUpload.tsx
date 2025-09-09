@@ -82,6 +82,13 @@ export function LogoUpload({ startupSlug, currentLogoUrl, onLogoUploaded }: Logo
             src={currentLogoUrl} 
             alt="Current logo" 
             className="w-full h-full object-cover"
+            onError={(e) => {
+              console.error('Error loading logo image:', currentLogoUrl);
+              e.currentTarget.style.display = 'none';
+            }}
+            onLoad={() => {
+              console.log('Logo loaded successfully:', currentLogoUrl);
+            }}
           />
         </div>
       )}

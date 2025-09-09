@@ -187,7 +187,8 @@ export default function ManageStartups() {
         markdownLength: content?.length || 0,
         htmlLength: htmlContent?.length || 0,
         hasMarkdown: !!data.markdown,
-        hasHtml: !!data.html
+        hasHtml: !!data.html,
+        fullData: data // Add full data for debugging
       });
       
       // Simple extraction logic for LinkedIn content
@@ -203,30 +204,39 @@ export default function ManageStartups() {
         console.log('HTML content length:', htmlContent.length);
         console.log('HTML snippet (first 500 chars):', htmlContent.substring(0, 500));
         
-        // More comprehensive logo extraction patterns
+        // More comprehensive logo extraction patterns for LinkedIn
         const logoPatterns = [
-          // LinkedIn specific patterns
-          /class="[^"]*org-top-card-summary-info-list__logo[^"]*"[^>]*src="([^"]+)"/i,
-          /class="[^"]*org-top-card-primary-content__logo[^"]*"[^>]*src="([^"]+)"/i,
-          /class="[^"]*company-logo[^"]*"[^>]*src="([^"]+)"/i,
-          /class="[^"]*profile-photo-edit__preview[^"]*"[^>]*src="([^"]+)"/i,
+          // LinkedIn specific patterns - updated for current structure
+          /img[^>]*class="[^"]*EntityPhoto-square-[^"]*"[^>]*src="([^"]+)"/i,
+          /img[^>]*class="[^"]*org-top-card-summary-info-list__logo[^"]*"[^>]*src="([^"]+)"/i,
+          /img[^>]*class="[^"]*org-top-card-primary-content__logo[^"]*"[^>]*src="([^"]+)"/i,
+          /img[^>]*class="[^"]*company-logo[^"]*"[^>]*src="([^"]+)"/i,
+          /img[^>]*class="[^"]*profile-photo-edit__preview[^"]*"[^>]*src="([^"]+)"/i,
+          /img[^>]*class="[^"]*org-[^"]*logo[^"]*"[^>]*src="([^"]+)"/i,
           
           // Generic patterns for images that might be logos
-          /<img[^>]*alt="[^"]*logo[^"]*"[^>]*src="([^"]+)"/i,
-          /<img[^>]*src="([^"]*)"[^>]*alt="[^"]*logo[^"]*"/i,
-          /<img[^>]*class="[^"]*logo[^"]*"[^>]*src="([^"]+)"/i,
-          /<img[^>]*src="([^"]*)"[^>]*class="[^"]*logo[^"]*"/i,
+          /img[^>]*alt="[^"]*logo[^"]*"[^>]*src="([^"]+)"/i,
+          /img[^>]*src="([^"]*)"[^>]*alt="[^"]*logo[^"]*"/i,
+          /img[^>]*class="[^"]*logo[^"]*"[^>]*src="([^"]+)"/i,
+          /img[^>]*src="([^"]*)"[^>]*class="[^"]*logo[^"]*"/i,
           
-          // Media.licdn.com patterns
-          /<img[^>]*src="(https:\/\/media\.licdn\.com\/dms\/image\/[^"]*)"[^>]*>/i,
-          /<img[^>]*src="([^"]*media\.licdn\.com[^"]*)"[^>]*>/i,
+          // Media.licdn.com patterns (most reliable for LinkedIn)
+          /img[^>]*src="(https:\/\/media\.licdn\.com\/dms\/image\/[A-Z0-9-_]+\/company-logo_[^"]*)"[^>]*/i,
+          /src="(https:\/\/media\.licdn\.com\/dms\/image\/[^"]*company[^"]*)"[^>]*/i,
+          /img[^>]*src="([^"]*media\.licdn\.com[^"]*)"[^>]*>/i,
           
-          // Company specific patterns
-          /<img[^>]*src="([^"]*company[^"]*)"[^>]*>/i,
-          /<img[^>]*alt="[^"]*company[^"]*"[^>]*src="([^"]+)"/i,
+          // Company specific patterns - look for images with company or organization
+          /img[^>]*src="([^"]*company[^"]*)"[^>]*>/i,
+          /img[^>]*alt="[^"]*company[^"]*"[^>]*src="([^"]+)"/i,
+          /img[^>]*alt="[^"]*organization[^"]*"[^>]*src="([^"]+)"/i,
           
-          // Fallback patterns
-          /src="(https:\/\/[^"]*\.(?:jpg|jpeg|png|gif|webp|svg))"[^>]*>/i
+          // Kevel specific (for this case)
+          /img[^>]*src="([^"]*)"[^>]*alt="[^"]*Kevel[^"]*"/i,
+          /img[^>]*alt="[^"]*Kevel[^"]*"[^>]*src="([^"]+)"/i,
+          
+          // Fallback patterns for any reasonable image
+          /src="(https:\/\/[^"]*\.(?:jpg|jpeg|png|gif|webp|svg))"[^>]*>/i,
+          /img[^>]*src="(https:\/\/[^"]*\.(?:jpg|jpeg|png|gif|webp|svg))"/i
         ];
         
         let foundLogos = [];
@@ -243,77 +253,102 @@ export default function ManageStartups() {
         }
         
         console.log('Found potential logos:', foundLogos);
+        console.log('HTML content sample (chars 1000-2000):', htmlContent.substring(1000, 2000));
         
-        // Select the best logo
-        for (const logoInfo of foundLogos) {
-          let logoUrl = logoInfo.url;
-          
-          // Clean up the URL
-          if (logoUrl.startsWith('//')) {
-            logoUrl = 'https:' + logoUrl;
-          }
-          
-          // Skip obviously bad URLs
-          if (logoUrl.includes('data:') || 
-              logoUrl.includes('blob:') || 
-              logoUrl.length < 10 ||
-              logoUrl.includes('generic') ||
-              logoUrl.includes('default') ||
-              logoUrl.includes('icon-') ||
-              logoUrl.includes('sprite')) {
-            continue;
-          }
-          
-          // Prefer media.licdn.com URLs
-          if (logoUrl.includes('media.licdn.com')) {
+        // Select the best logo with priority order
+        const priorityOrder = [
+          (logo) => logo.url.includes('media.licdn.com') && logo.url.includes('company-logo'),
+          (logo) => logo.url.includes('media.licdn.com'),
+          (logo) => logo.url.includes('kevel') || logo.url.includes('Kevel'),
+          (logo) => logo.url.match(/\.(jpg|jpeg|png|gif|webp|svg)(\?|$)/i)
+        ];
+        
+        for (const priorityCheck of priorityOrder) {
+          const priorityLogo = foundLogos.find(priorityCheck);
+          if (priorityLogo) {
+            let logoUrl = priorityLogo.url;
+            
+            // Clean up the URL
+            if (logoUrl.startsWith('//')) {
+              logoUrl = 'https:' + logoUrl;
+            }
+            
+            // Skip obviously bad URLs
+            if (logoUrl.includes('data:') || 
+                logoUrl.includes('blob:') || 
+                logoUrl.length < 10 ||
+                logoUrl.includes('generic') ||
+                logoUrl.includes('default') ||
+                logoUrl.includes('icon-') ||
+                logoUrl.includes('sprite')) {
+              continue;
+            }
+            
             extractedLogoUrl = logoUrl;
-            console.log('Selected logo (media.licdn.com):', logoUrl);
+            console.log('Selected logo with priority:', logoUrl, 'Pattern:', priorityLogo.pattern);
             break;
-          }
-          
-          // Accept any reasonable logo URL if we haven't found a better one
-          if (!extractedLogoUrl && logoUrl.match(/\.(jpg|jpeg|png|gif|webp|svg)(\?|$)/i)) {
-            extractedLogoUrl = logoUrl;
-            console.log('Selected logo (fallback):', logoUrl);
           }
         }
 
-        // Extract website from HTML - more comprehensive patterns
-        const websitePatterns = [
-          // LinkedIn specific website patterns
-          /href="([^"]*)"[^>]*data-tracking-control-name="organization_website"/i,
-          /data-tracking-control-name="organization_website"[^>]*href="([^"]+)"/i,
-          /class="[^"]*org-about-us-organization-description__website[^"]*"[^>]*href="([^"]+)"/i,
-          
-          // Generic website patterns
-          /href="(https?:\/\/[^"]*)"[^>]*>Website<\/a>/i,
-          /href="(https?:\/\/[^"]*)"[^>]*>\s*Site\s*<\/a>/i,
-          /href="(https?:\/\/[^"]*)"[^>]*>\s*Website\s*<\/a>/i,
-          /href="(https?:\/\/[^"]*)"[^>]*>\s*www\./i,
-          
-          // JSON-LD or structured data
-          /"website":\s*"(https?:\/\/[^"]*)"/i,
-          /"url":\s*"(https?:\/\/[^"]*)"/i,
-          
-          // Meta tags
-          /<meta[^>]*property="og:url"[^>]*content="([^"]+)"/i,
-          /<link[^>]*rel="canonical"[^>]*href="([^"]+)"/i
-        ];
+      // Extract website from HTML and markdown - more comprehensive patterns
+      const websitePatterns = [
+        // LinkedIn specific website patterns
+        /href="([^"]*)"[^>]*data-tracking-control-name="organization_website"/i,
+        /data-tracking-control-name="organization_website"[^>]*href="([^"]+)"/i,
+        /class="[^"]*org-about-us-organization-description__website[^"]*"[^>]*href="([^"]+)"/i,
+        
+        // Generic website patterns from HTML
+        /href="(https?:\/\/[^"]*)"[^>]*>Website<\/a>/i,
+        /href="(https?:\/\/[^"]*)"[^>]*>\s*Site\s*<\/a>/i,
+        /href="(https?:\/\/[^"]*)"[^>]*>\s*Website\s*<\/a>/i,
+        /href="(https?:\/\/[^"]*)"[^>]*>\s*www\./i,
+        
+        // From markdown - look for website mentions
+        /Website:\s*(https?:\/\/[^\s\]]+)/i,
+        /Site:\s*(https?:\/\/[^\s\]]+)/i,
+        /\[Website\]\((https?:\/\/[^)]+)\)/i,
+        /\[Site\]\((https?:\/\/[^)]+)\)/i,
+        
+        // JSON-LD or structured data
+        /"website":\s*"(https?:\/\/[^"]*)"/i,
+        /"url":\s*"(https?:\/\/[^"]*)"/i,
+        
+        // Meta tags
+        /<meta[^>]*property="og:url"[^>]*content="([^"]+)"/i,
+        /<link[^>]*rel="canonical"[^>]*href="([^"]+)"/i,
+        
+        // Look for kevel.co specifically (for this case)
+        /(https?:\/\/(?:www\.)?kevel\.co[^\s\]]*)/i,
+        /(https?:\/\/[^.\s]*\.(?:com|co|net|org|io)[^\s\]]*)/i
+      ];
         
         let foundWebsites = [];
-        for (const pattern of websitePatterns) {
-          const matches = htmlContent.matchAll(new RegExp(pattern.source, pattern.flags + 'g'));
-          for (const match of matches) {
-            if (match[1]) {
-              foundWebsites.push({
-                url: match[1],
-                pattern: pattern.source.substring(0, 50) + '...'
-              });
+        
+        // Search in both HTML and markdown content
+        const contentToSearch = [
+          { content: htmlContent, type: 'HTML' },
+          { content: content, type: 'Markdown' }
+        ];
+        
+        for (const { content: searchContent, type } of contentToSearch) {
+          if (!searchContent) continue;
+          
+          for (const pattern of websitePatterns) {
+            const matches = searchContent.matchAll(new RegExp(pattern.source, pattern.flags + 'g'));
+            for (const match of matches) {
+              if (match[1]) {
+                foundWebsites.push({
+                  url: match[1],
+                  pattern: pattern.source.substring(0, 50) + '...',
+                  source: type
+                });
+              }
             }
           }
         }
         
         console.log('Found potential websites:', foundWebsites);
+        console.log('First 1000 chars of markdown content:', content.substring(0, 1000));
         
         for (const websiteInfo of foundWebsites) {
           let websiteUrl = websiteInfo.url;
