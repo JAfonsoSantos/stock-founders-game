@@ -159,11 +159,11 @@ export default function ManageStartups() {
     setIsScrapingLinkedIn(true);
     
     try {
-      // Use Supabase edge function to fetch LinkedIn content
+      // Use Supabase edge function to fetch LinkedIn content including HTML for logo extraction
       const { data, error } = await supabase.functions.invoke('fetch-website', {
         body: {
           url: newStartup.linkedin,
-          formats: 'markdown'
+          formats: 'markdown,html'
         }
       });
 
@@ -172,12 +172,44 @@ export default function ManageStartups() {
       }
 
       const content = data.markdown || '';
+      const htmlContent = data.html || '';
       
       // Simple extraction logic for LinkedIn content
       const lines = content.split('\n').filter(line => line.trim());
       
       let extractedName = '';
       let extractedDescription = '';
+      let extractedLogoUrl = '';
+      
+      // Extract logo from HTML - look for company logo patterns in LinkedIn
+      if (htmlContent) {
+        // Look for common LinkedIn logo patterns
+        const logoPatterns = [
+          /class="[^"]*company-logo[^"]*"[^>]*src="([^"]+)"/i,
+          /class="[^"]*org-top-card-primary-content__logo[^"]*"[^>]*src="([^"]+)"/i,
+          /data-delayed-url="([^"]+)"[^>]*class="[^"]*company-logo/i,
+          /<img[^>]*src="([^"]*profile-displayphoto[^"]*)"[^>]*>/i,
+          /<img[^>]*src="([^"]*company.*logo[^"]*)"[^>]*>/i
+        ];
+        
+        for (const pattern of logoPatterns) {
+          const match = htmlContent.match(pattern);
+          if (match && match[1]) {
+            // Clean up the URL
+            let logoUrl = match[1];
+            if (logoUrl.startsWith('//')) {
+              logoUrl = 'https:' + logoUrl;
+            }
+            // Avoid low quality or generic images
+            if (logoUrl.includes('profile-displayphoto') || 
+                logoUrl.includes('company') || 
+                logoUrl.includes('logo')) {
+              extractedLogoUrl = logoUrl;
+              break;
+            }
+          }
+        }
+      }
       
       // Find company name (usually in the first few lines or as a heading)
       for (let i = 0; i < Math.min(10, lines.length); i++) {
@@ -200,23 +232,29 @@ export default function ManageStartups() {
         }
       }
       
-      if (extractedName || extractedDescription) {
+      if (extractedName || extractedDescription || extractedLogoUrl) {
         setNewStartup(prev => ({
           ...prev,
           name: extractedName || prev.name,
           slug: extractedName ? generateSlug(extractedName) : prev.slug,
-          description: extractedDescription || prev.description
+          description: extractedDescription || prev.description,
+          logo_url: extractedLogoUrl || prev.logo_url
         }));
         
+        const extractedItems = [];
+        if (extractedName) extractedItems.push('nome');
+        if (extractedDescription) extractedItems.push('descrição');
+        if (extractedLogoUrl) extractedItems.push('logo');
+        
         toast({
-          title: "Success",
-          description: "Startup information auto-filled from LinkedIn",
+          title: "Sucesso",
+          description: `Informações extraídas do LinkedIn: ${extractedItems.join(', ')}`,
         });
       } else {
         toast({
           variant: "destructive",
-          title: "No data found",
-          description: "Could not extract startup information from LinkedIn. Please fill manually.",
+          title: "Nenhum dado encontrado",
+          description: "Não foi possível extrair informações da startup do LinkedIn. Preencha manualmente.",
         });
       }
     } catch (error: any) {
