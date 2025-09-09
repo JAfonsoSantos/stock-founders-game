@@ -204,8 +204,14 @@ export default function ManageStartups() {
         console.log('HTML content length:', htmlContent.length);
         console.log('HTML snippet (first 500 chars):', htmlContent.substring(0, 500));
         
-        // More comprehensive logo extraction patterns for LinkedIn
+        // More comprehensive logo extraction patterns based on LinkedIn API structure
         const logoPatterns = [
+          // LinkedIn API specific fields (from structured data)
+          /"square-logo-url":\s*"([^"]+)"/i,
+          /"squareLogoUrl":\s*"([^"]+)"/i,
+          /"logo_url":\s*"([^"]+)"/i,
+          /"logoUrl":\s*"([^"]+)"/i,
+          
           // LinkedIn specific patterns - updated for current structure
           /img[^>]*class="[^"]*EntityPhoto-square-[^"]*"[^>]*src="([^"]+)"/i,
           /img[^>]*class="[^"]*org-top-card-summary-info-list__logo[^"]*"[^>]*src="([^"]+)"/i,
@@ -290,9 +296,15 @@ export default function ManageStartups() {
           }
         }
 
-      // Extract website from HTML and markdown - more comprehensive patterns
+      // Extract website from HTML and markdown based on LinkedIn API structure
       const websitePatterns = [
-        // LinkedIn specific website patterns
+        // LinkedIn API specific fields (from structured data)
+        /"website-url":\s*"([^"]+)"/i,
+        /"websiteUrl":\s*"([^"]+)"/i,
+        /"website":\s*"([^"]+)"/i,
+        /"companyWebsite":\s*"([^"]+)"/i,
+        
+        // LinkedIn specific website patterns from HTML
         /href="([^"]*)"[^>]*data-tracking-control-name="organization_website"/i,
         /data-tracking-control-name="organization_website"[^>]*href="([^"]+)"/i,
         /class="[^"]*org-about-us-organization-description__website[^"]*"[^>]*href="([^"]+)"/i,
@@ -310,7 +322,6 @@ export default function ManageStartups() {
         /\[Site\]\((https?:\/\/[^)]+)\)/i,
         
         // JSON-LD or structured data
-        /"website":\s*"(https?:\/\/[^"]*)"/i,
         /"url":\s*"(https?:\/\/[^"]*)"/i,
         
         // Meta tags
@@ -318,8 +329,8 @@ export default function ManageStartups() {
         /<link[^>]*rel="canonical"[^>]*href="([^"]+)"/i,
         
         // Look for kevel.co specifically (for this case)
-        /(https?:\/\/(?:www\.)?kevel\.co[^\s\]]*)/i,
-        /(https?:\/\/[^.\s]*\.(?:com|co|net|org|io)[^\s\]]*)/i
+        /(https?:\/\/(?:www\.)?kevel\.co[^\s\]"]*)/i,
+        /(https?:\/\/[^.\s"]*\.(?:com|co|net|org|io)[^\s\]"]*)/i
       ];
         
         let foundWebsites = [];
@@ -349,6 +360,40 @@ export default function ManageStartups() {
         
         console.log('Found potential websites:', foundWebsites);
         console.log('First 1000 chars of markdown content:', content.substring(0, 1000));
+        console.log('Searching for LinkedIn API fields in content...');
+        
+        // Check for JSON-LD or structured data with LinkedIn API fields
+        const jsonLdMatches = htmlContent.match(/<script[^>]*type="application\/ld\+json"[^>]*>([^<]*)<\/script>/gi);
+        if (jsonLdMatches) {
+          console.log('Found JSON-LD scripts:', jsonLdMatches.length);
+          for (const match of jsonLdMatches) {
+            try {
+              const jsonContent = match.replace(/<[^>]*>/g, '');
+              console.log('JSON-LD content sample:', jsonContent.substring(0, 200));
+              
+              const websiteUrlMatch = jsonContent.match(/"website-url":\s*"([^"]+)"/i) || 
+                                    jsonContent.match(/"websiteUrl":\s*"([^"]+)"/i) ||
+                                    jsonContent.match(/"website":\s*"([^"]+)"/i);
+              if (websiteUrlMatch && !extractedWebsite) {
+                const url = websiteUrlMatch[1];
+                if (!url.includes('linkedin.com')) {
+                  extractedWebsite = url;
+                  console.log('Found website from JSON-LD:', url);
+                }
+              }
+              
+              const logoUrlMatch = jsonContent.match(/"square-logo-url":\s*"([^"]+)"/i) ||
+                                 jsonContent.match(/"squareLogoUrl":\s*"([^"]+)"/i) ||
+                                 jsonContent.match(/"logo_url":\s*"([^"]+)"/i);
+              if (logoUrlMatch && !extractedLogoUrl) {
+                extractedLogoUrl = logoUrlMatch[1];
+                console.log('Found logo from JSON-LD:', extractedLogoUrl);
+              }
+            } catch (e) {
+              console.log('Error parsing JSON-LD:', e);
+            }
+          }
+        }
         
         for (const websiteInfo of foundWebsites) {
           let websiteUrl = websiteInfo.url;
