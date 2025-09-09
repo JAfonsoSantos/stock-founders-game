@@ -321,35 +321,33 @@ export default function Auth() {
               />
             </div>
 
-            {/* Password field - show for password and signup modes */}
-            {(authMode === 'password' || authMode === 'signup') && (
-              <div className="space-y-2">
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="h-14 text-base pr-12 bg-white border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all duration-200"
-                    required
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-0 h-14 w-12 hover:bg-transparent"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4 text-gray-400" />
-                    ) : (
-                      <Eye className="h-4 w-4 text-gray-400" />
-                    )}
-                  </Button>
-                </div>
+            {/* Password field - always show */}
+            <div className="space-y-2">
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="h-14 text-base pr-12 bg-white border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all duration-200"
+                  required={authMode !== 'magic'}
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-0 top-0 h-14 w-12 hover:bg-transparent"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4 text-gray-400" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-gray-400" />
+                  )}
+                </Button>
               </div>
-            )}
+            </div>
 
             {/* Confirm Password field - only for signup */}
             {authMode === 'signup' && (
@@ -398,19 +396,17 @@ export default function Auth() {
               </>
             )}
 
-            {/* Forgot Password Link */}
-            {authMode === 'password' && (
-              <div className="text-left">
-                <Button
-                  type="button"
-                  variant="link"
-                  className="p-0 h-auto text-sm text-gray-500 hover:text-orange-600 transition-colors"
-                  onClick={() => setAuthMode('magic')}
-                >
-                  Forgot your password?
-                </Button>
-              </div>
-            )}
+            {/* Forgot Password Link - always show */}
+            <div className="text-left">
+              <Button
+                type="button"
+                variant="link"
+                className="p-0 h-auto text-sm text-gray-500 hover:text-orange-600 transition-colors"
+                onClick={() => setAuthMode('magic')}
+              >
+                Forgot your password?
+              </Button>
+            </div>
 
             {/* Submit button */}
             {authMode === 'magic' && (
