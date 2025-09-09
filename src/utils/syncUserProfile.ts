@@ -5,7 +5,7 @@ export async function syncUserProfile(user: User) {
   if (!user) return null;
 
   try {
-    // Extract data from Google OAuth user_metadata
+    // Extract data from OAuth providers (Google, LinkedIn, etc.)
     const firstName = user.user_metadata?.first_name || 
                      user.user_metadata?.given_name ||
                      user.user_metadata?.full_name?.split(' ')[0] ||
@@ -24,7 +24,7 @@ export async function syncUserProfile(user: User) {
 
     const email = user.email || user.user_metadata?.email || null;
 
-    // Update or insert user profile with Google data
+    // Update or insert user profile with OAuth data
     const { data, error } = await supabase
       .from('users')
       .upsert({

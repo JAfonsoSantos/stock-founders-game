@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
-import { ArrowLeft, Camera, User, Lock, Globe, Upload } from "lucide-react";
+import { ArrowLeft, Camera, User, Lock, Globe, Upload, Link2, Unlink } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useI18n } from "@/hooks/useI18n";
@@ -217,6 +217,18 @@ export default function Profile() {
   };
 
   const isGoogleUser = user?.app_metadata?.provider === 'google';
+  const isLinkedInUser = user?.app_metadata?.provider === 'linkedin_oidc';
+  const isOAuthUser = isGoogleUser || isLinkedInUser;
+
+  const unlinkProvider = async (provider: string) => {
+    if (!confirm(`Desligar a conexão com ${provider === 'google' ? 'Google' : 'LinkedIn'}?`)) return;
+    
+    toast.info("Funcionalidade de desligar conexões será implementada em breve.");
+    
+    // Note: Supabase doesn't have a direct unlink method in the client
+    // This would typically require a server-side implementation
+    // For now, we show a message about the feature being planned
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted">
@@ -236,7 +248,7 @@ export default function Profile() {
 
         <div className="max-w-4xl mx-auto">
           <Tabs defaultValue="profile" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="profile" className="flex items-center gap-2">
                 <User className="h-4 w-4" />
                 Perfil
@@ -244,6 +256,10 @@ export default function Profile() {
               <TabsTrigger value="security" className="flex items-center gap-2">
                 <Lock className="h-4 w-4" />
                 Segurança
+              </TabsTrigger>
+              <TabsTrigger value="connections" className="flex items-center gap-2">
+                <Link2 className="h-4 w-4" />
+                Conexões
               </TabsTrigger>
               <TabsTrigger value="preferences" className="flex items-center gap-2">
                 <Globe className="h-4 w-4" />
@@ -344,18 +360,18 @@ export default function Profile() {
               <Card>
                 <CardHeader>
                   <CardTitle>
-                    {isGoogleUser ? "Adicionar Password" : "Alterar Password"}
+                    {isOAuthUser ? "Adicionar Password" : "Alterar Password"}
                   </CardTitle>
                   <CardDescription>
-                    {isGoogleUser 
-                      ? "Adicione uma password à sua conta Google para poder fazer login com email/password também."
+                    {isOAuthUser 
+                      ? "Adicione uma password à sua conta para poder fazer login com email/password também."
                       : "Altere sua password para manter sua conta segura."
                     }
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <form onSubmit={isGoogleUser ? addPasswordToGoogleAccount : updatePassword} className="space-y-4">
-                    {!isGoogleUser && (
+                  <form onSubmit={isOAuthUser ? addPasswordToGoogleAccount : updatePassword} className="space-y-4">
+                    {!isOAuthUser && (
                       <div className="space-y-2">
                         <Label htmlFor="current_password">Password Atual</Label>
                         <Input
@@ -370,7 +386,7 @@ export default function Profile() {
 
                     <div className="space-y-2">
                       <Label htmlFor="new_password">
-                        {isGoogleUser ? "Nova Password" : "Nova Password"}
+                        {isOAuthUser ? "Nova Password" : "Nova Password"}
                       </Label>
                       <Input
                         id="new_password"
@@ -393,9 +409,80 @@ export default function Profile() {
                     </div>
 
                     <Button type="submit" disabled={loading}>
-                      {loading ? "Salvando..." : (isGoogleUser ? "Adicionar Password" : "Alterar Password")}
+                      {loading ? "Salvando..." : (isOAuthUser ? "Adicionar Password" : "Alterar Password")}
                     </Button>
                   </form>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="connections">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Conexões OAuth</CardTitle>
+                  <CardDescription>
+                    Gerencie suas conexões com provedores externos.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                          <span className="text-white text-sm font-bold">G</span>
+                        </div>
+                        <div>
+                          <p className="font-medium">Google</p>
+                          <p className="text-sm text-muted-foreground">
+                            {isGoogleUser ? "Conectado" : "Não conectado"}
+                          </p>
+                        </div>
+                      </div>
+                      {isGoogleUser && (
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => unlinkProvider('google')}
+                          disabled={loading}
+                        >
+                          <Unlink className="h-4 w-4 mr-2" />
+                          Desligar
+                        </Button>
+                      )}
+                    </div>
+
+                    <div className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-blue-700 rounded-lg flex items-center justify-center">
+                          <span className="text-white text-sm font-bold">Li</span>
+                        </div>
+                        <div>
+                          <p className="font-medium">LinkedIn</p>
+                          <p className="text-sm text-muted-foreground">
+                            {isLinkedInUser ? "Conectado" : "Não conectado"}
+                          </p>
+                        </div>
+                      </div>
+                      {isLinkedInUser && (
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => unlinkProvider('linkedin_oidc')}
+                          disabled={loading}
+                        >
+                          <Unlink className="h-4 w-4 mr-2" />
+                          Desligar
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="p-4 bg-muted/50 rounded-lg">
+                    <p className="text-sm text-muted-foreground">
+                      <strong>Nota:</strong> Ao desligar uma conexão OAuth, você ainda poderá fazer login 
+                      com email/password se tiver configurado uma password para sua conta.
+                    </p>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>

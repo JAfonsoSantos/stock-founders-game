@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { syncUserProfile } from "@/utils/syncUserProfile";
 
 interface AuthContextType {
   user: User | null;
@@ -24,10 +25,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+        
+        // Sync user profile when user signs in
+        if (session?.user && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED')) {
+          setTimeout(() => {
+            syncUserProfile(session.user);
+          }, 0);
+        }
       }
     );
 
@@ -36,6 +44,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+      
+      // Sync profile for existing session
+      if (session?.user) {
+        setTimeout(() => {
+          syncUserProfile(session.user);
+        }, 0);
+      }
     });
 
     return () => subscription.unsubscribe();
