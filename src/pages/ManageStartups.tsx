@@ -375,7 +375,7 @@ export default function ManageStartups() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-4">
+                  <div className="grid gap-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="name">Startup Name</Label>
@@ -474,118 +474,161 @@ export default function ManageStartups() {
             </CardHeader>
             <CardContent>
               {startups.length > 0 ? (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Slug</TableHead>
-                      <TableHead>Total Shares</TableHead>
-                      <TableHead>Available</TableHead>
-                      <TableHead>VWAP Price</TableHead>
-                      <TableHead>Links</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {startups.map((startup) => (
-                      <TableRow key={startup.id}>
-                        <TableCell className="font-medium">
-                          {editingStartup === startup.id ? (
-                            <Input
-                              value={editData.name || ''}
-                              onChange={(e) => setEditData(prev => ({ ...prev, name: e.target.value }))}
-                            />
-                          ) : (
-                            startup.name
-                          )}
-                        </TableCell>
-                        <TableCell className="text-muted-foreground">
-                          {editingStartup === startup.id ? (
-                            <Input
-                              value={editData.slug || ''}
-                              onChange={(e) => setEditData(prev => ({ ...prev, slug: e.target.value }))}
-                            />
-                          ) : (
-                            startup.slug
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {editingStartup === startup.id ? (
-                            <Input
-                              type="number"
-                              min="1"
-                              value={editData.total_shares || ''}
-                              onChange={(e) => setEditData(prev => ({ ...prev, total_shares: Number(e.target.value) }))}
-                            />
-                          ) : (
-                            startup.total_shares
-                          )}
-                        </TableCell>
-                        <TableCell>{startup.primary_shares_remaining}</TableCell>
-                        <TableCell>
-                          {startup.last_vwap_price ? `$${startup.last_vwap_price.toFixed(2)}` : '-'}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex gap-2">
-                            {startup.website && (
-                              <Button variant="ghost" size="sm" asChild>
-                                <a href={startup.website} target="_blank" rel="noopener noreferrer">
-                                  <ExternalLink className="h-4 w-4" />
-                                </a>
-                              </Button>
-                            )}
-                            {startup.linkedin && (
-                              <Button variant="ghost" size="sm" asChild>
-                                <a href={startup.linkedin} target="_blank" rel="noopener noreferrer">
-                                  <ExternalLink className="h-4 w-4" />
-                                </a>
-                              </Button>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex gap-2">
-                            {editingStartup === startup.id ? (
-                              <>
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm"
-                                  onClick={() => saveEdit(startup.id)}
-                                >
-                                  Save
-                                </Button>
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm"
-                                  onClick={cancelEditing}
-                                >
-                                  Cancel
-                                </Button>
-                              </>
-                            ) : (
-                              <>
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm"
-                                  onClick={() => startEditing(startup)}
-                                >
-                                  <Edit className="h-4 w-4" />
-                                </Button>
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm"
-                                  onClick={() => deleteStartup(startup.id)}
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </>
-                            )}
-                          </div>
-                        </TableCell>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Slug</TableHead>
+                        <TableHead>Description</TableHead>
+                        <TableHead>Website</TableHead>
+                        <TableHead>LinkedIn</TableHead>
+                        <TableHead>Total Shares</TableHead>
+                        <TableHead>Available</TableHead>
+                        <TableHead>VWAP Price</TableHead>
+                        <TableHead>Actions</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {startups.map((startup) => (
+                        <TableRow key={startup.id}>
+                          <TableCell className="font-medium">
+                            {editingStartup === startup.id ? (
+                              <Input
+                                value={editData.name || ''}
+                                onChange={(e) => setEditData(prev => ({ ...prev, name: e.target.value }))}
+                                placeholder="Startup name"
+                              />
+                            ) : (
+                              startup.name
+                            )}
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">
+                            {editingStartup === startup.id ? (
+                              <Input
+                                value={editData.slug || ''}
+                                onChange={(e) => setEditData(prev => ({ ...prev, slug: e.target.value }))}
+                                placeholder="startup-slug"
+                              />
+                            ) : (
+                              startup.slug
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {editingStartup === startup.id ? (
+                              <Textarea
+                                value={editData.description || ''}
+                                onChange={(e) => setEditData(prev => ({ ...prev, description: e.target.value }))}
+                                placeholder="Description..."
+                                rows={2}
+                                className="min-w-[200px]"
+                              />
+                            ) : (
+                              <div className="max-w-[200px] truncate" title={startup.description || ''}>
+                                {startup.description || '-'}
+                              </div>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {editingStartup === startup.id ? (
+                              <Input
+                                value={editData.website || ''}
+                                onChange={(e) => setEditData(prev => ({ ...prev, website: e.target.value }))}
+                                placeholder="https://website.com"
+                              />
+                            ) : (
+                              startup.website ? (
+                                <a 
+                                  href={startup.website} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-primary hover:underline truncate block max-w-[150px]"
+                                  title={startup.website}
+                                >
+                                  {startup.website.replace(/^https?:\/\//, '')}
+                                </a>
+                              ) : '-'
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {editingStartup === startup.id ? (
+                              <Input
+                                value={editData.linkedin || ''}
+                                onChange={(e) => setEditData(prev => ({ ...prev, linkedin: e.target.value }))}
+                                placeholder="https://linkedin.com/company/..."
+                              />
+                            ) : (
+                              startup.linkedin ? (
+                                <a 
+                                  href={startup.linkedin} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-primary hover:underline truncate block max-w-[150px]"
+                                  title={startup.linkedin}
+                                >
+                                  LinkedIn
+                                </a>
+                              ) : '-'
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {editingStartup === startup.id ? (
+                              <Input
+                                type="number"
+                                min="1"
+                                value={editData.total_shares || ''}
+                                onChange={(e) => setEditData(prev => ({ ...prev, total_shares: Number(e.target.value) }))}
+                              />
+                            ) : (
+                              startup.total_shares
+                            )}
+                          </TableCell>
+                          <TableCell>{startup.primary_shares_remaining}</TableCell>
+                          <TableCell>
+                            {startup.last_vwap_price ? `$${startup.last_vwap_price.toFixed(2)}` : '-'}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex gap-2">
+                              {editingStartup === startup.id ? (
+                                <>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm"
+                                    onClick={() => saveEdit(startup.id)}
+                                  >
+                                    Save
+                                  </Button>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm"
+                                    onClick={cancelEditing}
+                                  >
+                                    Cancel
+                                  </Button>
+                                </>
+                              ) : (
+                                <>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm"
+                                    onClick={() => startEditing(startup)}
+                                  >
+                                    <Edit className="h-4 w-4" />
+                                  </Button>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm"
+                                    onClick={() => deleteStartup(startup.id)}
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </>
+                              )}
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
               ) : (
                 <div className="text-center py-8 text-muted-foreground">
                   No startups yet. Add the first startup above.
