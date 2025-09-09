@@ -293,11 +293,10 @@ export default function Auth() {
 
           {/* Email input */}
           <div className="space-y-2">
-            <Label htmlFor="primary-email" className="text-sm font-medium">EMAIL</Label>
             <Input
               id="primary-email"
               type="email"
-              placeholder="Enter your email"
+              placeholder="EMAIL"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="h-12 text-base"
@@ -307,12 +306,11 @@ export default function Auth() {
 
           {/* Password field - always show */}
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-sm font-medium">PASSWORD</Label>
             <div className="relative">
               <Input
                 id="password"
                 type={showPassword ? "text" : "password"}
-                placeholder="Password"
+                placeholder="PASSWORD"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="h-12 text-base pr-10"
