@@ -259,7 +259,7 @@ export default function Auth() {
               <Button
                 onClick={handleLinkedInSignIn}
                 variant="outline"
-                className="w-full h-14 text-base font-medium bg-white border border-gray-200 hover:bg-gray-50 hover:text-gray-900 text-gray-700 shadow-sm transition-all duration-200"
+                className="w-full h-14 text-base font-medium bg-white border border-gray-200 hover:bg-gray-50 hover:text-black text-gray-700 shadow-sm transition-all duration-200"
                 disabled={loading}
               >
                 <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24" fill="#0A66C2">
@@ -271,7 +271,7 @@ export default function Auth() {
               <Button
                 onClick={handleGoogleSignIn}
                 variant="outline"
-                className="w-full h-14 text-base font-medium bg-white border border-gray-200 hover:bg-gray-50 hover:text-gray-900 text-gray-700 shadow-sm transition-all duration-200"
+                className="w-full h-14 text-base font-medium bg-white border border-gray-200 hover:bg-gray-50 hover:text-black text-gray-700 shadow-sm transition-all duration-200"
                 disabled={loading}
               >
                 <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
