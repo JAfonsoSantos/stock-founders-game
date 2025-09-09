@@ -11,6 +11,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { LogoUpload } from "@/components/LogoUpload";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 
 interface Startup {
   id: string;
@@ -36,6 +37,7 @@ export default function ManageStartups() {
   const [isScrapingLinkedIn, setIsScrapingLinkedIn] = useState(false);
   const [editingStartup, setEditingStartup] = useState<string | null>(null);
   const [editData, setEditData] = useState<Partial<Startup>>({});
+  const [startupToDelete, setStartupToDelete] = useState<Startup | null>(null);
   const [newStartup, setNewStartup] = useState({
     slug: "",
     name: "",
@@ -436,6 +438,13 @@ export default function ManageStartups() {
     }
   };
 
+  const confirmDeleteStartup = () => {
+    if (startupToDelete) {
+      deleteStartup(startupToDelete.id);
+      setStartupToDelete(null);
+    }
+  };
+
   const startEditing = (startup: Startup) => {
     setEditingStartup(startup.id);
     setEditData({
@@ -774,7 +783,7 @@ export default function ManageStartups() {
                                   <Button 
                                     variant="ghost" 
                                     size="sm"
-                                    onClick={() => deleteStartup(startup.id)}
+                                    onClick={() => setStartupToDelete(startup)}
                                   >
                                     <Trash2 className="h-4 w-4" />
                                   </Button>
@@ -795,6 +804,21 @@ export default function ManageStartups() {
           </Card>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={!!startupToDelete}
+        onOpenChange={(open) => !open && setStartupToDelete(null)}
+        onConfirm={confirmDeleteStartup}
+        title="Delete Startup"
+        description={
+          startupToDelete
+            ? `Are you sure you want to delete "${startupToDelete.name}"? This action cannot be undone.`
+            : ""
+        }
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="destructive"
+      />
     </div>
   );
 }
