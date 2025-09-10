@@ -249,8 +249,38 @@ export default function Auth() {
       return;
     }
 
-    // Navigate directly to reset password page with email
-    navigate(`/reset-password?email=${encodeURIComponent(email)}`);
+    setLoading(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      const { error } = await resetPassword(email);
+      
+      if (error) {
+        setError(error.message);
+        toast({
+          variant: "destructive",
+          title: "Erro",
+          description: error.message,
+        });
+      } else {
+        setSuccess("Email de recuperação enviado! Verifica a tua caixa de entrada.");
+        toast({
+          title: "Email enviado",
+          description: "Enviámos-te um email para recuperar a password. Verifica a tua caixa de entrada (e o Spam).",
+        });
+      }
+    } catch (err: any) {
+      const errorMessage = err.message || "Falha ao enviar email de recuperação";
+      setError(errorMessage);
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: errorMessage,
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
