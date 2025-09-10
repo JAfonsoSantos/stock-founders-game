@@ -11,9 +11,11 @@ export function AppShell({ children }: AppShellProps) {
     <SidebarProvider defaultOpen={false}>
       <div className="min-h-screen flex flex-col w-full">
         <Header />
-        <div className="flex flex-1">
-          {/* Sidebar - always visible on desktop, toggle overlay on mobile */}
-          <AppSidebar />
+        <div className="flex flex-1 relative">
+          {/* Mobile sidebar overlay - positioned below header */}
+          <div className="md:hidden absolute top-0 left-0 z-10">
+            <AppSidebar />
+          </div>
           <main className="flex-1 bg-background">
             {children}
           </main>

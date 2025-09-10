@@ -32,10 +32,10 @@ export function Header() {
 
   return (
     <header className="h-14 border-b flex items-center px-4 gap-4 bg-background">
-      {/* Avatar - Mobile sidebar trigger, Desktop non-interactive */}
+      {/* Avatar - Mobile sidebar trigger only */}
       <button 
         onClick={toggleSidebar}
-        className="h-10 w-10 shrink-0 border-2 border-border/20 rounded-full overflow-hidden bg-transparent p-0 md:pointer-events-none"
+        className="h-10 w-10 shrink-0 border-2 border-border/20 rounded-full overflow-hidden bg-transparent p-0 md:pointer-events-none md:cursor-default"
       >
         <Avatar className="h-full w-full">
           <AvatarImage src={profile?.avatar_url || ''} alt={displayName} />
