@@ -254,7 +254,7 @@ export default function Auth() {
                   <Button
                     variant="link"
                     size="sm"
-                    onClick={() => setAuthMode('signup')}
+                    onClick={() => navigate('/join')}
                     className="text-orange-600 font-medium p-0 h-auto hover:no-underline"
                   >
                     Join
