@@ -125,11 +125,11 @@ export function GameSearch() {
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => setOpen(true)}
           onBlur={() => setTimeout(() => setOpen(false), 200)}
-          className="pl-10 bg-white text-gray-900 placeholder:text-gray-500 border-sidebar-border"
+          className="pl-10 bg-white text-gray-900 placeholder:text-gray-500 border-sidebar-border focus:border-sidebar-border"
         />
       </div>
       {open && (query.length >= 2 || loading) && (
-        <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white border border-input rounded-md shadow-lg">
+        <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white border border-sidebar-border rounded-md shadow-lg">
           <Command shouldFilter={false}>
             <CommandList>
               {loading && (
