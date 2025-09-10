@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { toast } from "sonner";
 import { Loader2, Eye, EyeOff } from "lucide-react";
 import { validateEmail } from "@/lib/validation";
+import { PasswordStrengthBars } from "@/components/PasswordStrengthBars";
 
 export default function Join() {
   const { gameId } = useParams();
@@ -23,7 +24,7 @@ export default function Join() {
   const [loading, setLoading] = useState(false);
   const [gameInfo, setGameInfo] = useState<any>(null);
   const [loadingGame, setLoadingGame] = useState(true);
-  const [authMode, setAuthMode] = useState<'signup' | 'signin'>('signup');
+  
 
   useEffect(() => {
     if (!gameId) return;
@@ -96,26 +97,24 @@ export default function Join() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (authMode === 'signup') {
-      if (!firstName.trim() || !lastName.trim()) {
-        toast.error("Please fill in all fields");
-        return;
-      }
+    if (!firstName.trim() || !lastName.trim()) {
+      toast.error("Please fill in all fields");
+      return;
+    }
 
-      if (!validateEmail(email)) {
-        toast.error("Please enter a valid email address");
-        return;
-      }
+    if (!validateEmail(email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
 
-      if (password.length < 8) {
-        toast.error("Password must be at least 8 characters");
-        return;
-      }
+    if (password.length < 8) {
+      toast.error("Password must be at least 8 characters");
+      return;
+    }
 
-      if (password !== confirmPassword) {
-        toast.error("Passwords don't match");
-        return;
-      }
+    if (password !== confirmPassword) {
+      toast.error("Passwords don't match");
+      return;
     }
 
     if (!email.trim()) {
@@ -126,28 +125,18 @@ export default function Join() {
     setLoading(true);
     
     try {
-      if (authMode === 'signup') {
-        // Create account with name
-        const { error } = await signUp(email, password);
-        if (error) {
-          toast.error(error.message);
-        } else {
-          // Update profile with name after signup
-          await supabase.from("users").upsert({
-            id: user?.id,
-            first_name: firstName,
-            last_name: lastName,
-          });
-          toast.success("Account created! Check your email to confirm.");
-        }
+      // Always signup since this is the join page
+      const { error } = await signUp(email, password);
+      if (error) {
+        toast.error(error.message);
       } else {
-        // Magic link signin
-        const { error } = await signIn(email);
-        if (error) {
-          toast.error(error.message);
-        } else {
-          toast.success("Check your email for the magic link!");
-        }
+        // Update profile with name after signup
+        await supabase.from("users").upsert({
+          id: user?.id,
+          first_name: firstName,
+          last_name: lastName,
+        });
+        toast.success("Account created! Check your email to confirm.");
       }
     } catch (error) {
       toast.error("An error occurred");
@@ -203,19 +192,17 @@ export default function Join() {
               <div className="text-2xl font-bold text-gray-700">
                 stox
               </div>
-              {authMode === 'signup' && (
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="text-gray-500">Already a member?</span>
-                  <Button
-                    variant="link"
-                    size="sm"
-                    onClick={() => setAuthMode('signin')}
-                    className="text-orange-600 font-medium p-0 h-auto hover:no-underline"
-                  >
-                    Log in
-                  </Button>
-                </div>
-              )}
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-gray-500">Already a member?</span>
+                <Button
+                  variant="link"
+                  size="sm"
+                  onClick={() => navigate('/auth')}
+                  className="text-orange-600 font-medium p-0 h-auto hover:no-underline"
+                >
+                  Log in
+                </Button>
+              </div>
             </div>
             <div>
               <h1 className="text-4xl font-bold text-gray-900 mb-2">
@@ -285,28 +272,24 @@ export default function Join() {
 
             {/* Form fields */}
             <form onSubmit={handleSubmit} className="space-y-4">
-              {authMode === 'signup' && (
-                <>
-                  <div className="grid grid-cols-2 gap-3">
-                    <Input
-                      type="text"
-                      placeholder="First Name"
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
-                      className="h-14 text-base bg-white border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all duration-200"
-                      required
-                    />
-                    <Input
-                      type="text"
-                      placeholder="Last Name"
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
-                      className="h-14 text-base bg-white border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all duration-200"
-                      required
-                    />
-                  </div>
-                </>
-              )}
+              <div className="grid grid-cols-2 gap-3">
+                <Input
+                  type="text"
+                  placeholder="First Name"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className="h-14 text-base bg-white border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all duration-200"
+                  required
+                />
+                <Input
+                  type="text"
+                  placeholder="Last Name"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className="h-14 text-base bg-white border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all duration-200"
+                  required
+                />
+              </div>
 
               <Input
                 type="email"
@@ -317,57 +300,58 @@ export default function Join() {
                 required
               />
 
-              {authMode === 'signup' && (
-                <>
-                  <div className="relative">
-                    <Input
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="h-14 text-base pr-12 bg-white border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all duration-200"
-                      required
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="absolute right-0 top-0 h-14 w-12 hover:bg-transparent"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? (
-                        <EyeOff className="h-4 w-4 text-gray-400" />
-                      ) : (
-                        <Eye className="h-4 w-4 text-gray-400" />
-                      )}
-                    </Button>
-                  </div>
+              <div className="space-y-3">
+                <div className="relative">
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="New Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="h-14 text-base pr-12 bg-white border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all duration-200"
+                    required
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-14 w-12 hover:bg-transparent"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4 text-gray-400" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-gray-400" />
+                    )}
+                  </Button>
+                </div>
+                
+                {/* Password strength bars */}
+                <PasswordStrengthBars password={password} />
+              </div>
 
-                  <div className="relative">
-                    <Input
-                      type={showConfirmPassword ? "text" : "password"}
-                      placeholder="Password again"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="h-14 text-base pr-12 bg-white border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all duration-200"
-                      required
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="absolute right-0 top-0 h-14 w-12 hover:bg-transparent"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    >
-                      {showConfirmPassword ? (
-                        <EyeOff className="h-4 w-4 text-gray-400" />
-                      ) : (
-                        <Eye className="h-4 w-4 text-gray-400" />
-                      )}
-                    </Button>
-                  </div>
-                </>
-              )}
+              <div className="relative">
+                <Input
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="Repeat the password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="h-14 text-base pr-12 bg-white border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all duration-200"
+                  required
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-0 top-0 h-14 w-12 hover:bg-transparent"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-4 w-4 text-gray-400" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-gray-400" />
+                  )}
+                </Button>
+              </div>
 
               <Button 
                 type="submit" 
@@ -377,27 +361,25 @@ export default function Join() {
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {authMode === 'signup' ? 'Creating Account...' : 'Sending...'}
+                    Creating Account...
                   </>
                 ) : (
-                  authMode === 'signup' ? 'Create Account' : 'Join Game'
+                  'Create Account'
                 )}
               </Button>
             </form>
 
-            {/* Mode switcher */}
-            {authMode === 'signin' && (
-              <div className="text-center pt-4">
-                <Button
-                  type="button"
-                  variant="link"
-                  className="p-0 h-auto text-gray-500 hover:text-orange-600 transition-colors"
-                  onClick={() => setAuthMode('signup')}
-                >
-                  Need to create an account?
-                </Button>
-              </div>
-            )}
+            {/* Mode switcher - redirect to main auth page for login */}
+            <div className="text-center pt-4">
+              <Button
+                type="button"
+                variant="link" 
+                className="p-0 h-auto text-gray-500 hover:text-orange-600 transition-colors"
+                onClick={() => navigate('/auth')}
+              >
+                Already have an account? Sign in here
+              </Button>
+            </div>
           </div>
         </div>
       </div>
