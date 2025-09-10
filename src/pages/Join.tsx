@@ -27,7 +27,11 @@ export default function Join() {
   
 
   useEffect(() => {
-    if (!gameId) return;
+    if (!gameId) {
+      // If no gameId, just set loading to false and show generic join page
+      setLoadingGame(false);
+      return;
+    }
     
     const fetchGameInfo = async () => {
       const { data, error } = await supabase
@@ -38,7 +42,9 @@ export default function Join() {
       
       if (error) {
         toast.error("Game not found");
-        navigate("/");
+        // Don't redirect, just show generic join page
+        setGameInfo({ name: "Stox Game" });
+        setLoadingGame(false);
         return;
       }
       
@@ -206,10 +212,13 @@ export default function Join() {
             </div>
             <div>
               <h1 className="text-4xl font-bold text-gray-900 mb-2">
-                Join Game
+                Create Account
               </h1>
               <p className="text-gray-600">
-                You're invited to join <strong>{gameInfo?.name}</strong>
+                {gameInfo?.name && gameInfo.name !== "Stox Game" 
+                  ? `You're invited to join ${gameInfo.name}`
+                  : "Join the startup stock market experience"
+                }
               </p>
             </div>
           </div>
