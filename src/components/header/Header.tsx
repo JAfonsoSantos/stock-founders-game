@@ -1,4 +1,5 @@
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { GameSearch } from "./GameSearch";
 import { ChartBarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -6,11 +7,15 @@ import { useGameContext } from "@/context/GameContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useI18n } from "@/hooks/useI18n";
+import { useAuth } from "@/hooks/useAuth";
+import { useUserProfile } from "@/hooks/useUserProfile";
 
 export function Header() {
   const { currentGameId, activeGames } = useGameContext();
   const navigate = useNavigate();
   const { t } = useI18n();
+  const { user } = useAuth();
+  const { profile, displayName, initials } = useUserProfile(user);
 
   const handleChartClick = () => {
     if (currentGameId) {
@@ -26,9 +31,16 @@ export function Header() {
   };
 
   return (
-    <header className="h-14 border-b bg-card flex items-center px-4 gap-4">
-      {/* Avatar trigger for sidebar - hidden, sidebar opens on avatar click */}
-      <SidebarTrigger className="opacity-0 pointer-events-none" />
+    <header className="h-14 border-b flex items-center px-4 gap-4" style={{ backgroundColor: 'hsl(var(--header-background))' }}>
+      {/* Avatar trigger for sidebar */}
+      <SidebarTrigger asChild>
+        <Avatar className="h-10 w-10 cursor-pointer shrink-0 border-2 border-white/10 hover:border-white/20 transition-colors">
+          <AvatarImage src={profile?.avatar_url || ''} alt={displayName} />
+          <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
+            {initials}
+          </AvatarFallback>
+        </Avatar>
+      </SidebarTrigger>
       
       <div className="flex-1 flex items-center gap-4">
         {/* Game Search */}
@@ -41,7 +53,7 @@ export function Header() {
           variant="ghost"
           size="icon"
           onClick={handleChartClick}
-          className="shrink-0"
+          className="shrink-0 text-white hover:bg-white/10"
         >
           <ChartBarIcon className="h-5 w-5" />
         </Button>

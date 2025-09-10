@@ -44,15 +44,18 @@ All colors are now using OKLCH for better color accuracy and perception.
     --chart-4: 47.9 95.8% 53.1%;
     --chart-5: 27.8 87.3% 67.3%;
 
-    /* Sidebar colors */
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 222.2 84% 4.9%;
+    /* Sidebar colors - STOXD dark theme */
+    --sidebar-background: 220 13% 18%;
+    --sidebar-foreground: 210 40% 98%;
     --sidebar-primary: 221.2 83.2% 53.3%;
     --sidebar-primary-foreground: 210 40% 98%;
-    --sidebar-accent: 210 40% 96%;
-    --sidebar-accent-foreground: 222.2 47.4% 11.2%;
-    --sidebar-border: 214.3 31.8% 91.4%;
+    --sidebar-accent: 220 13% 22%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 220 13% 22%;
     --sidebar-ring: 221.2 83.2% 53.3%;
+    
+    /* Header background matching sidebar */
+    --header-background: 220 13% 18%;
   }
 
   .dark {
@@ -91,15 +94,18 @@ All colors are now using OKLCH for better color accuracy and perception.
     --chart-4: 286.3 86.3% 49.8%;
     --chart-5: 10.2 93.1% 74.9%;
 
-    /* Sidebar colors */
-    --sidebar-background: 222.2 47.4% 11.2%;
+    /* Sidebar colors - STOXD dark theme */
+    --sidebar-background: 220 13% 18%;
     --sidebar-foreground: 210 40% 98%;
     --sidebar-primary: 221.2 83.2% 53.3%;
     --sidebar-primary-foreground: 210 40% 98%;
-    --sidebar-accent: 217.2 32.6% 17.5%;
+    --sidebar-accent: 220 13% 22%;
     --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 217.2 32.6% 17.5%;
+    --sidebar-border: 220 13% 22%;
     --sidebar-ring: 224.3 76.3% 48%;
+    
+    /* Header background matching sidebar */
+    --header-background: 220 13% 18%;
   }
 }
 
