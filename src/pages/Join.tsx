@@ -212,13 +212,10 @@ export default function Join() {
             </div>
             <div>
               <h1 className="text-4xl font-bold text-gray-900 mb-2">
-                Create Account
+                Let's Play!
               </h1>
               <p className="text-gray-600">
-                {gameInfo?.name && gameInfo.name !== "Stox Game" 
-                  ? `You're invited to join ${gameInfo.name}`
-                  : "Join the startup stock market experience"
-                }
+                Where networking meets play
               </p>
             </div>
           </div>
@@ -302,7 +299,7 @@ export default function Join() {
 
               <Input
                 type="email"
-                placeholder="EMAIL"
+                placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="h-14 text-base bg-white border border-gray-200 focus:border-gray-400 transition-all duration-200 text-gray-700"

@@ -163,8 +163,8 @@ export default function ResetPassword() {
               <div className="text-2xl font-bold text-gray-700">stox</div>
               <Button
                 variant="link"
-                onClick={() => navigate('/join')}
-                className="text-orange-600 font-medium p-0 h-auto hover:no-underline"
+                onClick={() => navigate('/auth')}
+                className="text-gray-500 p-0 h-auto hover:text-orange-600 hover:no-underline transition-colors"
               >
                 Got the password? Log in
               </Button>
