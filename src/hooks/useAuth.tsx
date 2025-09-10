@@ -50,6 +50,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      // Don't set user for password recovery sessions
+      if (session?.user?.aud === 'authenticated' && session?.user?.recovery_sent_at) {
+        setSession(session);
+        setUser(null); // Keep user as null for password recovery
+        setLoading(false);
+        return;
+      }
+      
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
