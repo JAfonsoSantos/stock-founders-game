@@ -398,19 +398,8 @@ export default function Auth() {
             </div>
 
             {/* Submit button */}
-            {authMode === 'magic' && (
-              <form onSubmit={handleMagicLink}>
-                <Button 
-                  type="submit" 
-                  className="w-full h-14 text-base font-semibold bg-[#FF6B35] hover:bg-[#E55A2B] text-white border-0 rounded-lg shadow-sm transition-all duration-200" 
-                  disabled={loading || !email}
-                >
-                  {loading ? "Sending..." : "Continue"}
-                </Button>
-              </form>
-            )}
-
-            {authMode === 'password' && (
+            {password ? (
+              // If password is filled, use password login
               <form onSubmit={handleLogin}>
                 <Button 
                   type="submit" 
@@ -418,6 +407,17 @@ export default function Auth() {
                   disabled={loading || !email || !password}
                 >
                   {loading ? "Signing in..." : "Continue"}
+                </Button>
+              </form>
+            ) : (
+              // If no password, use magic link
+              <form onSubmit={handleMagicLink}>
+                <Button 
+                  type="submit" 
+                  className="w-full h-14 text-base font-semibold bg-[#FF6B35] hover:bg-[#E55A2B] text-white border-0 rounded-lg shadow-sm transition-all duration-200" 
+                  disabled={loading || !email}
+                >
+                  {loading ? "Sending..." : "Continue"}
                 </Button>
               </form>
             )}
