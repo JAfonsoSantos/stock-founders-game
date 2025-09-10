@@ -116,60 +116,57 @@ export function GameSearch() {
   };
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className="w-full justify-start text-muted-foreground"
-        >
-          <Search className="h-4 w-4 mr-2" />
-          {t('search.placeholder')}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-full p-0" side="bottom" align="start">
-        <Command shouldFilter={false}>
-          <CommandInput
-            placeholder={t('search.inputPlaceholder')}
-            value={query}
-            onValueChange={setQuery}
-          />
-          <CommandList>
-            {loading && (
-              <div className="p-4 text-center text-muted-foreground">
-                {t('common.loading')}
-              </div>
-            )}
-            {!loading && query.length >= 2 && results.length === 0 && (
-              <CommandEmpty>{t('search.noResults')}</CommandEmpty>
-            )}
-            {!loading && results.length > 0 && (
-              <CommandGroup>
-                {results.map((game) => (
-                  <CommandItem
-                    key={game.id}
-                    value={game.id}
-                    onSelect={() => handleJoinGame(game.id)}
-                    className="flex items-center justify-between"
-                  >
-                    <div className="flex flex-col">
-                      <span className="font-medium">{game.name}</span>
-                      <span className="text-xs text-muted-foreground">
-                        {game.currency} • 
-                        <span className={`ml-1 ${getStatusColor(game.status)}`}>
-                          {game.status.replace('_', ' ')}
+    <div className="relative">
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          placeholder={t('search.placeholder')}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onFocus={() => setOpen(true)}
+          onBlur={() => setTimeout(() => setOpen(false), 200)}
+          className="pl-10 bg-white"
+        />
+      </div>
+      {open && (query.length >= 2 || loading) && (
+        <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white border border-input rounded-md shadow-lg">
+          <Command shouldFilter={false}>
+            <CommandList>
+              {loading && (
+                <div className="p-4 text-center text-muted-foreground">
+                  {t('common.loading')}
+                </div>
+              )}
+              {!loading && query.length >= 2 && results.length === 0 && (
+                <CommandEmpty>{t('search.noResults')}</CommandEmpty>
+              )}
+              {!loading && results.length > 0 && (
+                <CommandGroup>
+                  {results.map((game) => (
+                    <CommandItem
+                      key={game.id}
+                      value={game.id}
+                      onSelect={() => handleJoinGame(game.id)}
+                      className="flex items-center justify-between"
+                    >
+                      <div className="flex flex-col">
+                        <span className="font-medium">{game.name}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {game.currency} • 
+                          <span className={`ml-1 ${getStatusColor(game.status)}`}>
+                            {game.status.replace('_', ' ')}
+                          </span>
                         </span>
-                      </span>
-                    </div>
-                    <ExternalLink className="h-4 w-4 text-muted-foreground" />
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            )}
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
+                      </div>
+                      <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              )}
+            </CommandList>
+          </Command>
+        </div>
+      )}
+    </div>
   );
 }
