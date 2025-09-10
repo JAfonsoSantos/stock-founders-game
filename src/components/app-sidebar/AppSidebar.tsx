@@ -1,31 +1,18 @@
-import { 
-  Sidebar, 
-  SidebarContent, 
-  SidebarFooter, 
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "@/components/ui/sidebar";
+import { Sidebar, SidebarContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Home, Menu, Share2, ShoppingCart, BarChart3, Settings, LogOut } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
+import { Home, Store, Trophy, ArrowLeftRight } from "lucide-react";
 import { useGameContext } from "@/context/GameContext";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/hooks/useI18n";
 import { toast } from "sonner";
 import { SelectActiveGameModal } from "@/components/modals/SelectActiveGameModal";
 import { useState } from "react";
-import { useUserProfile } from "@/hooks/useUserProfile";
 
 export function AppSidebar() {
-  const { signOut } = useAuth();
   const { currentGameId, activeGames } = useGameContext();
   const navigate = useNavigate();
   const { t } = useI18n();
   const [showGameModal, setShowGameModal] = useState(false);
-  const { user } = useAuth();
-  const { profile, displayName, initials } = useUserProfile(user);
 
   const handleGameNavigation = () => {
     if (!currentGameId && activeGames.length === 0) {
@@ -59,49 +46,45 @@ export function AppSidebar() {
     }
   };
 
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/auth');
-  };
 
   return (
     <TooltipProvider>
       <Sidebar 
         variant="sidebar" 
-        collapsible="offcanvas"
-        className="w-16 bg-background border-r border-border/20"
+        collapsible="none"
+        className="fixed left-0 top-14 h-[calc(100vh-3.5rem)] w-16 bg-[hsl(var(--sidebar-background))] text-[hsl(var(--sidebar-foreground))] border-r border-[hsl(var(--sidebar-border))] z-20"
       >
         {/* Main Navigation - Icons Only */}
-        <SidebarContent className="p-3 pt-2 flex flex-col items-center">
+        <SidebarContent className="p-2 pt-2 flex flex-col items-center">
           <SidebarMenu className="space-y-2 flex flex-col items-center">
-            {/* Menu Icon */}
-            <SidebarMenuItem>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <SidebarMenuButton
-                    onClick={() => navigate('/discover')}
-                    className="h-8 w-8 justify-center p-0 hover:bg-accent/20 rounded-lg"
-                    size="sm"
-                  >
-                    <Menu className="h-4 w-4 text-foreground" />
-                  </SidebarMenuButton>
-                </TooltipTrigger>
-                <TooltipContent side="right" className="ml-2">
-                  Menu
-                </TooltipContent>
-              </Tooltip>
-            </SidebarMenuItem>
-
             {/* Home */}
             <SidebarMenuItem>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <SidebarMenuButton
-                    onClick={() => navigate('/discover')}
-                    className="h-8 w-8 justify-center p-0 hover:bg-accent/20 rounded-lg"
+                    onClick={() => navigate('/')}
+                    className="h-8 w-8 justify-center p-0 hover:bg-[hsl(var(--sidebar-accent))] rounded-lg"
                     size="sm"
                   >
-                    <Home className="h-4 w-4 text-foreground" />
+                    <Home className="h-4 w-4" />
+                  </SidebarMenuButton>
+                </TooltipTrigger>
+                <TooltipContent side="right" className="ml-2">
+                  Home
+                </TooltipContent>
+              </Tooltip>
+            </SidebarMenuItem>
+
+            {/* Store */}
+            <SidebarMenuItem>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <SidebarMenuButton
+                    onClick={() => navigate('/discover')}
+                    className="h-8 w-8 justify-center p-0 hover:bg-[hsl(var(--sidebar-accent))] rounded-lg"
+                    size="sm"
+                  >
+                    <Store className="h-4 w-4" />
                   </SidebarMenuButton>
                 </TooltipTrigger>
                 <TooltipContent side="right" className="ml-2">
@@ -110,16 +93,16 @@ export function AppSidebar() {
               </Tooltip>
             </SidebarMenuItem>
 
-            {/* Share */}
+            {/* Game (active) */}
             <SidebarMenuItem>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <SidebarMenuButton
                     onClick={handleGameNavigation}
-                    className="h-8 w-8 justify-center p-0 hover:bg-accent/20 rounded-lg"
+                    className="h-8 w-8 justify-center p-0 hover:bg-[hsl(var(--sidebar-accent))] rounded-lg"
                     size="sm"
                   >
-                    <Share2 className="h-4 w-4 text-foreground" />
+                    <Trophy className="h-4 w-4" />
                   </SidebarMenuButton>
                 </TooltipTrigger>
                 <TooltipContent side="right" className="ml-2">
@@ -128,16 +111,16 @@ export function AppSidebar() {
               </Tooltip>
             </SidebarMenuItem>
 
-            {/* Shopping Cart */}
+            {/* Transfers */}
             <SidebarMenuItem>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <SidebarMenuButton
                     onClick={handleTransactionsNavigation}
-                    className="h-8 w-8 justify-center p-0 hover:bg-accent/20 rounded-lg"
+                    className="h-8 w-8 justify-center p-0 hover:bg-[hsl(var(--sidebar-accent))] rounded-lg"
                     size="sm"
                   >
-                    <ShoppingCart className="h-4 w-4 text-foreground" />
+                    <ArrowLeftRight className="h-4 w-4" />
                   </SidebarMenuButton>
                 </TooltipTrigger>
                 <TooltipContent side="right" className="ml-2">
@@ -145,74 +128,9 @@ export function AppSidebar() {
                 </TooltipContent>
               </Tooltip>
             </SidebarMenuItem>
-
-            {/* Chart */}
-            <SidebarMenuItem>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <SidebarMenuButton
-                    onClick={handleTransactionsNavigation}
-                    className="h-8 w-8 justify-center p-0 hover:bg-accent/20 rounded-lg"
-                    size="sm"
-                  >
-                    <BarChart3 className="h-4 w-4 text-foreground" />
-                  </SidebarMenuButton>
-                </TooltipTrigger>
-                <TooltipContent side="right" className="ml-2">
-                  Analytics
-                </TooltipContent>
-              </Tooltip>
-            </SidebarMenuItem>
           </SidebarMenu>
         </SidebarContent>
 
-        {/* Footer with Settings and Logout */}
-        <SidebarFooter className="p-3 pb-6 flex flex-col items-center">
-          <SidebarMenu className="space-y-2 flex flex-col items-center">
-            {/* Settings */}
-            <SidebarMenuItem>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <SidebarMenuButton
-                    onClick={() => navigate('/settings')}
-                    className="h-8 w-8 justify-center p-0 hover:bg-accent/20 rounded-lg"
-                    size="sm"
-                  >
-                    <Settings className="h-4 w-4 text-foreground" />
-                  </SidebarMenuButton>
-                </TooltipTrigger>
-                <TooltipContent side="right" className="ml-2">
-                  {t('sidebar.settings')}
-                </TooltipContent>
-              </Tooltip>
-            </SidebarMenuItem>
-
-            {/* Logout */}
-            <SidebarMenuItem>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <SidebarMenuButton
-                    onClick={handleSignOut}
-                    className="h-8 w-8 justify-center p-0 hover:bg-destructive/20 text-destructive hover:text-destructive rounded-lg"
-                    size="sm"
-                  >
-                    <LogOut className="h-4 w-4" />
-                  </SidebarMenuButton>
-                </TooltipTrigger>
-                <TooltipContent side="right" className="ml-2">
-                  {t('sidebar.logout')}
-                </TooltipContent>
-              </Tooltip>
-            </SidebarMenuItem>
-
-            {/* STOX Logo */}
-            <SidebarMenuItem>
-              <div className="flex items-center justify-center py-2 mt-2">
-                <span className="text-xs font-bold text-foreground/60">STOX</span>
-              </div>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarFooter>
       </Sidebar>
 
       {/* Game Selection Modal */}

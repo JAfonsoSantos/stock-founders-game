@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { useI18n } from "@/hooks/useI18n";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserProfile } from "@/hooks/useUserProfile";
-import { useSidebar } from "@/components/ui/sidebar";
+
 
 export function Header() {
   const { currentGameId, activeGames } = useGameContext();
@@ -15,7 +15,7 @@ export function Header() {
   const { t } = useI18n();
   const { user } = useAuth();
   const { profile, displayName, initials } = useUserProfile(user);
-  const { toggleSidebar } = useSidebar();
+  
 
   const handleChartClick = () => {
     if (currentGameId) {
@@ -31,11 +31,11 @@ export function Header() {
   };
 
   return (
-    <header className="h-14 border-b flex items-center px-4 gap-4 bg-background">
+    <header className="h-14 border-b flex items-center px-4 gap-4 bg-[hsl(var(--sidebar-background))] text-[hsl(var(--sidebar-foreground))]">
       {/* Avatar - Mobile sidebar trigger only */}
       <button 
-        onClick={toggleSidebar}
-        className="h-10 w-10 shrink-0 border-2 border-border/20 rounded-full overflow-hidden bg-transparent p-0 md:pointer-events-none md:cursor-default"
+        onClick={() => navigate('/profile')}
+        className="h-10 w-10 shrink-0 border-2 border-border/20 rounded-full overflow-hidden bg-transparent p-0"
       >
         <Avatar className="h-full w-full">
           <AvatarImage src={profile?.avatar_url || ''} alt={displayName} />
