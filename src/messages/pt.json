@@ -156,5 +156,30 @@
     "saveSettings": "Guardar Definições",
     "saving": "A guardar...",
     "savedSuccess": "Definições guardadas com sucesso!"
+  },
+  "header": {
+    "selectGame": "Por favor selecione primeiro um jogo",
+    "noActiveGames": "Nenhum jogo ativo disponível"
+  },
+  "sidebar": {
+    "discover": "Descobrir",
+    "competition": "Competição",
+    "transactions": "Transações",
+    "settings": "Definições",
+    "logout": "Sair",
+    "noActiveGames": "Nenhum jogo ativo disponível"
+  },
+  "search": {
+    "placeholder": "Pesquisar jogos...",
+    "inputPlaceholder": "Pesquisar por nome, código, ou URL...",
+    "noResults": "Nenhum jogo encontrado",
+    "joinError": "Falha ao juntar-se ao jogo"
+  },
+  "modal": {
+    "selectGame": {
+      "title": "Selecionar Jogo Ativo",
+      "noGames": "Nenhum jogo ativo disponível",
+      "select": "Selecionar Jogo"
+    }
   }
 }

@@ -7,6 +7,8 @@ import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { I18nProvider } from "@/hooks/useI18n";
 import { SettingsProvider } from "@/hooks/useSettings";
 import { ThemeProvider } from "next-themes";
+import { GameProvider } from "@/context/GameContext";
+import { AppShell } from "@/components/layout/AppShell";
 import Dashboard from "./pages/Dashboard";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
@@ -46,6 +48,24 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function ProtectedShellRoute({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+  
+  if (!user) {
+    return <Navigate to="/auth" replace />;
+  }
+  
+  return <AppShell>{children}</AppShell>;
+}
+
 function PublicRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   
@@ -69,100 +89,102 @@ const App = () => (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <I18nProvider>
         <AuthProvider>
-          <SettingsProvider>
-            <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-          <Routes>
-            <Route path="/" element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/auth" element={
-              <PublicRoute>
-                <Auth />
-              </PublicRoute>
-            } />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/profile" element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            } />
-            <Route path="/settings" element={
-              <ProtectedRoute>
-                <Settings />
-              </ProtectedRoute>
-            } />
-            <Route path="/games/new" element={
-              <ProtectedRoute>
-                <CreateGame />
-              </ProtectedRoute>
-            } />
-            <Route path="/games/:gameId/organizer" element={
-              <ProtectedRoute>
-                <GameOrganizer />
-              </ProtectedRoute>
-            } />
-            <Route path="/games/:gameId/participants" element={
-              <ProtectedRoute>
-                <ManageParticipants />
-              </ProtectedRoute>
-            } />
-            <Route path="/games/:gameId/startups" element={
-              <ProtectedRoute>
-                <ManageStartups />
-              </ProtectedRoute>
-            } />
-            <Route path="/games/:gameId/settings" element={
-              <ProtectedRoute>
-                <GameSettings />
-              </ProtectedRoute>
-            } />
-            <Route path="/join/:gameId" element={<Join />} />
-            <Route path="/join" element={<Join />} />
-            <Route path="/games/:gameId/discover" element={
-              <ProtectedRoute>
-                <Discover />
-              </ProtectedRoute>
-            } />
-            <Route path="/games/:gameId/me" element={
-              <ProtectedRoute>
-                <PlayerDashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/games/:gameId/startup/:slug" element={
-              <ProtectedRoute>
-                <StartupProfile />
-              </ProtectedRoute>
-            } />
-            <Route path="/games/:gameId/startup/:slug/admin" element={
-              <ProtectedRoute>
-                <StartupAdmin />
-              </ProtectedRoute>
-            } />
-            <Route path="/games/:gameId/leaderboard" element={
-              <ProtectedRoute>
-                <Leaderboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/games/:gameId/founder-onboarding" element={
-              <ProtectedRoute>
-                <FounderOnboarding />
-              </ProtectedRoute>
-            } />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-         </BrowserRouter>
-           </TooltipProvider>
-         </SettingsProvider>
-       </AuthProvider>
-     </I18nProvider>
-   </ThemeProvider>
- </QueryClientProvider>
+          <GameProvider>
+            <SettingsProvider>
+              <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+            <Routes>
+              <Route path="/" element={
+                <ProtectedShellRoute>
+                  <Dashboard />
+                </ProtectedShellRoute>
+              } />
+              <Route path="/auth" element={
+                <PublicRoute>
+                  <Auth />
+                </PublicRoute>
+              } />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/profile" element={
+                <ProtectedShellRoute>
+                  <Profile />
+                </ProtectedShellRoute>
+              } />
+              <Route path="/settings" element={
+                <ProtectedShellRoute>
+                  <Settings />
+                </ProtectedShellRoute>
+              } />
+              <Route path="/games/new" element={
+                <ProtectedShellRoute>
+                  <CreateGame />
+                </ProtectedShellRoute>
+              } />
+              <Route path="/games/:gameId/organizer" element={
+                <ProtectedShellRoute>
+                  <GameOrganizer />
+                </ProtectedShellRoute>
+              } />
+              <Route path="/games/:gameId/participants" element={
+                <ProtectedShellRoute>
+                  <ManageParticipants />
+                </ProtectedShellRoute>
+              } />
+              <Route path="/games/:gameId/startups" element={
+                <ProtectedShellRoute>
+                  <ManageStartups />
+                </ProtectedShellRoute>
+              } />
+              <Route path="/games/:gameId/settings" element={
+                <ProtectedShellRoute>
+                  <GameSettings />
+                </ProtectedShellRoute>
+              } />
+              <Route path="/join/:gameId" element={<Join />} />
+              <Route path="/join" element={<Join />} />
+              <Route path="/games/:gameId/discover" element={
+                <ProtectedShellRoute>
+                  <Discover />
+                </ProtectedShellRoute>
+              } />
+              <Route path="/games/:gameId/me" element={
+                <ProtectedShellRoute>
+                  <PlayerDashboard />
+                </ProtectedShellRoute>
+              } />
+              <Route path="/games/:gameId/startup/:slug" element={
+                <ProtectedShellRoute>
+                  <StartupProfile />
+                </ProtectedShellRoute>
+              } />
+              <Route path="/games/:gameId/startup/:slug/admin" element={
+                <ProtectedShellRoute>
+                  <StartupAdmin />
+                </ProtectedShellRoute>
+              } />
+              <Route path="/games/:gameId/leaderboard" element={
+                <ProtectedShellRoute>
+                  <Leaderboard />
+                </ProtectedShellRoute>
+              } />
+              <Route path="/games/:gameId/founder-onboarding" element={
+                <ProtectedShellRoute>
+                  <FounderOnboarding />
+                </ProtectedShellRoute>
+              } />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+           </BrowserRouter>
+             </TooltipProvider>
+           </SettingsProvider>
+          </GameProvider>
+        </AuthProvider>
+      </I18nProvider>
+    </ThemeProvider>
+  </QueryClientProvider>
 );
 
 export default App;

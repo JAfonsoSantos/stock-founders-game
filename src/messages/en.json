@@ -156,5 +156,30 @@
     "saveSettings": "Save Settings",
     "saving": "Saving...",
     "savedSuccess": "Settings saved successfully!"
+  },
+  "header": {
+    "selectGame": "Please select a game first",
+    "noActiveGames": "No active games available"
+  },
+  "sidebar": {
+    "discover": "Discover",
+    "competition": "Competition",
+    "transactions": "Transactions",
+    "settings": "Settings", 
+    "logout": "Logout",
+    "noActiveGames": "No active games available"
+  },
+  "search": {
+    "placeholder": "Search games...",
+    "inputPlaceholder": "Search by name, code, or URL...",
+    "noResults": "No games found",
+    "joinError": "Failed to join game"
+  },
+  "modal": {
+    "selectGame": {
+      "title": "Select Active Game",
+      "noGames": "No active games available",
+      "select": "Select Game"
+    }
   }
 }
