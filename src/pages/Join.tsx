@@ -364,7 +364,7 @@ export default function Join() {
 
               <Button 
                 type="submit" 
-                className="w-full h-14 text-base font-semibold bg-[#4285F4] hover:bg-[#3367D6] text-white border-0 rounded-lg shadow-sm transition-all duration-200" 
+                className="w-full h-14 text-base font-semibold bg-[#FF6B35] hover:bg-[#E55A2B] text-white border-0 rounded-lg shadow-sm transition-all duration-200" 
                 disabled={loading}
               >
                 {loading ? (
@@ -378,17 +378,6 @@ export default function Join() {
               </Button>
             </form>
 
-            {/* Mode switcher - redirect to main auth page for login */}
-            <div className="text-center pt-4">
-              <Button
-                type="button"
-                variant="link" 
-                className="p-0 h-auto text-gray-500 hover:text-orange-600 transition-colors"
-                onClick={() => navigate('/auth')}
-              >
-                Already have an account? Sign in here
-              </Button>
-            </div>
           </div>
         </div>
       </div>

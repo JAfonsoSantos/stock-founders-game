@@ -21,7 +21,7 @@ export default function Auth() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [authMode, setAuthMode] = useState<'magic' | 'password' | 'signup'>('magic');
+  const [authMode, setAuthMode] = useState<'magic' | 'password' | 'signup'>('password');
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
   const [rememberMe, setRememberMe] = useState(() => {
@@ -161,8 +161,8 @@ export default function Auth() {
 
       if (signupCheck?.userExists) {
         toast({
-          title: "✉️ Email já registado",
-          description: "Enviámos-te um link mágico para entrar. Verifica o email (e o Spam).",
+          title: "Email já registado",
+          description: "Usa 'Forgot your password?' para recuperar o acesso.",
         });
         setLoading(false);
         return;
@@ -398,7 +398,7 @@ export default function Auth() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="h-14 text-base pr-12 bg-white border border-gray-200 focus:border-gray-400 transition-all duration-200 text-gray-700"
-                  required={authMode !== 'magic'}
+                  required
                 />
                 <Button
                   type="button"
@@ -483,27 +483,26 @@ export default function Auth() {
 
             {/* Auth mode switcher */}
             <div className="flex justify-center gap-6 text-sm pt-6">
-              {authMode !== 'magic' && (
+              {authMode === 'signup' ? (
                 <Button
                   type="button"
                   variant="link"
                   className="p-0 h-auto text-gray-500 hover:text-orange-600 transition-colors"
-                  onClick={() => setAuthMode('magic')}
+                  onClick={() => setAuthMode('password')}
                 >
-                  Use magic link instead
+                  Already have an account? Log in
                 </Button>
-              )}
-              
-              {authMode === 'signup' && (
+              ) : (
                 <Button
                   type="button"
                   variant="link"
                   className="p-0 h-auto text-gray-500 hover:text-orange-600 transition-colors"
-                  onClick={() => setAuthMode('magic')}
+                  onClick={() => setAuthMode('signup')}
                 >
-                  Already have an account?
+                  Create an account
                 </Button>
               )}
+            </div>
             </div>
 
             {/* Terms text */}
