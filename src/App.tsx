@@ -23,6 +23,7 @@ import StartupProfile from "./pages/StartupProfile";
 import StartupAdmin from "./pages/StartupAdmin";
 import Leaderboard from "./pages/Leaderboard";
 import FounderOnboarding from "./pages/FounderOnboarding";
+import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -82,6 +83,11 @@ const App = () => (
             <Route path="/auth" element={
               <PublicRoute>
                 <Auth />
+              </PublicRoute>
+            } />
+            <Route path="/reset-password" element={
+              <PublicRoute>
+                <ResetPassword />
               </PublicRoute>
             } />
             <Route path="/profile" element={

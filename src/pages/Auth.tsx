@@ -22,11 +22,13 @@ export default function Auth() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [authMode, setAuthMode] = useState<'magic' | 'password' | 'signup'>('magic');
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
   const [rememberMe, setRememberMe] = useState(() => {
     // Load remember me preference from localStorage
     return localStorage.getItem('rememberMe') === 'true';
   });
-  const { signIn, signInWithPassword, signUp, signInWithGoogle, signInWithLinkedIn } = useAuth();
+  const { signIn, signInWithPassword, signUp, signInWithGoogle, signInWithLinkedIn, resetPassword } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const gameId = searchParams.get("gameId");
@@ -237,6 +239,50 @@ export default function Auth() {
     }
   };
 
+  const handleForgotPassword = async () => {
+    if (!email) {
+      toast({
+        variant: "destructive",
+        title: "Email necessário",
+        description: "Introduz o teu email primeiro para recuperar a password.",
+      });
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      const { error } = await resetPassword(email);
+      
+      if (error) {
+        setError(error.message);
+        toast({
+          variant: "destructive",
+          title: "Erro",
+          description: error.message,
+        });
+      } else {
+        setSuccess("Email de recuperação enviado! Verifica a tua caixa de entrada.");
+        toast({
+          title: "Email enviado",
+          description: "Enviámos-te um email para recuperar a password. Verifica a tua caixa de entrada (e o Spam).",
+        });
+      }
+    } catch (err: any) {
+      const errorMessage = err.message || "Falha ao enviar email de recuperação";
+      setError(errorMessage);
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: errorMessage,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex bg-gray-100">
       {/* Left Panel - Form */}
@@ -391,7 +437,8 @@ export default function Auth() {
                 type="button"
                 variant="link"
                 className="p-0 h-auto text-xs text-gray-400 hover:text-orange-600 transition-colors"
-                onClick={() => setAuthMode('magic')}
+                onClick={handleForgotPassword}
+                disabled={loading}
               >
                 Forgot your password?
               </Button>
