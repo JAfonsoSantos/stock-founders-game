@@ -71,12 +71,9 @@ export default function ResetPassword() {
         return;
       }
 
-      setSuccess(true);
-      
-      // Redirect to login after 3 seconds
-      setTimeout(() => {
-        navigate('/auth');
-      }, 3000);
+      // Sign out the temporary recovery session and go to the login page
+      await supabase.auth.signOut();
+      navigate('/auth', { replace: true });
 
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred");
