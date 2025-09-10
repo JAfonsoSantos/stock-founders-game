@@ -120,6 +120,7 @@ const App = () => (
               </ProtectedRoute>
             } />
             <Route path="/join/:gameId" element={<Join />} />
+            <Route path="/join" element={<Join />} />
             <Route path="/games/:gameId/discover" element={
               <ProtectedRoute>
                 <Discover />
