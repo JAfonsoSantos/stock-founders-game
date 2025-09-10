@@ -22,22 +22,28 @@ export default function ResetPassword() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
-  // Check if we have the required parameters
+  // Check if we have recovery tokens in the URL hash (Supabase sends them as #...)
   useEffect(() => {
-    const accessToken = searchParams.get('access_token');
-    const refreshToken = searchParams.get('refresh_token');
-    
-    if (!accessToken || !refreshToken) {
-      setError("Invalid or expired reset link. Please request a new password reset.");
+    const hash = window.location.hash || "";
+    if (!hash) {
+      // If user navigated here without a recovery link, don't show an error
       return;
     }
 
-    // Set the session with the tokens from the URL
-    supabase.auth.setSession({
-      access_token: accessToken,
-      refresh_token: refreshToken
-    });
-  }, [searchParams]);
+    const params = new URLSearchParams(hash.replace(/^#/, ""));
+    const type = params.get("type");
+    const accessToken = params.get("access_token");
+    const refreshToken = params.get("refresh_token");
+
+    if (type === "recovery" && accessToken && refreshToken) {
+      supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken,
+      });
+    } else {
+      setError("Invalid or expired reset link. Please request a new password reset.");
+    }
+  }, []);
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -157,9 +163,14 @@ export default function ResetPassword() {
           {/* Header */}
           <div className="mb-12">
             <div className="flex items-center justify-between mb-8">
-              <div className="text-2xl font-bold text-gray-700">
-                stox
-              </div>
+              <div className="text-2xl font-bold text-gray-700">stox</div>
+              <Button
+                variant="link"
+                onClick={() => navigate('/join')}
+                className="text-orange-600 font-medium p-0 h-auto hover:no-underline"
+              >
+                Got the password? Log in
+              </Button>
             </div>
             <div>
               <h1 className="text-4xl font-bold text-gray-900 mb-2">Reset Your Password</h1>
@@ -242,17 +253,6 @@ export default function ResetPassword() {
             </Button>
           </form>
 
-          {/* Back to Login */}
-          <div className="text-center pt-6">
-            <Button
-              variant="link"
-              onClick={() => navigate('/auth')}
-              className="p-0 h-auto text-gray-500 hover:text-orange-600 transition-colors"
-            >
-              <ArrowLeft size={16} className="mr-2" />
-              Back to Login
-            </Button>
-          </div>
         </div>
       </div>
 

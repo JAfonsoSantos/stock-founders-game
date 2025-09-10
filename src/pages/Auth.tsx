@@ -481,28 +481,6 @@ export default function Auth() {
               </form>
             )}
 
-            {/* Auth mode switcher */}
-            <div className="flex justify-center gap-6 text-sm pt-6">
-              {authMode === 'signup' ? (
-                <Button
-                  type="button"
-                  variant="link"
-                  className="p-0 h-auto text-gray-500 hover:text-orange-600 transition-colors"
-                  onClick={() => setAuthMode('password')}
-                >
-                  Already have an account? Log in
-                </Button>
-              ) : (
-                <Button
-                  type="button"
-                  variant="link"
-                  className="p-0 h-auto text-gray-500 hover:text-orange-600 transition-colors"
-                  onClick={() => setAuthMode('signup')}
-                >
-                  Create an account
-                </Button>
-              )}
-            </div>
 
             {/* Terms text */}
             <div className="text-center pt-4">
