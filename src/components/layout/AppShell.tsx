@@ -12,7 +12,7 @@ export function AppShell({ children }: AppShellProps) {
       <div className="min-h-screen flex flex-col w-full">
         <Header />
         <div className="flex flex-1">
-          {/* Sidebar - always present but collapsed on mobile */}
+          {/* Sidebar - always visible on desktop, toggle overlay on mobile */}
           <AppSidebar />
           <main className="flex-1 bg-background">
             {children}
