@@ -1,4 +1,4 @@
-import { SidebarTrigger } from "@/components/ui/sidebar";
+import { useSidebar } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { GameSearch } from "./GameSearch";
 import { ChartBarIcon } from "lucide-react";
@@ -16,6 +16,7 @@ export function Header() {
   const { t } = useI18n();
   const { user } = useAuth();
   const { profile, displayName, initials } = useUserProfile(user);
+  const { toggleSidebar } = useSidebar();
 
   const handleChartClick = () => {
     if (currentGameId) {
@@ -33,16 +34,14 @@ export function Header() {
   return (
     <header className="h-14 border-b flex items-center px-4 gap-4" style={{ backgroundColor: 'hsl(var(--header-background))' }}>
       {/* Avatar trigger for sidebar */}
-      <SidebarTrigger asChild>
-        <button className="h-10 w-10 cursor-pointer shrink-0 border-2 border-white/10 hover:border-white/20 transition-colors rounded-full overflow-hidden bg-transparent p-0">
-          <Avatar className="h-full w-full">
-            <AvatarImage src={profile?.avatar_url || ''} alt={displayName} />
-            <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
-              {initials}
-            </AvatarFallback>
-          </Avatar>
-        </button>
-      </SidebarTrigger>
+      <button onClick={toggleSidebar} className="h-10 w-10 cursor-pointer shrink-0 border-2 border-white/10 hover:border-white/20 transition-colors rounded-full overflow-hidden bg-transparent p-0">
+        <Avatar className="h-full w-full">
+          <AvatarImage src={profile?.avatar_url || ''} alt={displayName} />
+          <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
+            {initials}
+          </AvatarFallback>
+        </Avatar>
+      </button>
       
       <div className="flex-1 flex items-center gap-4">
         {/* Game Search */}
