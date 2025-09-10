@@ -154,47 +154,34 @@ export function AppSidebar() {
           </div>
 
           {/* Bottom Section */}
-          <div className="flex flex-col items-center space-y-0 pb-2">
-            {/* Stox Logo */}
-            <div className="text-lg font-bold text-gray-500 select-none">
-              stox
-            </div>
+          <div className="flex flex-col items-center gap-[2px] pb-1">
+            <div className="text-lg font-bold text-gray-600 leading-none tracking-tight select-none">stox</div>
             
-            {/* Settings */}
-            <SidebarMenuItem>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <SidebarMenuButton
-                    onClick={() => navigate('/settings')}
-                    className="h-8 w-8 justify-center p-0 hover:bg-gray-200 rounded-lg text-gray-600 hover:text-gray-800"
-                    size="sm"
-                  >
-                    <Settings className="h-4 w-4" />
-                  </SidebarMenuButton>
-                </TooltipTrigger>
-                <TooltipContent side="right" className="ml-2">
-                  Settings
-                </TooltipContent>
-              </Tooltip>
-            </SidebarMenuItem>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={() => navigate('/settings')}
+                  className="mt-[2px] h-7 w-7 flex items-center justify-center rounded-lg text-gray-600 hover:text-gray-800 hover:bg-gray-200 transition-colors"
+                  aria-label="Settings"
+                >
+                  <Settings className="h-4 w-4" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="right" className="ml-2">Settings</TooltipContent>
+            </Tooltip>
 
-            {/* Logout */}
-            <SidebarMenuItem>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <SidebarMenuButton
-                    onClick={signOut}
-                    className="h-8 w-8 justify-center p-0 hover:bg-red-100 rounded-lg text-gray-600 hover:text-red-600"
-                    size="sm"
-                  >
-                    <LogOut className="h-4 w-4" />
-                  </SidebarMenuButton>
-                </TooltipTrigger>
-                <TooltipContent side="right" className="ml-2">
-                  Log out
-                </TooltipContent>
-              </Tooltip>
-            </SidebarMenuItem>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={signOut}
+                  className="mt-[2px] h-7 w-7 flex items-center justify-center rounded-lg text-gray-600 hover:text-red-600 hover:bg-red-100 transition-colors"
+                  aria-label="Log out"
+                >
+                  <LogOut className="h-4 w-4" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="right" className="ml-2">Log out</TooltipContent>
+            </Tooltip>
           </div>
         </SidebarContent>
 
