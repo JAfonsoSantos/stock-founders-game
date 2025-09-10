@@ -66,7 +66,7 @@ export function AppSidebar() {
             {/* Avatar - at the top */}
             <div className="mb-4">
               <button 
-                onClick={() => navigate('/profile')}
+                onClick={() => navigate('/dashboard')}
                 className="h-10 w-10 shrink-0 border-2 border-gray-300 rounded-full overflow-hidden bg-transparent p-0 hover:border-gray-400 transition-colors"
               >
                 <Avatar className="h-full w-full">
@@ -159,11 +159,11 @@ export function AppSidebar() {
             
             <Tooltip>
               <TooltipTrigger asChild>
-                <button
-                  onClick={() => navigate('/settings')}
-                  className="mt-[2px] h-7 w-7 flex items-center justify-center rounded-lg text-gray-600 hover:text-gray-800 hover:bg-gray-200 transition-colors"
-                  aria-label="Settings"
-                >
+              <button
+                onClick={() => navigate('/profile')}
+                className="mt-[2px] h-7 w-7 flex items-center justify-center rounded-lg text-gray-600 hover:text-gray-800 hover:bg-gray-200 transition-colors"
+                aria-label="Settings"
+              >
                   <Settings className="h-4 w-4" />
                 </button>
               </TooltipTrigger>
