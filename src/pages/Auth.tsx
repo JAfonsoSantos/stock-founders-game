@@ -310,12 +310,12 @@ export default function Auth() {
             </div>
             <div>
               <h1 className="text-4xl font-bold text-gray-900 mb-2">
-                {authMode === 'signup' ? 'Create Account' : 'Welcome Back'}
+                {authMode === 'signup' ? 'Create Account' : 'Welcome'}
               </h1>
               <p className="text-gray-600">
                 {authMode === 'signup' 
                   ? 'Join the startup stock market experience' 
-                  : 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed'
+                  : 'Where networking meets play'
                 }
               </p>
             </div>
