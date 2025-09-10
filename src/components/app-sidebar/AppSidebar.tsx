@@ -69,7 +69,7 @@ export function AppSidebar() {
       <Sidebar 
         variant="sidebar" 
         collapsible="offcanvas"
-        className="w-16 bg-background border-r border-border/20 md:hidden"
+        className="w-16 bg-background border-r border-border/20"
       >
         {/* Main Navigation - Icons Only */}
         <SidebarContent className="p-3 pt-2 flex flex-col items-center">
