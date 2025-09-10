@@ -12,7 +12,10 @@ export function AppShell({ children }: AppShellProps) {
       <div className="min-h-screen flex flex-col w-full">
         <Header />
         <div className="flex flex-1">
-          <AppSidebar />
+          {/* Hide sidebar on mobile */}
+          <div className="hidden md:block">
+            <AppSidebar />
+          </div>
           <main className="flex-1 bg-background">
             {children}
           </main>

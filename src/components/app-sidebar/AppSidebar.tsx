@@ -73,16 +73,6 @@ export function AppSidebar() {
       >
         {/* Avatar and Main Navigation */}
         <SidebarContent className="p-3 pt-6 flex flex-col items-center">
-          {/* Avatar at top */}
-          <div className="mb-6 h-10 w-10 shrink-0 border-2 border-border/20 rounded-full overflow-hidden">
-            <Avatar className="h-full w-full">
-              <AvatarImage src={profile?.avatar_url || ''} alt={displayName} />
-              <AvatarFallback className="bg-primary text-primary-foreground font-semibold text-sm">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
-          </div>
-
           <SidebarMenu className="space-y-3 flex flex-col items-center">
             {/* Menu Icon */}
             <SidebarMenuItem>
@@ -197,24 +187,6 @@ export function AppSidebar() {
               </Tooltip>
             </SidebarMenuItem>
 
-            {/* Logout */}
-            <SidebarMenuItem>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <SidebarMenuButton
-                    onClick={handleSignOut}
-                    className="h-10 w-10 justify-center p-0 hover:bg-destructive/20 text-destructive hover:text-destructive rounded-lg"
-                    size="sm"
-                  >
-                    <LogOut className="h-4 w-4" />
-                  </SidebarMenuButton>
-                </TooltipTrigger>
-                <TooltipContent side="right" className="ml-2">
-                  {t('sidebar.logout')}
-                </TooltipContent>
-              </Tooltip>
-            </SidebarMenuItem>
-            
             {/* STOX Logo */}
             <SidebarMenuItem>
               <div className="flex items-center justify-center py-2 mt-4">

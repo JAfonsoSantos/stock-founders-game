@@ -1,14 +1,19 @@
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { GameSearch } from "./GameSearch";
 import { BarChart3 } from "lucide-react";
 import { useGameContext } from "@/context/GameContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useI18n } from "@/hooks/useI18n";
+import { useAuth } from "@/hooks/useAuth";
+import { useUserProfile } from "@/hooks/useUserProfile";
 
 export function Header() {
   const { currentGameId, activeGames } = useGameContext();
   const navigate = useNavigate();
   const { t } = useI18n();
+  const { user } = useAuth();
+  const { profile, displayName, initials } = useUserProfile(user);
 
   const handleChartClick = () => {
     if (currentGameId) {
@@ -24,7 +29,17 @@ export function Header() {
   };
 
   return (
-    <header className="h-14 border-b flex items-center px-4 gap-4" style={{ backgroundColor: 'hsl(var(--header-background))' }}>      
+    <header className="h-14 border-b flex items-center px-4 gap-4 bg-background">
+      {/* Avatar */}
+      <div className="h-10 w-10 shrink-0 border-2 border-border/20 rounded-full overflow-hidden">
+        <Avatar className="h-full w-full">
+          <AvatarImage src={profile?.avatar_url || ''} alt={displayName} />
+          <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
+            {initials}
+          </AvatarFallback>
+        </Avatar>
+      </div>
+      
       <div className="flex-1 flex items-center gap-4">
         {/* Game Search */}
         <div className="flex-1 max-w-md">
@@ -34,9 +49,9 @@ export function Header() {
         {/* Chart/Dashboard Icon in Circle */}
         <button
           onClick={handleChartClick}
-          className="shrink-0 h-10 w-10 rounded-full bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center"
+          className="shrink-0 h-10 w-10 rounded-full bg-accent/20 hover:bg-accent/30 transition-colors flex items-center justify-center"
         >
-          <BarChart3 className="h-5 w-5 text-white" />
+          <BarChart3 className="h-5 w-5 text-foreground" />
         </button>
       </div>
     </header>
