@@ -26,7 +26,7 @@ export function Header() {
   };
 
   return (
-    <header className="h-14 border-b flex items-center px-4 gap-4 bg-gray-50 pl-20">
+    <header className="h-14 border-b border-sidebar-border flex items-center px-4 gap-4 bg-gray-50 pl-20">
       <div className="flex-1 flex items-center justify-end gap-4">
         {/* Game Search */}
         <div className="flex-1 md:flex-none md:w-80">
