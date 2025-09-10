@@ -27,6 +27,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        // Don't set user as logged in for password recovery events
+        if (event === 'PASSWORD_RECOVERY') {
+          setSession(session);
+          setUser(null); // Keep user as null for password recovery
+          setLoading(false);
+          return;
+        }
+        
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);

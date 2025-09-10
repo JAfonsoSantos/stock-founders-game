@@ -85,11 +85,7 @@ const App = () => (
                 <Auth />
               </PublicRoute>
             } />
-            <Route path="/reset-password" element={
-              <PublicRoute>
-                <ResetPassword />
-              </PublicRoute>
-            } />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/profile" element={
               <ProtectedRoute>
                 <Profile />
