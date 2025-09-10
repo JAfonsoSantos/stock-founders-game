@@ -154,7 +154,7 @@ export function AppSidebar() {
           </div>
 
           {/* Bottom Section */}
-          <div className="flex flex-col items-center gap-[3px] pb-1">
+          <div className="flex flex-col items-center gap-[4px] pb-1">
             <div className="text-lg font-bold text-gray-600 leading-none tracking-tight select-none">stox</div>
             
             <Tooltip>
