@@ -34,12 +34,14 @@ export function Header() {
     <header className="h-14 border-b flex items-center px-4 gap-4" style={{ backgroundColor: 'hsl(var(--header-background))' }}>
       {/* Avatar trigger for sidebar */}
       <SidebarTrigger asChild>
-        <Avatar className="h-10 w-10 cursor-pointer shrink-0 border-2 border-white/10 hover:border-white/20 transition-colors">
-          <AvatarImage src={profile?.avatar_url || ''} alt={displayName} />
-          <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
-            {initials}
-          </AvatarFallback>
-        </Avatar>
+        <button className="h-10 w-10 cursor-pointer shrink-0 border-2 border-white/10 hover:border-white/20 transition-colors rounded-full overflow-hidden bg-transparent p-0">
+          <Avatar className="h-full w-full">
+            <AvatarImage src={profile?.avatar_url || ''} alt={displayName} />
+            <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
+              {initials}
+            </AvatarFallback>
+          </Avatar>
+        </button>
       </SidebarTrigger>
       
       <div className="flex-1 flex items-center gap-4">
