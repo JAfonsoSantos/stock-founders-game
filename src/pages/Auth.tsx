@@ -339,7 +339,7 @@ export default function Auth() {
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="h-14 text-base bg-white border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all duration-200 text-foreground"
+                className="h-14 text-base focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all duration-200"
                 required
               />
 
@@ -351,7 +351,7 @@ export default function Auth() {
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="h-14 text-base pr-12 bg-white border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all duration-200 text-foreground"
+                  className="h-14 text-base pr-12 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all duration-200"
                   required={authMode !== 'magic'}
                 />
                 <Button
