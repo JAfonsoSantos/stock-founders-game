@@ -161,13 +161,17 @@ export default function ResetPassword() {
           <div className="mb-12">
             <div className="flex items-center justify-between mb-8">
               <div className="text-2xl font-bold text-gray-700">stox</div>
-              <Button
-                variant="link"
-                onClick={() => navigate('/auth')}
-                className="text-gray-500 p-0 h-auto hover:text-orange-600 hover:no-underline transition-colors"
-              >
-                Got the password? Log in
-              </Button>
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-gray-500">Got the password?</span>
+                <Button
+                  variant="link"
+                  size="sm"
+                  onClick={() => navigate('/auth')}
+                  className="text-orange-600 font-medium p-0 h-auto hover:no-underline"
+                >
+                  Log in
+                </Button>
+              </div>
             </div>
             <div>
               <h1 className="text-4xl font-bold text-gray-900 mb-2">Reset Your Password</h1>
