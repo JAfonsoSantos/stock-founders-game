@@ -198,7 +198,7 @@ export default function ResetPassword() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your new password"
-                  className="h-14 pr-12 text-base bg-white border-gray-200 rounded-lg focus:border-orange-500 focus:ring-orange-500"
+                  className="h-14 pr-12 text-base bg-white border border-gray-200 focus:border-gray-400 transition-all duration-200 text-gray-700"
                   disabled={loading}
                 />
                 <button
@@ -224,7 +224,7 @@ export default function ResetPassword() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Confirm your new password"
-                  className="h-14 pr-12 text-base bg-white border-gray-200 rounded-lg focus:border-orange-500 focus:ring-orange-500"
+                  className="h-14 pr-12 text-base bg-white border border-gray-200 focus:border-gray-400 transition-all duration-200 text-gray-700"
                   disabled={loading}
                 />
                 <button
