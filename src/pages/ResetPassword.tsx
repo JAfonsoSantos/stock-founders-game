@@ -81,28 +81,68 @@ export default function ResetPassword() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center p-4">
-        <div className="w-full max-w-md">
-          <div className="bg-card border border-border rounded-xl shadow-lg p-8 space-y-6">
-            <div className="text-center space-y-4">
+      <div className="min-h-screen flex bg-gray-100">
+        {/* Left Panel - Success */}
+        <div className="flex-1 flex items-center justify-center p-8 lg:p-16 bg-gray-50">
+          <div className="w-full max-w-md animate-fade-in">
+            <div className="text-center space-y-6">
               <div className="w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mx-auto">
                 <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
               </div>
               
-              <div className="space-y-2">
-                <h1 className="text-2xl font-bold text-foreground">Password Updated!</h1>
-                <p className="text-muted-foreground">
+              <div className="space-y-3">
+                <h1 className="text-4xl font-bold text-gray-900">Password Updated!</h1>
+                <p className="text-gray-600 text-lg">
                   Your password has been successfully updated. You will be redirected to the login page shortly.
                 </p>
               </div>
 
               <Button 
                 onClick={() => navigate('/auth')}
-                className="w-full h-12 text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground"
+                className="w-full h-14 text-base font-semibold bg-[#FF6B35] hover:bg-[#E55A2B] text-white border-0 rounded-lg shadow-sm transition-all duration-200"
               >
                 Go to Login
               </Button>
             </div>
+          </div>
+        </div>
+
+        {/* Right Panel - Visual */}
+        <div className="hidden lg:flex flex-1 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600">
+            {/* Organic shapes */}
+            <div className="absolute top-20 right-20 w-96 h-96 bg-gradient-to-br from-white/20 to-transparent rounded-full blur-3xl"></div>
+            <div className="absolute bottom-32 left-16 w-80 h-80 bg-gradient-to-tr from-orange-300/30 to-transparent rounded-full blur-2xl"></div>
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-orange-300/20 to-orange-600/20 rounded-full blur-3xl"></div>
+            
+            {/* Flowing curves */}
+            <svg
+              className="absolute inset-0 w-full h-full"
+              viewBox="0 0 400 600"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M-50 200 Q100 150 200 200 T450 250 L450 600 L-50 600 Z"
+                fill="url(#gradient1)"
+                opacity="0.6"
+              />
+              <path
+                d="M-50 300 Q150 250 250 300 T500 350 L500 600 L-50 600 Z"
+                fill="url(#gradient2)"
+                opacity="0.4"
+              />
+              <defs>
+                <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="rgba(255,255,255,0.3)" />
+                  <stop offset="100%" stopColor="rgba(255,255,255,0.1)" />
+                </linearGradient>
+                <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="rgba(251,146,60,0.4)" />
+                  <stop offset="100%" stopColor="rgba(251,146,60,0.2)" />
+                </linearGradient>
+              </defs>
+            </svg>
           </div>
         </div>
       </div>
@@ -110,29 +150,37 @@ export default function ResetPassword() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="bg-card border border-border rounded-xl shadow-lg p-8 space-y-6">
+    <div className="min-h-screen flex bg-gray-100">
+      {/* Left Panel - Form */}
+      <div className="flex-1 flex items-center justify-center p-8 lg:p-16 bg-gray-50">
+        <div className="w-full max-w-md animate-fade-in">
           {/* Header */}
-          <div className="text-center space-y-2">
-            <h1 className="text-2xl font-bold text-foreground">Reset Your Password</h1>
-            <p className="text-muted-foreground">
-              Enter your new password below
-            </p>
+          <div className="mb-12">
+            <div className="flex items-center justify-between mb-8">
+              <div className="text-2xl font-bold text-gray-700">
+                stox
+              </div>
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900 mb-2">Reset Your Password</h1>
+              <p className="text-gray-600 text-lg">
+                Enter your new password below
+              </p>
+            </div>
           </div>
 
           {/* Error Alert */}
           {error && (
-            <Alert className="border-destructive/20 bg-destructive/5">
-              <AlertTriangle className="h-4 w-4 text-destructive" />
-              <AlertDescription className="text-destructive">{error}</AlertDescription>
+            <Alert className="border-red-200 bg-red-50 mb-6">
+              <AlertTriangle className="h-4 w-4 text-red-500" />
+              <AlertDescription className="text-red-700">{error}</AlertDescription>
             </Alert>
           )}
 
-          <form onSubmit={handleResetPassword} className="space-y-4">
+          <form onSubmit={handleResetPassword} className="space-y-6">
             {/* New Password */}
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm font-medium text-foreground">
+              <Label htmlFor="password" className="text-base font-medium text-gray-700">
                 New Password
               </Label>
               <div className="relative">
@@ -142,15 +190,15 @@ export default function ResetPassword() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your new password"
-                  className="h-12 pr-12 border-input bg-background"
+                  className="h-14 pr-12 text-base bg-white border-gray-200 rounded-lg focus:border-orange-500 focus:ring-orange-500"
                   disabled={loading}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                 >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
               <PasswordStrengthIndicator password={password} />
@@ -158,7 +206,7 @@ export default function ResetPassword() {
 
             {/* Confirm Password */}
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword" className="text-sm font-medium text-foreground">
+              <Label htmlFor="confirmPassword" className="text-base font-medium text-gray-700">
                 Confirm New Password
               </Label>
               <div className="relative">
@@ -168,26 +216,26 @@ export default function ResetPassword() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Confirm your new password"
-                  className="h-12 pr-12 border-input bg-background"
+                  className="h-14 pr-12 text-base bg-white border-gray-200 rounded-lg focus:border-orange-500 focus:ring-orange-500"
                   disabled={loading}
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                 >
-                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
               {confirmPassword && password !== confirmPassword && (
-                <p className="text-sm text-destructive">Passwords do not match</p>
+                <p className="text-sm text-red-500">Passwords do not match</p>
               )}
             </div>
 
             {/* Submit Button */}
             <Button 
               type="submit" 
-              className="w-full h-12 text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground"
+              className="w-full h-14 text-base font-semibold bg-[#FF6B35] hover:bg-[#E55A2B] text-white border-0 rounded-lg shadow-sm transition-all duration-200"
               disabled={loading || !password || !confirmPassword || password !== confirmPassword}
             >
               {loading ? "Updating Password..." : "Update Password"}
@@ -195,16 +243,55 @@ export default function ResetPassword() {
           </form>
 
           {/* Back to Login */}
-          <div className="text-center pt-4 border-t border-border">
+          <div className="text-center pt-6">
             <Button
-              variant="ghost"
+              variant="link"
               onClick={() => navigate('/auth')}
-              className="text-muted-foreground hover:text-foreground"
+              className="p-0 h-auto text-gray-500 hover:text-orange-600 transition-colors"
             >
               <ArrowLeft size={16} className="mr-2" />
               Back to Login
             </Button>
           </div>
+        </div>
+      </div>
+
+      {/* Right Panel - Visual */}
+      <div className="hidden lg:flex flex-1 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600">
+          {/* Organic shapes */}
+          <div className="absolute top-20 right-20 w-96 h-96 bg-gradient-to-br from-white/20 to-transparent rounded-full blur-3xl"></div>
+          <div className="absolute bottom-32 left-16 w-80 h-80 bg-gradient-to-tr from-orange-300/30 to-transparent rounded-full blur-2xl"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-orange-300/20 to-orange-600/20 rounded-full blur-3xl"></div>
+          
+          {/* Flowing curves */}
+          <svg
+            className="absolute inset-0 w-full h-full"
+            viewBox="0 0 400 600"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M-50 200 Q100 150 200 200 T450 250 L450 600 L-50 600 Z"
+              fill="url(#gradient1)"
+              opacity="0.6"
+            />
+            <path
+              d="M-50 300 Q150 250 250 300 T500 350 L500 600 L-50 600 Z"
+              fill="url(#gradient2)"
+              opacity="0.4"
+            />
+            <defs>
+              <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="rgba(255,255,255,0.3)" />
+                <stop offset="100%" stopColor="rgba(255,255,255,0.1)" />
+              </linearGradient>
+              <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="rgba(251,146,60,0.4)" />
+                <stop offset="100%" stopColor="rgba(251,146,60,0.2)" />
+              </linearGradient>
+            </defs>
+          </svg>
         </div>
       </div>
     </div>
