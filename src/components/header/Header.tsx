@@ -38,7 +38,7 @@ export function Header() {
           onClick={handleChartClick}
           className="shrink-0 h-10 w-10 rounded-full border-2 border-border/20 hover:border-border/30 transition-colors flex items-center justify-center"
         >
-          <Inbox className="h-5 w-5 text-foreground" />
+          <Inbox className="h-5 w-5 text-gray-600" />
         </button>
       </div>
     </header>
