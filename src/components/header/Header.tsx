@@ -1,7 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { GameSearch } from "./GameSearch";
 import { BarChart3 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useGameContext } from "@/context/GameContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -47,15 +46,13 @@ export function Header() {
           <GameSearch />
         </div>
         
-        {/* Chart/Dashboard Icon */}
-        <Button
-          variant="ghost"
-          size="icon"
+        {/* Chart/Dashboard Icon in Circle */}
+        <button
           onClick={handleChartClick}
-          className="shrink-0 text-white hover:bg-white/10"
+          className="shrink-0 h-10 w-10 rounded-full bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center"
         >
-          <BarChart3 className="h-5 w-5" />
-        </Button>
+          <BarChart3 className="h-5 w-5 text-white" />
+        </button>
       </div>
     </header>
   );

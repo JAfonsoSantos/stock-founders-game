@@ -69,8 +69,8 @@ export function AppSidebar() {
         className="w-20 bg-sidebar-background border-r-sidebar-border"
       >
         {/* Main Navigation - Icons Only */}
-        <SidebarContent className="p-3 pt-6">
-          <SidebarMenu className="space-y-4">
+        <SidebarContent className="p-3 pt-2">
+          <SidebarMenu className="space-y-1">
             {/* Discover */}
             <SidebarMenuItem>
               <Tooltip>
@@ -129,7 +129,7 @@ export function AppSidebar() {
 
         {/* Footer with STOX logo, Settings and Logout */}
         <SidebarFooter className="p-3 pb-6">
-          <SidebarMenu className="space-y-3">
+          <SidebarMenu className="space-y-1">
             {/* STOX Logo */}
             <SidebarMenuItem>
               <div className="flex items-center justify-center py-2">
