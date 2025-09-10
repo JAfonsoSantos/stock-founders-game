@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Store, Trophy, ArrowLeftRight, Settings, LogOut } from "lucide-react";
+import { Home, TrendingUp, Wallet, Settings, LogOut } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useGameContext } from "@/context/GameContext";
 import { useNavigate } from "react-router-dom";
@@ -65,8 +65,8 @@ export function AppSidebar() {
     <TooltipProvider>
       <Sidebar 
         variant="sidebar" 
-        collapsible="offcanvas"
-        className="w-16 bg-sidebar-background border-r-sidebar-border"
+        collapsible="none"
+        className="w-20 bg-sidebar-background border-r-sidebar-border"
       >
         {/* Main Navigation - Icons Only */}
         <SidebarContent className="p-3 pt-6">
@@ -80,7 +80,7 @@ export function AppSidebar() {
                     className="h-12 w-12 justify-center p-0 hover:bg-sidebar-accent"
                     size="sm"
                   >
-                    <Store className="h-6 w-6 text-sidebar-foreground" />
+                    <Home className="h-6 w-6 text-sidebar-foreground" />
                   </SidebarMenuButton>
                 </TooltipTrigger>
                 <TooltipContent side="right" className="ml-2">
@@ -98,7 +98,7 @@ export function AppSidebar() {
                     className="h-12 w-12 justify-center p-0 hover:bg-sidebar-accent"
                     size="sm"
                   >
-                    <Trophy className="h-6 w-6 text-sidebar-foreground" />
+                    <TrendingUp className="h-6 w-6 text-sidebar-foreground" />
                   </SidebarMenuButton>
                 </TooltipTrigger>
                 <TooltipContent side="right" className="ml-2">
@@ -116,7 +116,7 @@ export function AppSidebar() {
                     className="h-12 w-12 justify-center p-0 hover:bg-sidebar-accent"
                     size="sm"
                   >
-                    <ArrowLeftRight className="h-6 w-6 text-sidebar-foreground" />
+                    <Wallet className="h-6 w-6 text-sidebar-foreground" />
                   </SidebarMenuButton>
                 </TooltipTrigger>
                 <TooltipContent side="right" className="ml-2">
