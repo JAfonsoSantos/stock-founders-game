@@ -389,6 +389,35 @@ export default function Join() {
           <div className="absolute top-20 right-20 w-96 h-96 bg-gradient-to-br from-white/20 to-transparent rounded-full blur-3xl"></div>
           <div className="absolute bottom-32 left-16 w-80 h-80 bg-gradient-to-tr from-orange-300/30 to-transparent rounded-full blur-2xl"></div>
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-orange-300/20 to-orange-600/20 rounded-full blur-3xl"></div>
+          
+          {/* Flowing curves */}
+          <svg
+            className="absolute inset-0 w-full h-full"
+            viewBox="0 0 400 600"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M-50 200 Q100 150 200 200 T450 250 L450 600 L-50 600 Z"
+              fill="url(#gradient1)"
+              opacity="0.6"
+            />
+            <path
+              d="M-50 300 Q150 250 250 300 T500 350 L500 600 L-50 600 Z"
+              fill="url(#gradient2)"
+              opacity="0.4"
+            />
+            <defs>
+              <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="rgba(255,255,255,0.3)" />
+                <stop offset="100%" stopColor="rgba(255,255,255,0.1)" />
+              </linearGradient>
+              <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="rgba(251,146,60,0.4)" />
+                <stop offset="100%" stopColor="rgba(251,146,60,0.2)" />
+              </linearGradient>
+            </defs>
+          </svg>
         </div>
       </div>
     </div>
