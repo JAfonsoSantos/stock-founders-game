@@ -271,21 +271,6 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="border-b border-gray-200 bg-white shadow-sm">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900">Stox</h1>
-          <div className="flex items-center gap-4">
-            <Avatar className="h-8 w-8">
-              <AvatarImage src={profile?.avatar_url || undefined} />
-              <AvatarFallback>
-                {initials || <User className="h-4 w-4" />}
-              </AvatarFallback>
-            </Avatar>
-          </div>
-        </div>
-      </header>
-
       <div className="container mx-auto px-4 py-8">
         {/* Welcome Section */}
         <div className="mb-8">

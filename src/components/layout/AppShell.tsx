@@ -8,14 +8,12 @@ interface AppShellProps {
 
 export function AppShell({ children }: AppShellProps) {
   return (
-    <SidebarProvider defaultOpen={true}>
+    <SidebarProvider defaultOpen={false}>
       <div className="min-h-screen flex flex-col w-full">
         <Header />
         <div className="flex flex-1">
-          {/* Hide sidebar on mobile */}
-          <div className="hidden md:block">
-            <AppSidebar />
-          </div>
+          {/* Sidebar - always present but collapsed on mobile */}
+          <AppSidebar />
           <main className="flex-1 bg-background">
             {children}
           </main>

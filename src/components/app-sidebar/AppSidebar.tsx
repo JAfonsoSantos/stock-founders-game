@@ -68,7 +68,7 @@ export function AppSidebar() {
     <TooltipProvider>
       <Sidebar 
         variant="sidebar" 
-        collapsible="none"
+        collapsible="offcanvas"
         className="w-20 bg-background border-r border-border/20"
       >
         {/* Avatar and Main Navigation */}
