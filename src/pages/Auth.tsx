@@ -370,17 +370,8 @@ export default function Auth() {
               </div>
             </div>
 
-            {/* Forgot Password Link and Remember Me - always show */}
+            {/* Remember Me and Forgot Password Link - always show */}
             <div className="flex justify-between items-center">
-              <Button
-                type="button"
-                variant="link"
-                className="p-0 h-auto text-xs text-gray-400 hover:text-orange-600 transition-colors"
-                onClick={() => setAuthMode('magic')}
-              >
-                Forgot your password?
-              </Button>
-              
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="remember-me"
@@ -395,6 +386,15 @@ export default function Auth() {
                   Remember me
                 </Label>
               </div>
+
+              <Button
+                type="button"
+                variant="link"
+                className="p-0 h-auto text-xs text-gray-400 hover:text-orange-600 transition-colors"
+                onClick={() => setAuthMode('magic')}
+              >
+                Forgot your password?
+              </Button>
             </div>
 
             {/* Submit button */}
