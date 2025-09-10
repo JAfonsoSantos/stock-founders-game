@@ -154,9 +154,9 @@ export function AppSidebar() {
           </div>
 
           {/* Bottom Section */}
-          <div className="flex flex-col items-center space-y-4 pb-2">
+          <div className="flex flex-col items-center space-y-2 pb-2">
             {/* Stox Logo */}
-            <div className="text-xs font-bold text-gray-500 rotate-90 select-none">
+            <div className="text-xs font-bold text-gray-500 select-none">
               stox
             </div>
             
