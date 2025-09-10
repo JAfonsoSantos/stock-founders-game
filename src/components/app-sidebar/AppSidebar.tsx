@@ -65,17 +65,24 @@ export function AppSidebar() {
           <div className="flex flex-col items-center">
             {/* Avatar - at the top */}
             <div className="mb-4">
-              <button 
-                onClick={() => navigate('/dashboard')}
-                className="h-10 w-10 shrink-0 border-2 border-gray-300 rounded-full overflow-hidden bg-transparent p-0 hover:border-gray-400 transition-colors"
-              >
-                <Avatar className="h-full w-full">
-                  <AvatarImage src={profile?.avatar_url || ''} alt={displayName} />
-                  <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
-                    {initials}
-                  </AvatarFallback>
-                </Avatar>
-              </button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button 
+                    onClick={() => navigate('/dashboard')}
+                    className="h-10 w-10 shrink-0 border-2 border-gray-300 rounded-full overflow-hidden bg-transparent p-0 hover:border-gray-400 transition-colors"
+                  >
+                    <Avatar className="h-full w-full">
+                      <AvatarImage src={profile?.avatar_url || ''} alt={displayName} />
+                      <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
+                        {initials}
+                      </AvatarFallback>
+                    </Avatar>
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="right" className="ml-2 bg-gray-700 text-white border-gray-600">
+                  {displayName} Profile
+                </TooltipContent>
+              </Tooltip>
             </div>
             
             <SidebarMenu className="space-y-2 flex flex-col items-center">
@@ -91,8 +98,8 @@ export function AppSidebar() {
                       <Home className="h-4 w-4" />
                     </SidebarMenuButton>
                   </TooltipTrigger>
-                  <TooltipContent side="right" className="ml-2">
-                    Home
+                  <TooltipContent side="right" className="ml-2 bg-gray-700 text-white border-gray-600">
+                    Dashboard
                   </TooltipContent>
                 </Tooltip>
               </SidebarMenuItem>
@@ -109,8 +116,8 @@ export function AppSidebar() {
                       <Store className="h-4 w-4" />
                     </SidebarMenuButton>
                   </TooltipTrigger>
-                  <TooltipContent side="right" className="ml-2">
-                    {t('sidebar.discover')}
+                  <TooltipContent side="right" className="ml-2 bg-gray-700 text-white border-gray-600">
+                    Your Startup
                   </TooltipContent>
                 </Tooltip>
               </SidebarMenuItem>
@@ -127,8 +134,8 @@ export function AppSidebar() {
                       <Trophy className="h-4 w-4" />
                     </SidebarMenuButton>
                   </TooltipTrigger>
-                  <TooltipContent side="right" className="ml-2">
-                    {t('sidebar.games')}
+                  <TooltipContent side="right" className="ml-2 bg-gray-700 text-white border-gray-600">
+                    Games
                   </TooltipContent>
                 </Tooltip>
               </SidebarMenuItem>
@@ -145,8 +152,8 @@ export function AppSidebar() {
                       <ArrowLeftRight className="h-4 w-4" />
                     </SidebarMenuButton>
                   </TooltipTrigger>
-                  <TooltipContent side="right" className="ml-2">
-                    {t('sidebar.transactions')}
+                  <TooltipContent side="right" className="ml-2 bg-gray-700 text-white border-gray-600">
+                    Inbox
                   </TooltipContent>
                 </Tooltip>
               </SidebarMenuItem>
@@ -167,7 +174,7 @@ export function AppSidebar() {
                   <Settings className="h-4 w-4" />
                 </button>
               </TooltipTrigger>
-              <TooltipContent side="right" className="ml-2">Settings</TooltipContent>
+              <TooltipContent side="right" className="ml-2 bg-gray-700 text-white border-gray-600">Settings</TooltipContent>
             </Tooltip>
 
             <Tooltip>
@@ -180,7 +187,7 @@ export function AppSidebar() {
                   <LogOut className="h-4 w-4" />
                 </button>
               </TooltipTrigger>
-              <TooltipContent side="right" className="ml-2">Log out</TooltipContent>
+              <TooltipContent side="right" className="ml-2 bg-gray-700 text-white border-gray-600">Log out</TooltipContent>
             </Tooltip>
           </div>
         </SidebarContent>
