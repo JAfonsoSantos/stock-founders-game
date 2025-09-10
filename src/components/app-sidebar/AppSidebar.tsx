@@ -1,9 +1,12 @@
 import { Sidebar, SidebarContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Home, Store, Trophy, ArrowLeftRight } from "lucide-react";
 import { useGameContext } from "@/context/GameContext";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/hooks/useI18n";
+import { useAuth } from "@/hooks/useAuth";
+import { useUserProfile } from "@/hooks/useUserProfile";
 import { toast } from "sonner";
 import { SelectActiveGameModal } from "@/components/modals/SelectActiveGameModal";
 import { useState } from "react";
@@ -12,6 +15,8 @@ export function AppSidebar() {
   const { currentGameId, activeGames } = useGameContext();
   const navigate = useNavigate();
   const { t } = useI18n();
+  const { user } = useAuth();
+  const { profile, displayName, initials } = useUserProfile(user);
   const [showGameModal, setShowGameModal] = useState(false);
 
   const handleGameNavigation = () => {
@@ -52,10 +57,24 @@ export function AppSidebar() {
       <Sidebar 
         variant="sidebar" 
         collapsible="none"
-        className="fixed left-0 top-14 h-[calc(100vh-3.5rem)] w-16 bg-[hsl(var(--sidebar-background))] text-[hsl(var(--sidebar-foreground))] border-r border-[hsl(var(--sidebar-border))] z-20"
+        className="fixed left-0 top-0 h-screen w-16 bg-gray-50 border-r border-gray-200 z-20"
       >
         {/* Main Navigation - Icons Only */}
-        <SidebarContent className="p-2 pt-2 flex flex-col items-center">
+        <SidebarContent className="p-2 pt-4 flex flex-col items-center">
+          {/* Avatar - at the top */}
+          <div className="mb-4">
+            <button 
+              onClick={() => navigate('/profile')}
+              className="h-10 w-10 shrink-0 border-2 border-border/20 rounded-full overflow-hidden bg-transparent p-0 hover:border-border/30 transition-colors"
+            >
+              <Avatar className="h-full w-full">
+                <AvatarImage src={profile?.avatar_url || ''} alt={displayName} />
+                <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+            </button>
+          </div>
           <SidebarMenu className="space-y-2 flex flex-col items-center">
             {/* Home */}
             <SidebarMenuItem>
