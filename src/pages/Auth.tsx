@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
@@ -21,10 +22,22 @@ export default function Auth() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [authMode, setAuthMode] = useState<'magic' | 'password' | 'signup'>('magic');
+  const [rememberMe, setRememberMe] = useState(() => {
+    // Load remember me preference from localStorage
+    return localStorage.getItem('rememberMe') === 'true';
+  });
   const { signIn, signInWithPassword, signUp, signInWithGoogle, signInWithLinkedIn } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const gameId = searchParams.get("gameId");
+
+  // Load remembered email on component mount
+  useEffect(() => {
+    const rememberedEmail = localStorage.getItem('rememberedEmail');
+    if (rememberedEmail && rememberMe) {
+      setEmail(rememberedEmail);
+    }
+  }, [rememberMe]);
 
   const handleMagicLink = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,6 +82,16 @@ export default function Auth() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    // Save remember me preference
+    localStorage.setItem('rememberMe', rememberMe.toString());
+    
+    // Save email if remember me is checked
+    if (rememberMe) {
+      localStorage.setItem('rememberedEmail', email);
+    } else {
+      localStorage.removeItem('rememberedEmail');
+    }
 
     try {
       const { error } = await signInWithPassword(email, password);
@@ -347,8 +370,8 @@ export default function Auth() {
               </div>
             </div>
 
-            {/* Forgot Password Link - always show, aligned right */}
-            <div className="text-right">
+            {/* Forgot Password Link and Remember Me - always show */}
+            <div className="flex justify-between items-center">
               <Button
                 type="button"
                 variant="link"
@@ -357,6 +380,21 @@ export default function Auth() {
               >
                 Forgot your password?
               </Button>
+              
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="remember-me"
+                  checked={rememberMe}
+                  onCheckedChange={(checked) => setRememberMe(checked as boolean)}
+                  className="data-[state=checked]:bg-orange-600 data-[state=checked]:border-orange-600"
+                />
+                <Label 
+                  htmlFor="remember-me" 
+                  className="text-xs text-gray-400 cursor-pointer hover:text-gray-600 transition-colors"
+                >
+                  Remember me
+                </Label>
+              </div>
             </div>
 
             {/* Submit button */}
