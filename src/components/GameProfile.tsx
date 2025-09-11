@@ -95,7 +95,7 @@ export function GameProfile({
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
       <div className="relative">
         {/* Background Image */}
@@ -227,7 +227,7 @@ export function GameProfile({
 
         {/* Description */}
         {gameData.description && (
-          <Card>
+          <Card className="bg-white shadow-md border border-gray-200">
             <CardContent className="pt-6">
               <p className="text-muted-foreground leading-relaxed">
                 {gameData.description}
@@ -239,7 +239,7 @@ export function GameProfile({
         {/* Game Details Grid */}
         <div className="grid md:grid-cols-2 gap-6">
           {/* Timing */}
-          <Card>
+          <Card className="bg-white shadow-md border border-gray-200">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Calendar className="h-5 w-5 text-primary" />
@@ -271,7 +271,7 @@ export function GameProfile({
           </Card>
 
           {/* Game Settings */}
-          <Card>
+          <Card className="bg-white shadow-md border border-gray-200">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Settings className="h-5 w-5 text-primary" />
@@ -332,7 +332,7 @@ export function GameProfile({
         </div>
 
         {/* Default Budgets */}
-        <Card>
+        <Card className="bg-white shadow-md border border-gray-200">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <TrendingUp className="h-5 w-5 text-primary" />
@@ -362,7 +362,7 @@ export function GameProfile({
 
         {/* Organizer Info */}
         {gameData.organizer && (
-          <Card>
+          <Card className="bg-white shadow-md border border-gray-200">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Users className="h-5 w-5 text-primary" />
