@@ -340,22 +340,11 @@ export default function CreateGame() {
   if (step === "template") {
     return (
       <div className="min-h-screen bg-gray-50">
-        <header className="border-b border-gray-200 bg-white shadow-sm">
-          <div className="container mx-auto px-4 py-4">
-            <Button 
-              variant="ghost" 
-              onClick={() => navigate("/")}
-              className="mb-4 text-gray-600 hover:text-gray-900"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Dashboard
-            </Button>
+        <div className="container mx-auto px-4 py-8">
+          <div className="mb-8">
             <h1 className="text-2xl font-bold text-gray-900">Create New Game</h1>
             <p className="text-gray-600 mt-2">Choose a template to get started</p>
           </div>
-        </header>
-
-        <div className="container mx-auto px-4 py-8">
           <div className="max-w-6xl mx-auto">
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {GAME_TEMPLATES.map((template) => {
@@ -402,24 +391,13 @@ export default function CreateGame() {
   return (
     <TooltipProvider>
       <div className="min-h-screen bg-gray-50">
-        <header className="border-b border-gray-200 bg-white shadow-sm">
-          <div className="container mx-auto px-4 py-4">
-            <Button 
-              variant="ghost" 
-              onClick={() => setStep("template")}
-              className="mb-4 text-gray-600 hover:text-gray-900"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Templates
-            </Button>
+        <div className="container mx-auto px-4 py-8">
+          <div className="mb-6">
             <h1 className="text-2xl font-bold text-gray-900">Configure Your Game</h1>
             <p className="text-gray-600 mt-1">
               {GAME_TEMPLATES.find(t => t.value === selectedTemplate)?.label || "Custom Game"}
             </p>
           </div>
-        </header>
-
-        <div className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto">
             {/* Editable Notice */}
             <Alert className="mb-6 bg-blue-50 border-blue-200">
