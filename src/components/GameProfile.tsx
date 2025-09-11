@@ -95,7 +95,7 @@ export function GameProfile({
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-white">
       {/* Hero Section */}
       <div className="relative">
         {/* Background Image */}
@@ -153,16 +153,19 @@ export function GameProfile({
         <div className="absolute -bottom-12 left-6">
           <div className="flex items-end gap-4">
             <div className="relative group">
-              <Avatar className="h-24 w-24 border-4 border-background shadow-lg cursor-pointer">
-                <AvatarImage src={gameData.logo_url} alt={gameData.name} />
-                <AvatarFallback className="text-2xl font-bold bg-primary text-primary-foreground">
-                  {gameData.name.charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
+              <div className="h-24 w-24 border-4 border-background shadow-lg cursor-pointer rounded-lg bg-gray-100 border-gray-300 flex items-center justify-center">
+                {gameData.logo_url ? (
+                  <img src={gameData.logo_url} alt={gameData.name} className="w-full h-full object-cover rounded-md" />
+                ) : (
+                  <span className="text-2xl font-bold text-gray-600">
+                    {gameData.name.charAt(0).toUpperCase()}
+                  </span>
+                )}
+              </div>
               
               {/* Edit Logo Button */}
               {isPreview && onEdit && (
-                <div className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+                <div className="absolute inset-0 rounded-lg bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
                   <Button
                     variant="secondary"
                     size="sm"
