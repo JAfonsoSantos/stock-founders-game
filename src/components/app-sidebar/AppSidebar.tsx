@@ -57,7 +57,7 @@ export function AppSidebar() {
       <Sidebar 
         variant="sidebar" 
         collapsible="none"
-        className="fixed left-0 top-0 h-screen w-16 bg-gray-50 border-r border-gray-200 z-20"
+        className="fixed left-0 top-0 h-screen w-16 bg-gray-50 border-r border-gray-200 z-20 overflow-hidden"
       >
         {/* Main Navigation - Icons Only */}
         <SidebarContent className="p-2 pt-4 flex flex-col items-center justify-between h-full">
@@ -161,7 +161,7 @@ export function AppSidebar() {
           </div>
 
           {/* Bottom Section */}
-          <div className="flex flex-col items-center gap-[4px] pb-1">
+          <div className="flex flex-col items-center gap-[4px] pb-1 min-h-[80px] justify-end">
             <div className="text-lg font-bold text-gray-600 leading-none tracking-tight select-none">stox</div>
             
             <Tooltip>
