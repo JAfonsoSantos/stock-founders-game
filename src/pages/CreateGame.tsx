@@ -424,9 +424,9 @@ export default function CreateGame() {
               </CardHeader>
               {howItWorksOpen && (
                 <CardContent className="space-y-4">
-                  <div className="space-y-3">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
                     <div>
-                      <h4 className="font-semibold text-gray-900 mb-1">1️⃣ Pre-Market Phase</h4>
+                      <h4 className="font-semibold text-gray-900 mb-2">1️⃣ Pre-Market Phase</h4>
                       <ul className="text-sm text-gray-600 space-y-1">
                         <li>• After creating the game, all players are notified.</li>
                         <li>• Players can create their projects/startups/ideas.</li>
@@ -435,7 +435,7 @@ export default function CreateGame() {
                     </div>
                     
                     <div>
-                      <h4 className="font-semibold text-gray-900 mb-1">2️⃣ Open Market</h4>
+                      <h4 className="font-semibold text-gray-900 mb-2">2️⃣ Open Market</h4>
                       <ul className="text-sm text-gray-600 space-y-1">
                         <li>• On Start Date & Time → trading opens.</li>
                         <li>• Players can pitch, buy and sell shares.</li>
@@ -444,12 +444,12 @@ export default function CreateGame() {
                     </div>
                     
                     <div>
-                      <h4 className="font-semibold text-gray-900 mb-1">3️⃣ Market Close</h4>
-                      <ul className="text-sm text-gray-600 space-y-1">
+                      <h4 className="font-semibold text-gray-900 mb-2">3️⃣ Market Close</h4>
+                      <ul className="text-sm text-gray-600 space-y-1 mb-3">
                         <li>• On End Date & Time → trading stops.</li>
                         <li>• Winners are announced:</li>
                       </ul>
-                      <div className="ml-4 mt-2 space-y-1 text-sm text-gray-600">
+                      <div className="text-xs text-gray-600 space-y-1">
                         <div>🏆 Most Valued Startup</div>
                         <div>💰 Best Investor (highest portfolio gain)</div>
                         <div>🔄 Most Active Trader</div>
