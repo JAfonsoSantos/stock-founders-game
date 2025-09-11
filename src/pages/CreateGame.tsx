@@ -337,10 +337,10 @@ export default function CreateGame() {
       <TooltipTrigger asChild>
         <div className="inline-flex items-center justify-center w-5 h-5 ml-2 cursor-help group">
           <div className="relative">
-            <div className="w-4 h-4 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-sm group-hover:shadow-md transition-all duration-200 group-hover:scale-110">
+            <div className="w-4 h-4 bg-gradient-to-br from-gray-400 to-gray-500 rounded-full flex items-center justify-center shadow-sm group-hover:shadow-md transition-all duration-200 group-hover:scale-110">
               <Info className="h-2.5 w-2.5 text-white" />
             </div>
-            <div className="absolute inset-0 w-4 h-4 bg-blue-400 rounded-full opacity-0 group-hover:opacity-30 animate-ping"></div>
+            <div className="absolute inset-0 w-4 h-4 bg-gray-300 rounded-full opacity-0 group-hover:opacity-30 animate-ping"></div>
           </div>
         </div>
       </TooltipTrigger>
