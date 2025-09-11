@@ -418,28 +418,28 @@ export default function CreateGame() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
-                      <Label>Selected Template</Label>
-                        <div className="p-3 bg-gray-50 rounded-lg border">
-                          <div className="flex items-center space-x-2">
-                            {(() => {
-                              const template = GAME_TEMPLATES.find(t => t.value === selectedTemplate);
-                              const IconComponent = template?.icon || Plus;
-                              return (
-                                <>
-                                  <div className={`p-2 ${template?.colors?.iconBg || 'bg-gray-500'} rounded-lg`}>
-                                    <IconComponent className="h-5 w-5 text-white" />
-                                  </div>
-                                  <span className="font-medium">{template?.label || "Custom Game"}</span>
-                                  {template?.tag && (
-                                    <Badge variant="secondary" className="bg-orange-100 text-orange-700">
-                                      {template.tag}
-                                    </Badge>
-                                  )}
-                                </>
-                              );
-                            })()}
-                          </div>
+                      <Label className="text-gray-700 font-medium">Selected Template</Label>
+                      <div className="p-3 bg-gray-50 rounded-lg border">
+                        <div className="flex items-center space-x-2">
+                          {(() => {
+                            const template = GAME_TEMPLATES.find(t => t.value === selectedTemplate);
+                            const IconComponent = template?.icon || Plus;
+                            return (
+                              <>
+                                <div className={`p-2 ${template?.colors?.iconBg || 'bg-gray-500'} rounded-lg`}>
+                                  <IconComponent className="h-5 w-5 text-white" />
+                                </div>
+                                <span className="font-medium text-gray-900">{template?.label || "Custom Game"}</span>
+                                {template?.tag && (
+                                  <Badge variant="secondary" className="bg-orange-100 text-orange-700">
+                                    {template.tag}
+                                  </Badge>
+                                )}
+                              </>
+                            );
+                          })()}
                         </div>
+                      </div>
                     </div>
 
                     <div>
@@ -574,13 +574,13 @@ export default function CreateGame() {
                      </div>
 
                     <div>
-                      <Label htmlFor="max-participants" className="text-gray-700">Max Participants</Label>
+                      <Label htmlFor="max-participants" className="text-gray-700 font-medium">Max Participants</Label>
                       <Input
                         id="max-participants"
                         type="number"
                         value={formData.maxParticipants}
                         onChange={(e) => setFormData({ ...formData, maxParticipants: parseInt(e.target.value) || 100 })}
-                        className="h-12 bg-white border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+                        className="h-12 bg-white border-gray-300 text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
                         min="1"
                       />
                     </div>
@@ -736,9 +736,9 @@ export default function CreateGame() {
                           value={formData.rewardSystem}
                           onValueChange={(value) => setFormData({ ...formData, rewardSystem: value })}
                         >
-                          <SelectTrigger className="h-12 bg-white border-gray-200 text-gray-700">
-                            <SelectValue />
-                          </SelectTrigger>
+                           <SelectTrigger className="h-12 bg-white border-gray-300 text-gray-700">
+                             <SelectValue />
+                           </SelectTrigger>
                           <SelectContent>
                             {REWARD_SYSTEMS.map((system) => (
                               <SelectItem key={system.value} value={system.value}>
@@ -761,78 +761,78 @@ export default function CreateGame() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                      <div>
-                        <Label htmlFor="founderBudget">{getTemplateLabels().primary} Budget</Label>
-                        <Input
-                          id="founderBudget"
-                          type="number"
-                          value={budgets.founder}
-                          onChange={(e) => setBudgets({ ...budgets, founder: Number(e.target.value) })}
-                          min="0"
-                          className="h-12 bg-white border-gray-200 text-gray-700"
-                        />
-                        <p className="text-xs text-gray-600 mt-1">
-                          {formatBudget(budgets.founder)}
-                        </p>
-                      </div>
-                      <div>
-                        <Label htmlFor="angelBudget">Angel Budget</Label>
-                        <Input
-                          id="angelBudget"
-                          type="number"
-                          value={budgets.angel}
-                          onChange={(e) => setBudgets({ ...budgets, angel: Number(e.target.value) })}
-                          min="0"
-                          className="h-12 bg-white border-gray-200 text-gray-700"
-                        />
-                        <p className="text-xs text-gray-600 mt-1">
-                          {formatBudget(budgets.angel)}
-                        </p>
-                      </div>
-                      <div>
-                        <Label htmlFor="vcBudget">VC Budget</Label>
-                        <Input
-                          id="vcBudget"
-                          type="number"
-                          value={budgets.vc}
-                          onChange={(e) => setBudgets({ ...budgets, vc: Number(e.target.value) })}
-                          min="0"
-                          className="h-12 bg-white border-gray-200 text-gray-700"
-                        />
-                        <p className="text-xs text-gray-600 mt-1">
-                          {formatBudget(budgets.vc)}
-                        </p>
-                      </div>
-                      <div>
-                        <Label htmlFor="teamBudget">{getTemplateLabels().secondary} Budget</Label>
-                        <Input
-                          id="teamBudget"
-                          type="number"
-                          value={budgets.team}
-                          onChange={(e) => setBudgets({ ...budgets, team: Number(e.target.value) })}
-                          min="0"
-                          className="h-12 bg-white border-gray-200 text-gray-700"
-                        />
-                        <p className="text-xs text-gray-600 mt-1">
-                          {formatBudget(budgets.team)}
-                        </p>
-                      </div>
-                      <div>
-                        <Label htmlFor="investorBudget">Investor Budget</Label>
-                        <Input
-                          id="investorBudget"
-                          type="number"
-                          value={budgets.investor}
-                          onChange={(e) => setBudgets({ ...budgets, investor: Number(e.target.value) })}
-                          min="0"
-                          className="h-12 bg-white border-gray-200 text-gray-700"
-                        />
-                        <p className="text-xs text-gray-600 mt-1">
-                          {formatBudget(budgets.investor)}
-                        </p>
-                      </div>
-                    </div>
+                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                       <div>
+                         <Label htmlFor="founderBudget" className="text-gray-700 font-medium">{getTemplateLabels().primary} Budget</Label>
+                         <Input
+                           id="founderBudget"
+                           type="number"
+                           value={budgets.founder}
+                           onChange={(e) => setBudgets({ ...budgets, founder: Number(e.target.value) })}
+                           min="0"
+                           className="h-12 bg-white border-gray-300 text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+                         />
+                         <p className="text-xs text-gray-600 mt-1">
+                           {formatBudget(budgets.founder)}
+                         </p>
+                       </div>
+                       <div>
+                         <Label htmlFor="angelBudget" className="text-gray-700 font-medium">Angel Budget</Label>
+                         <Input
+                           id="angelBudget"
+                           type="number"
+                           value={budgets.angel}
+                           onChange={(e) => setBudgets({ ...budgets, angel: Number(e.target.value) })}
+                           min="0"
+                           className="h-12 bg-white border-gray-300 text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+                         />
+                         <p className="text-xs text-gray-600 mt-1">
+                           {formatBudget(budgets.angel)}
+                         </p>
+                       </div>
+                       <div>
+                         <Label htmlFor="vcBudget" className="text-gray-700 font-medium">VC Budget</Label>
+                         <Input
+                           id="vcBudget"
+                           type="number"
+                           value={budgets.vc}
+                           onChange={(e) => setBudgets({ ...budgets, vc: Number(e.target.value) })}
+                           min="0"
+                           className="h-12 bg-white border-gray-300 text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+                         />
+                         <p className="text-xs text-gray-600 mt-1">
+                           {formatBudget(budgets.vc)}
+                         </p>
+                       </div>
+                       <div>
+                         <Label htmlFor="teamBudget" className="text-gray-700 font-medium">{getTemplateLabels().secondary} Budget</Label>
+                         <Input
+                           id="teamBudget"
+                           type="number"
+                           value={budgets.team}
+                           onChange={(e) => setBudgets({ ...budgets, team: Number(e.target.value) })}
+                           min="0"
+                           className="h-12 bg-white border-gray-300 text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+                         />
+                         <p className="text-xs text-gray-600 mt-1">
+                           {formatBudget(budgets.team)}
+                         </p>
+                       </div>
+                       <div>
+                         <Label htmlFor="investorBudget" className="text-gray-700 font-medium">Investor Budget</Label>
+                         <Input
+                           id="investorBudget"
+                           type="number"
+                           value={budgets.investor}
+                           onChange={(e) => setBudgets({ ...budgets, investor: Number(e.target.value) })}
+                           min="0"
+                           className="h-12 bg-white border-gray-300 text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+                         />
+                         <p className="text-xs text-gray-600 mt-1">
+                           {formatBudget(budgets.investor)}
+                         </p>
+                       </div>
+                     </div>
                   </CardContent>
                 </Card>
 
@@ -846,10 +846,10 @@ export default function CreateGame() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
-                      <Label className="flex items-center">
-                        Branding / Logo Upload
-                        <Upload className="h-4 w-4 ml-2 text-gray-400" />
-                      </Label>
+                       <Label className="text-gray-700 font-medium flex items-center">
+                         Branding / Logo Upload
+                         <Upload className="h-4 w-4 ml-2 text-gray-400" />
+                       </Label>
                       <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center text-gray-500">
                         <p>Click to upload or drag and drop</p>
                         <p className="text-xs">PNG, JPG up to 2MB</p>
@@ -858,14 +858,14 @@ export default function CreateGame() {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label className="flex items-center">
-                          Color Theme
-                          <Palette className="h-4 w-4 ml-2 text-gray-400" />
-                        </Label>
-                        <Select value={formData.colorTheme} onValueChange={(value) => setFormData({ ...formData, colorTheme: value })}>
-                          <SelectTrigger className="h-12 bg-white border-gray-200 text-gray-700">
-                            <SelectValue />
-                          </SelectTrigger>
+                         <Label className="text-gray-700 font-medium flex items-center">
+                           Color Theme
+                           <Palette className="h-4 w-4 ml-2 text-gray-400" />
+                         </Label>
+                         <Select value={formData.colorTheme} onValueChange={(value) => setFormData({ ...formData, colorTheme: value })}>
+                           <SelectTrigger className="h-12 bg-white border-gray-300 text-gray-700">
+                             <SelectValue />
+                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="default">Default</SelectItem>
                             <SelectItem value="corporate">Corporate</SelectItem>
@@ -876,15 +876,15 @@ export default function CreateGame() {
                       </div>
 
                       <div className="flex items-center justify-between">
-                        <div className="space-y-0.5">
-                          <Label className="flex items-center">
-                            Notification Settings
-                            <Bell className="h-4 w-4 ml-2 text-gray-400" />
-                          </Label>
-                          <p className="text-sm text-gray-600">
-                            Send event updates to participants
-                          </p>
-                        </div>
+                         <div className="space-y-0.5">
+                           <Label className="text-gray-700 font-medium flex items-center">
+                             Notification Settings
+                             <Bell className="h-4 w-4 ml-2 text-gray-400" />
+                           </Label>
+                           <p className="text-sm text-gray-600">
+                             Send event updates to participants
+                           </p>
+                         </div>
                         <Switch
                           checked={formData.notificationSettings}
                           onCheckedChange={(checked) => setFormData({ ...formData, notificationSettings: checked })}
@@ -949,18 +949,16 @@ export default function CreateGame() {
               </div>
             </div>
 
-            {/* Editable Notice */}
-            <Alert className="mb-6 bg-blue-50 border-blue-200">
-              <Info className="h-4 w-4 text-blue-600" />
-              <AlertDescription className="text-blue-800">
-                <strong>Don't worry</strong> — you can edit all game settings until the game starts.
-              </AlertDescription>
-            </Alert>
-
             {/* Create Game Button */}
             <div className="mt-8">
               <Card className="bg-white border-gray-200 shadow-sm">
-                <CardContent className="pt-6">
+                <CardContent className="pt-6 space-y-4">
+                  <div className="flex items-center space-x-2 mb-4">
+                    <Info className="h-4 w-4 text-blue-600" />
+                    <p className="text-sm text-gray-600">
+                      <strong>Don't worry</strong> — you can edit all game settings until the game starts.
+                    </p>
+                  </div>
                   <Button 
                     onClick={handleSubmit}
                     className="w-full h-14 bg-[#FF6B35] hover:bg-[#E55A2B] text-white font-semibold text-lg" 
