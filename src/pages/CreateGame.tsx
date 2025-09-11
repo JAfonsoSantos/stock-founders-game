@@ -344,7 +344,7 @@ export default function CreateGame() {
           </div>
         </div>
       </TooltipTrigger>
-      <TooltipContent className="max-w-xs bg-popover text-popover-foreground border shadow-xl">
+      <TooltipContent className="max-w-xs">
         <p className="text-sm leading-relaxed">{content}</p>
       </TooltipContent>
     </Tooltip>
