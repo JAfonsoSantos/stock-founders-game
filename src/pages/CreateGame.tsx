@@ -11,6 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import { 
   CalendarIcon, 
   ArrowLeft, 
@@ -23,7 +24,12 @@ import {
   TrendingUp,
   Zap,
   Crown,
-  Heart
+  Heart,
+  User,
+  Handshake,
+  Sparkles,
+  Lightbulb,
+  Plus
 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -58,12 +64,60 @@ const LOCALES = [
 ];
 
 const GAME_TEMPLATES = [
-  { value: "startup-pitch", label: "Startup Pitch Day", tag: "Popular" },
-  { value: "vc-simulation", label: "VC Investment Simulation", tag: "New" },
-  { value: "corporate-networking", label: "Corporate Networking Challenge", tag: "" },
-  { value: "conference-expo", label: "Conference & Expo Game", tag: "" },
-  { value: "hackathon-university", label: "Hackathon / University Edition", tag: "" },
-  { value: "blank", label: "From Blank", tag: "" },
+  { 
+    value: "startup-pitch", 
+    label: "Startup Pitch Day", 
+    tag: "Popular",
+    icon: User,
+    tagline: "Compete to raise the highest valuation.",
+    defaults: "Founder $10k | Angel $100k | VC $1M",
+    labels: { primary: "Founder", secondary: "Investor" }
+  },
+  { 
+    value: "vc-simulation", 
+    label: "VC Investment Simulation", 
+    tag: "New",
+    icon: Crown,
+    tagline: "Play as investors, evaluate and win.",
+    defaults: "Founder $10k | Angel $250k | VC $2M",
+    labels: { primary: "Startup", secondary: "Investor" }
+  },
+  { 
+    value: "corporate-networking", 
+    label: "Corporate Networking Challenge", 
+    tag: "",
+    icon: Handshake,
+    tagline: "Boost team connections through trading.",
+    defaults: "Team $5k | Employee $10k",
+    labels: { primary: "Team", secondary: "Employee" }
+  },
+  { 
+    value: "conference-expo", 
+    label: "Conference & Expo Game", 
+    tag: "",
+    icon: Sparkles,
+    tagline: "Engage attendees by turning stands into stocks.",
+    defaults: "Booth $20k | Visitor $50k",
+    labels: { primary: "Booth", secondary: "Visitor" }
+  },
+  { 
+    value: "hackathon-university", 
+    label: "Hackathon / University Edition", 
+    tag: "",
+    icon: Lightbulb,
+    tagline: "Teams pitch, students invest, growth wins.",
+    defaults: "Team $10k | Student $20k",
+    labels: { primary: "Team", secondary: "Student" }
+  },
+  { 
+    value: "custom", 
+    label: "Custom Game", 
+    tag: "",
+    icon: Plus,
+    tagline: "Design your own event experience.",
+    defaults: "All fields free for customization",
+    labels: { primary: "Founder", secondary: "Investor" }
+  },
 ];
 
 const VOTING_MODES = [
@@ -82,21 +136,23 @@ export default function CreateGame() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  
+  const [step, setStep] = useState<"template" | "form">("template");
+  const [selectedTemplate, setSelectedTemplate] = useState<string>("");
+
   const today = new Date();
-  
+
   const [formData, setFormData] = useState({
     // Event Details
     name: "",
     description: "",
     organizerName: "",
-    gameType: "blank",
+    gameType: "custom",
     currency: "USD",
     locale: "en",
     startsAt: today,
     endsAt: today,
     maxParticipants: 100,
-    
+
     // Game Settings
     allowSecondary: false,
     showPublicLeaderboards: false,
@@ -108,7 +164,7 @@ export default function CreateGame() {
     initialSharePrice: 100,
     votingMode: "virtual-money",
     rewardSystem: "none",
-    
+
     // Customization
     brandingLogo: "",
     colorTheme: "default",
@@ -132,9 +188,15 @@ export default function CreateGame() {
     return `${symbol}${amount.toLocaleString()}`;
   };
 
+  const getTemplateLabels = () => {
+    const template = GAME_TEMPLATES.find(t => t.value === selectedTemplate);
+    return template?.labels || { primary: "Founder", secondary: "Investor" };
+  };
+
   const applyTemplate = (templateValue: string) => {
+    setSelectedTemplate(templateValue);
     setFormData(prev => ({ ...prev, gameType: templateValue }));
-    
+
     switch (templateValue) {
       case "startup-pitch":
         setBudgets({ founder: 10000, angel: 100000, vc: 1000000, team: 50000, investor: 25000 });
@@ -179,16 +241,18 @@ export default function CreateGame() {
           circuitBreaker: false 
         }));
         break;
-      case "blank":
+      case "custom":
       default:
-        // Keep current values for blank template
+        // Keep current values for custom template
         break;
     }
+
+    setStep("form");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.startsAt || !formData.endsAt) {
       toast({
         variant: "destructive",
@@ -273,8 +337,8 @@ export default function CreateGame() {
     </Tooltip>
   );
 
-  return (
-    <TooltipProvider>
+  if (step === "template") {
+    return (
       <div className="min-h-screen bg-gray-50">
         <header className="border-b border-gray-200 bg-white shadow-sm">
           <div className="container mx-auto px-4 py-4">
@@ -287,6 +351,71 @@ export default function CreateGame() {
               Back to Dashboard
             </Button>
             <h1 className="text-2xl font-bold text-gray-900">Create New Game</h1>
+            <p className="text-gray-600 mt-2">Choose a template to get started</p>
+          </div>
+        </header>
+
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-6xl mx-auto">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {GAME_TEMPLATES.map((template) => {
+                const IconComponent = template.icon;
+                return (
+                  <Card 
+                    key={template.value} 
+                    className="cursor-pointer hover:shadow-lg transition-shadow bg-white border-gray-200"
+                    onClick={() => applyTemplate(template.value)}
+                  >
+                    <CardHeader className="pb-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <div className="p-2 bg-orange-100 rounded-lg">
+                            <IconComponent className="h-6 w-6 text-orange-600" />
+                          </div>
+                          <div>
+                            <CardTitle className="text-lg">{template.label}</CardTitle>
+                            {template.tag && (
+                              <Badge variant="secondary" className="mt-1 bg-orange-100 text-orange-700">
+                                {template.tag}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-gray-600 mb-4">{template.tagline}</p>
+                      <div className="text-sm text-gray-500">
+                        <strong>Defaults:</strong> {template.defaults}
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <TooltipProvider>
+      <div className="min-h-screen bg-gray-50">
+        <header className="border-b border-gray-200 bg-white shadow-sm">
+          <div className="container mx-auto px-4 py-4">
+            <Button 
+              variant="ghost" 
+              onClick={() => setStep("template")}
+              className="mb-4 text-gray-600 hover:text-gray-900"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Templates
+            </Button>
+            <h1 className="text-2xl font-bold text-gray-900">Configure Your Game</h1>
+            <p className="text-gray-600 mt-1">
+              {GAME_TEMPLATES.find(t => t.value === selectedTemplate)?.label || "Custom Game"}
+            </p>
           </div>
         </header>
 
@@ -311,6 +440,29 @@ export default function CreateGame() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
+                    <div>
+                      <Label>Selected Template</Label>
+                      <div className="p-3 bg-gray-50 rounded-lg border">
+                        <div className="flex items-center space-x-2">
+                          {(() => {
+                            const template = GAME_TEMPLATES.find(t => t.value === selectedTemplate);
+                            const IconComponent = template?.icon || Plus;
+                            return (
+                              <>
+                                <IconComponent className="h-5 w-5 text-orange-600" />
+                                <span className="font-medium">{template?.label || "Custom Game"}</span>
+                                {template?.tag && (
+                                  <Badge variant="secondary" className="bg-orange-100 text-orange-700">
+                                    {template.tag}
+                                  </Badge>
+                                )}
+                              </>
+                            );
+                          })()}
+                        </div>
+                      </div>
+                    </div>
+
                     <div>
                       <Label htmlFor="name" className="text-gray-700">Event Name</Label>
                       <Input
@@ -344,32 +496,6 @@ export default function CreateGame() {
                         placeholder="e.g., TechCorp Inc."
                         className="h-12 bg-white border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
                       />
-                    </div>
-
-                    <div>
-                      <Label>Game Type / Template</Label>
-                      <Select
-                        value={formData.gameType}
-                        onValueChange={applyTemplate}
-                      >
-                        <SelectTrigger className="h-12">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {GAME_TEMPLATES.map((template) => (
-                            <SelectItem key={template.value} value={template.value}>
-                              <div className="flex items-center justify-between w-full">
-                                <span>{template.label}</span>
-                                {template.tag && (
-                                  <span className="ml-2 px-2 py-0.5 bg-orange-100 text-orange-600 text-xs rounded-full">
-                                    {template.tag}
-                                  </span>
-                                )}
-                              </div>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
@@ -469,14 +595,14 @@ export default function CreateGame() {
                     </div>
 
                     <div>
-                      <Label htmlFor="maxParticipants" className="text-gray-700">Max Participants</Label>
+                      <Label htmlFor="max-participants" className="text-gray-700">Max Participants</Label>
                       <Input
-                        id="maxParticipants"
+                        id="max-participants"
                         type="number"
                         value={formData.maxParticipants}
-                        onChange={(e) => setFormData({ ...formData, maxParticipants: Number(e.target.value) })}
-                        min="1"
+                        onChange={(e) => setFormData({ ...formData, maxParticipants: parseInt(e.target.value) || 100 })}
                         className="h-12 bg-white border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+                        min="1"
                       />
                     </div>
                   </CardContent>
@@ -636,7 +762,7 @@ export default function CreateGame() {
                   <CardContent>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                       <div>
-                        <Label htmlFor="founderBudget">Founder Budget</Label>
+                        <Label htmlFor="founderBudget">{getTemplateLabels().primary} Budget</Label>
                         <Input
                           id="founderBudget"
                           type="number"
@@ -678,7 +804,7 @@ export default function CreateGame() {
                         </p>
                       </div>
                       <div>
-                        <Label htmlFor="teamBudget">Team Budget</Label>
+                        <Label htmlFor="teamBudget">{getTemplateLabels().secondary} Budget</Label>
                         <Input
                           id="teamBudget"
                           type="number"
