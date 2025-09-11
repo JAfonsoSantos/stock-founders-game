@@ -58,10 +58,12 @@ const LOCALES = [
 ];
 
 const GAME_TEMPLATES = [
-  { value: "startup-pitch", label: "Startup Pitch Day" },
-  { value: "vc-simulation", label: "VC Investment Simulation" },
-  { value: "innovation-challenge", label: "Innovation Challenge" },
-  { value: "custom", label: "Custom Event" },
+  { value: "startup-pitch", label: "Startup Pitch Day", tag: "Popular" },
+  { value: "vc-simulation", label: "VC Investment Simulation", tag: "New" },
+  { value: "corporate-networking", label: "Corporate Networking Challenge", tag: "" },
+  { value: "conference-expo", label: "Conference & Expo Game", tag: "" },
+  { value: "hackathon-university", label: "Hackathon / University Edition", tag: "" },
+  { value: "blank", label: "From Blank", tag: "" },
 ];
 
 const VOTING_MODES = [
@@ -88,7 +90,7 @@ export default function CreateGame() {
     name: "",
     description: "",
     organizerName: "",
-    gameType: "custom",
+    gameType: "blank",
     currency: "USD",
     locale: "en",
     startsAt: today,
@@ -128,6 +130,60 @@ export default function CreateGame() {
   const formatBudget = (amount: number) => {
     const symbol = getCurrencySymbol();
     return `${symbol}${amount.toLocaleString()}`;
+  };
+
+  const applyTemplate = (templateValue: string) => {
+    setFormData(prev => ({ ...prev, gameType: templateValue }));
+    
+    switch (templateValue) {
+      case "startup-pitch":
+        setBudgets({ founder: 10000, angel: 100000, vc: 1000000, team: 50000, investor: 25000 });
+        setFormData(prev => ({ 
+          ...prev, 
+          showPublicLeaderboards: true, 
+          circuitBreaker: true, 
+          circuitBreakerPercent: 200, 
+          circuitBreakerDuration: 60 
+        }));
+        break;
+      case "vc-simulation":
+        setBudgets({ founder: 10000, angel: 250000, vc: 2000000, team: 50000, investor: 25000 });
+        setFormData(prev => ({ 
+          ...prev, 
+          allowSecondary: true, 
+          showPublicLeaderboards: false, 
+          showPrivateLeaderboards: true 
+        }));
+        break;
+      case "corporate-networking":
+        setBudgets({ founder: 5000, angel: 10000, vc: 50000, team: 5000, investor: 10000 });
+        setFormData(prev => ({ 
+          ...prev, 
+          votingMode: "points", 
+          showPublicLeaderboards: false 
+        }));
+        break;
+      case "conference-expo":
+        setBudgets({ founder: 20000, angel: 50000, vc: 100000, team: 20000, investor: 50000 });
+        setFormData(prev => ({ 
+          ...prev, 
+          showPublicLeaderboards: true, 
+          allowSecondary: true 
+        }));
+        break;
+      case "hackathon-university":
+        setBudgets({ founder: 10000, angel: 20000, vc: 50000, team: 10000, investor: 20000 });
+        setFormData(prev => ({ 
+          ...prev, 
+          showPublicLeaderboards: true, 
+          circuitBreaker: false 
+        }));
+        break;
+      case "blank":
+      default:
+        // Keep current values for blank template
+        break;
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -294,7 +350,7 @@ export default function CreateGame() {
                       <Label>Game Type / Template</Label>
                       <Select
                         value={formData.gameType}
-                        onValueChange={(value) => setFormData({ ...formData, gameType: value })}
+                        onValueChange={applyTemplate}
                       >
                         <SelectTrigger className="h-12">
                           <SelectValue />
@@ -302,7 +358,14 @@ export default function CreateGame() {
                         <SelectContent>
                           {GAME_TEMPLATES.map((template) => (
                             <SelectItem key={template.value} value={template.value}>
-                              {template.label}
+                              <div className="flex items-center justify-between w-full">
+                                <span>{template.label}</span>
+                                {template.tag && (
+                                  <span className="ml-2 px-2 py-0.5 bg-orange-100 text-orange-600 text-xs rounded-full">
+                                    {template.tag}
+                                  </span>
+                                )}
+                              </div>
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -707,60 +770,51 @@ export default function CreateGame() {
 
               {/* Sidebar - How it works */}
               <div className="lg:col-span-1">
-                <Card className="bg-gradient-to-br from-orange-50 to-yellow-50 border-orange-200 shadow-sm sticky top-6">
+                <Card className="bg-[#f9f9f9] border-gray-200 shadow-sm sticky top-6">
                   <CardHeader>
-                    <CardTitle className="text-orange-900 flex items-center">
-                      <Trophy className="h-5 w-5 mr-2" />
-                      How it works
+                    <CardTitle className="text-gray-900 flex items-center">
+                      📘 How it works
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="flex items-start space-x-3">
-                      <div className="flex-shrink-0 w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
-                        <span className="text-sm font-semibold text-orange-600">1</span>
-                      </div>
+                    <div className="space-y-3">
                       <div>
-                        <h4 className="font-semibold text-orange-900 mb-1">Create Game → Pre-Market Phase</h4>
-                        <p className="text-sm text-orange-700">
-                          All players are notified and can create their projects/startups/ideas. Trading is locked (no buy/sell yet).
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start space-x-3">
-                      <div className="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                        <span className="text-sm font-semibold text-green-600">2</span>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-green-900 mb-1">Game Start → Open Market</h4>
-                        <p className="text-sm text-green-700">
-                          On the scheduled start date/time, trading opens. Players can pitch, buy and sell shares, and grow their valuation.
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start space-x-3">
-                      <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                        <span className="text-sm font-semibold text-blue-600">3</span>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-blue-900 mb-1">Game End → Market Close</h4>
-                        <p className="text-sm text-blue-700">
-                          On the scheduled end date/time, the market closes. Winners are announced:
-                        </p>
-                        <ul className="text-xs text-blue-600 mt-2 space-y-1">
-                          <li className="flex items-center"><Crown className="h-3 w-3 mr-1" />Most Valued Startup</li>
-                          <li className="flex items-center"><TrendingUp className="h-3 w-3 mr-1" />Best Investor (highest portfolio gain)</li>
-                          <li className="flex items-center"><Zap className="h-3 w-3 mr-1" />Most Active Trader</li>
-                          <li className="flex items-center"><Users className="h-3 w-3 mr-1" />Rising Star (startup with fastest growth)</li>
-                          <li className="flex items-center"><Heart className="h-3 w-3 mr-1" />People's Choice (most unique investors)</li>
+                        <h4 className="font-semibold text-gray-900 mb-1">1️⃣ Pre-Market Phase</h4>
+                        <ul className="text-sm text-gray-600 space-y-1">
+                          <li>• After creating the game, all players are notified.</li>
+                          <li>• Players can create their projects/startups/ideas.</li>
+                          <li>• Trading is locked (no buy/sell yet).</li>
                         </ul>
                       </div>
+                      
+                      <div>
+                        <h4 className="font-semibold text-gray-900 mb-1">2️⃣ Open Market</h4>
+                        <ul className="text-sm text-gray-600 space-y-1">
+                          <li>• On Start Date & Time → trading opens.</li>
+                          <li>• Players can pitch, buy and sell shares.</li>
+                          <li>• Valuations and leaderboards update in real time.</li>
+                        </ul>
+                      </div>
+                      
+                      <div>
+                        <h4 className="font-semibold text-gray-900 mb-1">3️⃣ Market Close</h4>
+                        <ul className="text-sm text-gray-600 space-y-1">
+                          <li>• On End Date & Time → trading stops.</li>
+                          <li>• Winners are announced:</li>
+                        </ul>
+                        <div className="ml-4 mt-2 space-y-1 text-sm text-gray-600">
+                          <div>🏆 Most Valued Startup</div>
+                          <div>💰 Best Investor (highest portfolio gain)</div>
+                          <div>🔄 Most Active Trader</div>
+                          <div>🚀 Rising Star (fastest growth)</div>
+                          <div>⭐ People's Choice (most unique investors)</div>
+                        </div>
+                      </div>
                     </div>
-
-                    <div className="bg-white/70 rounded-lg p-3 mt-4">
-                      <p className="text-sm text-gray-600 text-center">
-                        <strong>You can customize winners, rewards, and categories later.</strong>
+                    
+                    <div className="bg-white rounded-lg p-3 mt-4 border border-gray-200">
+                      <p className="text-sm text-gray-600">
+                        ℹ️ <strong>Note:</strong> You can customize winners, rewards, and categories later.
                       </p>
                     </div>
                   </CardContent>
