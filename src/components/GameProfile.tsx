@@ -100,14 +100,14 @@ export function GameProfile({
       <div className="relative">
         {/* Background Image */}
         <div 
-          className="h-48 w-full bg-gradient-to-r from-primary/20 via-primary/10 to-accent/20"
+          className="h-48 w-full bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600"
           style={{
             backgroundImage: gameData.hero_image_url ? `url(${gameData.hero_image_url})` : undefined,
             backgroundSize: 'cover',
             backgroundPosition: 'center'
           }}
         >
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
         </div>
         
         {/* Header Controls */}
