@@ -180,10 +180,17 @@ export function GameProfile({
               )}
             </div>
             <div className="pb-2">
-              <h1 className="text-3xl font-bold text-white drop-shadow-lg">
-                {gameData.name}
-              </h1>
-              <p className="text-white/90 font-medium drop-shadow">
+              <div className="flex items-center gap-3">
+                <h1 className="text-4xl font-bold text-gray-900 drop-shadow-sm">
+                  {gameData.name}
+                </h1>
+                {isPreview && (
+                  <Badge variant="secondary" className="text-sm font-medium text-gray-800 bg-gray-200/90 backdrop-blur-sm">
+                    Preview
+                  </Badge>
+                )}
+              </div>
+              <p className="text-gray-700 font-medium drop-shadow-sm text-lg">
                 Investment Game
               </p>
             </div>
@@ -196,9 +203,6 @@ export function GameProfile({
         {/* Game Status and Actions */}
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="text-base font-medium text-gray-800 bg-gray-200">
-              {isPreview ? "Preview" : "Pre-Market"}
-            </Badge>
             {gameData.participants_count && (
               <Badge variant="outline" className="text-sm">
                 <Users className="h-3 w-3 mr-1" />
