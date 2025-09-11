@@ -333,14 +333,19 @@ export default function CreateGame() {
   };
 
   const InfoTooltip = ({ content }: { content: string }) => (
-    <Tooltip>
+    <Tooltip delayDuration={200}>
       <TooltipTrigger asChild>
-        <div className="inline-flex items-center justify-center w-4 h-4 bg-gray-400 rounded-full ml-2 cursor-help">
-          <Info className="h-2.5 w-2.5 text-white" />
+        <div className="inline-flex items-center justify-center w-5 h-5 ml-2 cursor-help group">
+          <div className="relative">
+            <div className="w-4 h-4 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-sm group-hover:shadow-md transition-all duration-200 group-hover:scale-110">
+              <Info className="h-2.5 w-2.5 text-white" />
+            </div>
+            <div className="absolute inset-0 w-4 h-4 bg-blue-400 rounded-full opacity-0 group-hover:opacity-30 animate-ping"></div>
+          </div>
         </div>
       </TooltipTrigger>
-      <TooltipContent className="max-w-xs">
-        <p>{content}</p>
+      <TooltipContent className="max-w-xs bg-gray-900 text-white border-gray-700 shadow-xl">
+        <p className="text-sm leading-relaxed">{content}</p>
       </TooltipContent>
     </Tooltip>
   );
@@ -831,29 +836,7 @@ export default function CreateGame() {
                             ))}
                           </SelectContent>
                         </Select>
-                      </div>
-
-                      <div>
-                        <div className="flex items-center">
-                          <Label>Reward System</Label>
-                          <InfoTooltip content="How winners will be rewarded: no rewards, manual distribution by organizer, or integrated with prize platform" />
-                        </div>
-                        <Select
-                          value={formData.rewardSystem}
-                          onValueChange={(value) => setFormData({ ...formData, rewardSystem: value })}
-                        >
-                           <SelectTrigger className="h-12 bg-white border-gray-300 text-gray-700">
-                             <SelectValue />
-                           </SelectTrigger>
-                          <SelectContent>
-                            {REWARD_SYSTEMS.map((system) => (
-                              <SelectItem key={system.value} value={system.value}>
-                                {system.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
+                       </div>
                     </div>
                   </CardContent>
                 </Card>
