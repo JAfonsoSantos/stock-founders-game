@@ -241,8 +241,8 @@ export function GameProfile({
           {/* Timing */}
           <Card className="bg-white shadow-md border border-gray-200">
             <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-primary" />
+              <CardTitle className="text-lg flex items-center gap-2 text-gray-900">
+                <Calendar className="h-5 w-5 text-orange-500" />
                 Schedule
               </CardTitle>
             </CardHeader>
@@ -260,12 +260,12 @@ export function GameProfile({
                   <Clock className="h-4 w-4" />
                   Ends
                 </div>
-                <p className="font-medium">{formatDate(gameData.ends_at)}</p>
+                <p className="font-medium text-gray-900">{formatDate(gameData.ends_at)}</p>
               </div>
               <Separator />
               <div>
                 <div className="text-sm text-gray-600 mb-1">Duration</div>
-                <p className="font-medium">{getDuration()}</p>
+                <p className="font-medium text-gray-900">{getDuration()}</p>
               </div>
             </CardContent>
           </Card>
@@ -273,8 +273,8 @@ export function GameProfile({
           {/* Game Settings */}
           <Card className="bg-white shadow-md border border-gray-200">
             <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Settings className="h-5 w-5 text-primary" />
+              <CardTitle className="text-lg flex items-center gap-2 text-gray-900">
+                <Settings className="h-5 w-5 text-orange-500" />
                 Configuration
               </CardTitle>
             </CardHeader>
@@ -282,16 +282,16 @@ export function GameProfile({
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600">Currency</span>
                 <div className="flex items-center gap-1">
-                  <DollarSign className="h-4 w-4" />
-                  <span className="font-medium">{gameData.currency}</span>
+                  <DollarSign className="h-4 w-4 text-gray-600" />
+                  <span className="font-medium text-gray-900">{gameData.currency}</span>
                 </div>
               </div>
               <Separator />
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600">Language</span>
                 <div className="flex items-center gap-1">
-                  <Globe className="h-4 w-4" />
-                  <span className="font-medium">{gameData.locale.toUpperCase()}</span>
+                  <Globe className="h-4 w-4 text-gray-600" />
+                  <span className="font-medium text-gray-900">{gameData.locale.toUpperCase()}</span>
                 </div>
               </div>
               <Separator />
@@ -323,7 +323,7 @@ export function GameProfile({
                   <Separator />
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Max Price Per Share</span>
-                    <span className="font-medium">{formatCurrency(gameData.max_price_per_share)}</span>
+                    <span className="font-medium text-gray-900">{formatCurrency(gameData.max_price_per_share)}</span>
                   </div>
                 </>
               )}
@@ -334,8 +334,8 @@ export function GameProfile({
         {/* Default Budgets */}
         <Card className="bg-white shadow-md border border-gray-200">
           <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-primary" />
+            <CardTitle className="text-lg flex items-center gap-2 text-gray-900">
+              <TrendingUp className="h-5 w-5 text-orange-500" />
               Default Budgets
             </CardTitle>
           </CardHeader>
@@ -344,17 +344,17 @@ export function GameProfile({
               <div className="text-center p-4 rounded-lg bg-white border border-gray-200 shadow-sm">
                 <Crown className="h-8 w-8 text-amber-500 mx-auto mb-2" />
                 <div className="text-sm text-gray-600 mb-1">Founder</div>
-                <div className="text-xl font-bold">{formatCurrency(gameData.default_budgets.founder)}</div>
+                <div className="text-xl font-bold text-gray-900">{formatCurrency(gameData.default_budgets.founder)}</div>
               </div>
               <div className="text-center p-4 rounded-lg bg-white border border-gray-200 shadow-sm">
                 <Shield className="h-8 w-8 text-blue-500 mx-auto mb-2" />
                 <div className="text-sm text-gray-600 mb-1">Angel</div>
-                <div className="text-xl font-bold">{formatCurrency(gameData.default_budgets.angel)}</div>
+                <div className="text-xl font-bold text-gray-900">{formatCurrency(gameData.default_budgets.angel)}</div>
               </div>
               <div className="text-center p-4 rounded-lg bg-white border border-gray-200 shadow-sm">
                 <Building className="h-8 w-8 text-emerald-500 mx-auto mb-2" />
                 <div className="text-sm text-gray-600 mb-1">VC</div>
-                <div className="text-xl font-bold">{formatCurrency(gameData.default_budgets.vc)}</div>
+                <div className="text-xl font-bold text-gray-900">{formatCurrency(gameData.default_budgets.vc)}</div>
               </div>
             </div>
           </CardContent>
@@ -364,8 +364,8 @@ export function GameProfile({
         {gameData.organizer && (
           <Card className="bg-white shadow-md border border-gray-200">
             <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Users className="h-5 w-5 text-primary" />
+              <CardTitle className="text-lg flex items-center gap-2 text-gray-900">
+                <Users className="h-5 w-5 text-orange-500" />
                 Organizer
               </CardTitle>
             </CardHeader>
@@ -378,7 +378,7 @@ export function GameProfile({
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-medium">{gameData.organizer.name}</p>
+                  <p className="font-medium text-gray-900">{gameData.organizer.name}</p>
                   <p className="text-sm text-gray-600">Event Organizer</p>
                 </div>
               </div>
