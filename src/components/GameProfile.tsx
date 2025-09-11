@@ -135,18 +135,6 @@ export function GameProfile({
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
-          
-          {isPreview && onEdit && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onEdit}
-              className="bg-background/80 backdrop-blur-sm text-foreground hover:bg-background/90"
-            >
-              <Edit className="h-4 w-4 mr-2" />
-              Edit
-            </Button>
-          )}
         </div>
 
         {/* Game Logo and Title */}
@@ -180,10 +168,12 @@ export function GameProfile({
               )}
             </div>
             <div className="pb-2">
-              <div className="flex items-center gap-3">
-                <h1 className="text-4xl font-bold text-gray-900 drop-shadow-sm">
-                  {gameData.name}
-                </h1>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <h1 className="text-4xl font-bold text-gray-900 drop-shadow-sm">
+                    {gameData.name}
+                  </h1>
+                </div>
                 {isPreview && (
                   <Badge variant="secondary" className="text-sm font-medium text-gray-800 bg-gray-200/90 backdrop-blur-sm">
                     Preview
@@ -218,6 +208,12 @@ export function GameProfile({
           </div>
           
           <div className="flex gap-2">
+            {isPreview && onEdit && (
+              <Button onClick={onEdit} variant="outline" className="bg-white text-gray-700 border-gray-300 hover:bg-gray-50">
+                <Edit className="h-4 w-4 mr-2" />
+                Edit
+              </Button>
+            )}
             {isPreview && onCreateGame && (
               <Button onClick={onCreateGame} className="bg-orange-500 hover:bg-orange-600 text-white">
                 <Play className="h-4 w-4 mr-2" />
@@ -259,7 +255,7 @@ export function GameProfile({
                   <Clock className="h-4 w-4" />
                   Starts
                 </div>
-                <p className="font-medium">{formatDate(gameData.starts_at)}</p>
+                <p className="font-medium text-gray-900">{formatDate(gameData.starts_at)}</p>
               </div>
               <Separator />
               <div>
