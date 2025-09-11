@@ -68,7 +68,7 @@ export function AppSidebar() {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button 
-                    onClick={() => navigate('/dashboard')}
+                    onClick={() => navigate('/profile')}
                     className="h-10 w-10 shrink-0 border-2 border-gray-300 rounded-full overflow-hidden bg-transparent p-0 hover:border-gray-400 transition-colors"
                   >
                     <Avatar className="h-full w-full">
