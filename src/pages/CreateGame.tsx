@@ -159,6 +159,7 @@ export default function CreateGame() {
     startsAt: today,
     endsAt: today,
     maxParticipants: 100,
+    unlimitedParticipants: true,
 
     // Game Settings
     allowSecondary: false,
@@ -659,17 +660,36 @@ export default function CreateGame() {
                        </div>
                      </div>
 
-                    <div>
-                      <Label htmlFor="max-participants" className="text-gray-700 font-medium">Max Participants</Label>
-                      <Input
-                        id="max-participants"
-                        type="number"
-                        value={formData.maxParticipants}
-                        onChange={(e) => setFormData({ ...formData, maxParticipants: parseInt(e.target.value) || 100 })}
-                        className="h-12 bg-white border-gray-300 text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
-                        min="1"
-                      />
-                    </div>
+                     <div className="space-y-3">
+                       <div className="flex items-center justify-between">
+                         <div className="space-y-0.5">
+                           <Label className="text-gray-700 font-medium">Max Participants</Label>
+                           <p className="text-sm text-gray-600">
+                             Set a limit on the number of participants
+                           </p>
+                         </div>
+                         <div className="flex items-center space-x-2">
+                           <span className="text-sm text-gray-600">Unlimited</span>
+                           <Switch
+                             checked={formData.unlimitedParticipants}
+                             onCheckedChange={(checked) => setFormData({ ...formData, unlimitedParticipants: checked })}
+                           />
+                         </div>
+                       </div>
+                       {!formData.unlimitedParticipants && (
+                         <div>
+                           <Input
+                             id="max-participants"
+                             type="number"
+                             value={formData.maxParticipants}
+                             onChange={(e) => setFormData({ ...formData, maxParticipants: parseInt(e.target.value) || 100 })}
+                             className="h-12 bg-white border-gray-300 text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+                             min="1"
+                             placeholder="Enter maximum number of participants"
+                           />
+                         </div>
+                       )}
+                     </div>
                   </CardContent>
                 </Card>
 
