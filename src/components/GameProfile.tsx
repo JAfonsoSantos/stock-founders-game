@@ -168,12 +168,10 @@ export function GameProfile({
               )}
             </div>
             <div className="pb-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <h1 className="text-4xl font-bold text-gray-900 drop-shadow-sm">
-                    {gameData.name}
-                  </h1>
-                </div>
+              <div className="flex items-center justify-between w-full">
+                <h1 className="text-4xl font-bold text-gray-900 drop-shadow-sm">
+                  {gameData.name}
+                </h1>
                 {isPreview && (
                   <Badge variant="secondary" className="text-sm font-medium text-gray-800 bg-gray-200/90 backdrop-blur-sm">
                     Preview
@@ -211,7 +209,7 @@ export function GameProfile({
             {isPreview && onEdit && (
               <Button onClick={onEdit} variant="outline" className="bg-white text-gray-700 border-gray-300 hover:bg-gray-50">
                 <Edit className="h-4 w-4 mr-2" />
-                Edit
+                Keep editing
               </Button>
             )}
             {isPreview && onCreateGame && (
