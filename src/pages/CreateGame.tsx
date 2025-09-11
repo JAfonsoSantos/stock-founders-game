@@ -12,6 +12,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
+import { GameProfile } from "@/components/GameProfile";
 import { 
   CalendarIcon, 
   ArrowLeft, 
@@ -405,118 +406,43 @@ export default function CreateGame() {
   }
 
   if (step === "preview") {
-    const selectedTemplateData = GAME_TEMPLATES.find(t => t.value === selectedTemplate);
-    const currency = CURRENCIES.find(c => c.value === formData.currency);
-    
+    const gameData = {
+      name: formData.name,
+      description: formData.description,
+      logo_url: formData.brandingLogo,
+      hero_image_url: undefined, // Can be added later
+      starts_at: formData.startsAt.toISOString(),
+      ends_at: formData.endsAt.toISOString(),
+      currency: formData.currency,
+      locale: formData.locale,
+      allow_secondary: formData.allowSecondary,
+      show_public_leaderboards: formData.showPublicLeaderboards,
+      circuit_breaker: formData.circuitBreaker,
+      max_price_per_share: formData.maxPricePerShare,
+      default_budgets: {
+        founder: budgets.founder,
+        angel: budgets.angel,
+        vc: budgets.vc,
+      },
+      organizer: {
+        name: user?.user_metadata?.full_name || user?.email || "Event Organizer",
+        avatar: user?.user_metadata?.avatar_url,
+      },
+    };
+
+    const handleCreateGame = () => {
+      const fakeEvent = { preventDefault: () => {} } as React.FormEvent;
+      handleSubmit(fakeEvent);
+    };
+
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="container mx-auto px-4 py-8">
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">Game Preview</h1>
-            <p className="text-gray-600 mt-1">Review your game configuration before creating</p>
-          </div>
-          
-          <div className="max-w-4xl mx-auto">
-            {/* Game Header */}
-            <Card className="mb-6">
-              <CardContent className="pt-6">
-                <div className="flex items-start space-x-6">
-                  {formData.brandingLogo && (
-                    <div className="w-20 h-20 rounded-lg overflow-hidden border">
-                      <img 
-                        src={formData.brandingLogo} 
-                        alt="Game Logo" 
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  )}
-                  <div className="flex-1">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">{formData.name}</h2>
-                    <p className="text-gray-600 mb-4">{formData.description}</p>
-                    <div className="flex items-center space-x-4 text-sm text-gray-500">
-                      <span>{selectedTemplateData?.label}</span>
-                      <span>•</span>
-                      <span>{currency?.label}</span>
-                      <span>•</span>
-                      <span>{format(formData.startsAt, "MMM dd, yyyy 'at' HH:mm")} - {format(formData.endsAt, "MMM dd, yyyy 'at' HH:mm")}</span>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Game Settings */}
-            <div className="grid md:grid-cols-2 gap-6 mb-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Game Configuration</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Max Participants</span>
-                    <span className="font-medium">{formData.unlimitedParticipants ? "Unlimited" : formData.maxParticipants}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Secondary Trading</span>
-                    <span className="font-medium">{formData.allowSecondary ? "Enabled" : "Disabled"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Public Leaderboards</span>
-                    <span className="font-medium">{formData.showPublicLeaderboards ? "Yes" : "No"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Circuit Breaker</span>
-                    <span className="font-medium">{formData.circuitBreaker ? "Enabled" : "Disabled"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Max Price Per Share</span>
-                    <span className="font-medium">{currency?.symbol}{formData.maxPricePerShare?.toLocaleString()}</span>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Default Budgets</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 capitalize">Founder</span>
-                    <span className="font-medium">{currency?.symbol}{budgets.founder?.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 capitalize">Angel</span>
-                    <span className="font-medium">{currency?.symbol}{budgets.angel?.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 capitalize">VC</span>
-                    <span className="font-medium">{currency?.symbol}{budgets.vc?.toLocaleString()}</span>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex space-x-4">
-              <Button 
-                variant="outline" 
-                onClick={() => setStep("form")}
-                className="flex-1 h-12"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Edit
-              </Button>
-              <Button 
-                onClick={handleSubmit}
-                className="flex-1 h-12 bg-[#FF6B35] hover:bg-[#E55A2B] text-white font-semibold" 
-                disabled={loading}
-              >
-                {loading ? "Creating Game..." : "Create Game"}
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <GameProfile
+        gameData={gameData}
+        isPreview={true}
+        onBack={() => setStep("form")}
+        onEdit={() => setStep("form")}
+        onCreateGame={handleCreateGame}
+      />
     );
   }
 
