@@ -71,7 +71,8 @@ const GAME_TEMPLATES = [
     icon: User,
     tagline: "Compete to raise the highest valuation.",
     defaults: "Founder $10k | Angel $100k | VC $1M",
-    labels: { primary: "Founder", secondary: "Investor" }
+    labels: { primary: "Founder", secondary: "Investor" },
+    colors: { bg: "bg-gradient-to-br from-blue-100 to-blue-200", icon: "text-blue-600", iconBg: "bg-blue-500" }
   },
   { 
     value: "vc-simulation", 
@@ -80,7 +81,8 @@ const GAME_TEMPLATES = [
     icon: Crown,
     tagline: "Play as investors, evaluate and win.",
     defaults: "Founder $10k | Angel $250k | VC $2M",
-    labels: { primary: "Startup", secondary: "Investor" }
+    labels: { primary: "Startup", secondary: "Investor" },
+    colors: { bg: "bg-gradient-to-br from-purple-100 to-purple-200", icon: "text-purple-600", iconBg: "bg-purple-500" }
   },
   { 
     value: "corporate-networking", 
@@ -89,7 +91,8 @@ const GAME_TEMPLATES = [
     icon: Handshake,
     tagline: "Boost team connections through trading.",
     defaults: "Team $5k | Employee $10k",
-    labels: { primary: "Team", secondary: "Employee" }
+    labels: { primary: "Team", secondary: "Employee" },
+    colors: { bg: "bg-gradient-to-br from-green-100 to-green-200", icon: "text-green-600", iconBg: "bg-green-500" }
   },
   { 
     value: "conference-expo", 
@@ -98,7 +101,8 @@ const GAME_TEMPLATES = [
     icon: Sparkles,
     tagline: "Engage attendees by turning stands into stocks.",
     defaults: "Booth $20k | Visitor $50k",
-    labels: { primary: "Booth", secondary: "Visitor" }
+    labels: { primary: "Booth", secondary: "Visitor" },
+    colors: { bg: "bg-gradient-to-br from-amber-100 to-amber-200", icon: "text-amber-600", iconBg: "bg-amber-500" }
   },
   { 
     value: "hackathon-university", 
@@ -107,7 +111,8 @@ const GAME_TEMPLATES = [
     icon: Lightbulb,
     tagline: "Teams pitch, students invest, growth wins.",
     defaults: "Team $10k | Student $20k",
-    labels: { primary: "Team", secondary: "Student" }
+    labels: { primary: "Team", secondary: "Student" },
+    colors: { bg: "bg-gradient-to-br from-pink-100 to-pink-200", icon: "text-pink-600", iconBg: "bg-pink-500" }
   },
   { 
     value: "custom", 
@@ -116,7 +121,8 @@ const GAME_TEMPLATES = [
     icon: Plus,
     tagline: "Design your own event experience.",
     defaults: "All fields free for customization",
-    labels: { primary: "Founder", secondary: "Investor" }
+    labels: { primary: "Founder", secondary: "Investor" },
+    colors: { bg: "bg-gradient-to-br from-gray-100 to-gray-200", icon: "text-gray-600", iconBg: "bg-gray-500" }
   },
 ];
 
@@ -352,26 +358,26 @@ export default function CreateGame() {
                 return (
                   <Card 
                     key={template.value} 
-                    className="cursor-pointer hover:shadow-lg transition-shadow bg-white border-gray-200"
+                    className={`cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-105 border-gray-200 ${template.colors.bg}`}
                     onClick={() => applyTemplate(template.value)}
                   >
-                    <CardHeader className="pb-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <div className="p-2 bg-orange-100 rounded-lg">
-                            <IconComponent className="h-6 w-6 text-orange-600" />
-                          </div>
-                          <div>
-                            <CardTitle className="text-lg text-gray-700">{template.label}</CardTitle>
-                            {template.tag && (
-                              <Badge variant="secondary" className="mt-1 bg-orange-100 text-orange-700">
-                                {template.tag}
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </CardHeader>
+                     <CardHeader className="pb-4">
+                       <div className="flex items-center justify-between">
+                         <div className="flex items-center space-x-3">
+                           <div className={`p-3 ${template.colors.iconBg} rounded-xl shadow-sm`}>
+                             <IconComponent className={`h-6 w-6 text-white`} />
+                           </div>
+                           <div>
+                             <CardTitle className="text-lg text-gray-700">{template.label}</CardTitle>
+                             {template.tag && (
+                               <Badge variant="secondary" className="mt-1 bg-orange-100 text-orange-700">
+                                 {template.tag}
+                               </Badge>
+                             )}
+                           </div>
+                         </div>
+                       </div>
+                     </CardHeader>
                     <CardContent>
                       <p className="text-gray-600 mb-4">{template.tagline}</p>
                       <div className="text-sm text-gray-500">
@@ -413,25 +419,27 @@ export default function CreateGame() {
                   <CardContent className="space-y-4">
                     <div>
                       <Label>Selected Template</Label>
-                      <div className="p-3 bg-gray-50 rounded-lg border">
-                        <div className="flex items-center space-x-2">
-                          {(() => {
-                            const template = GAME_TEMPLATES.find(t => t.value === selectedTemplate);
-                            const IconComponent = template?.icon || Plus;
-                            return (
-                              <>
-                                <IconComponent className="h-5 w-5 text-orange-600" />
-                                <span className="font-medium">{template?.label || "Custom Game"}</span>
-                                {template?.tag && (
-                                  <Badge variant="secondary" className="bg-orange-100 text-orange-700">
-                                    {template.tag}
-                                  </Badge>
-                                )}
-                              </>
-                            );
-                          })()}
+                        <div className="p-3 bg-gray-50 rounded-lg border">
+                          <div className="flex items-center space-x-2">
+                            {(() => {
+                              const template = GAME_TEMPLATES.find(t => t.value === selectedTemplate);
+                              const IconComponent = template?.icon || Plus;
+                              return (
+                                <>
+                                  <div className={`p-2 ${template?.colors?.iconBg || 'bg-gray-500'} rounded-lg`}>
+                                    <IconComponent className="h-5 w-5 text-white" />
+                                  </div>
+                                  <span className="font-medium">{template?.label || "Custom Game"}</span>
+                                  {template?.tag && (
+                                    <Badge variant="secondary" className="bg-orange-100 text-orange-700">
+                                      {template.tag}
+                                    </Badge>
+                                  )}
+                                </>
+                              );
+                            })()}
+                          </div>
                         </div>
-                      </div>
                     </div>
 
                     <div>
