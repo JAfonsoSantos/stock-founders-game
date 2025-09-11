@@ -153,13 +153,16 @@ export function GameProfile({
         <div className="absolute -bottom-12 left-6">
           <div className="flex items-end gap-4">
             <div className="relative group">
-              <div className="h-24 w-24 border-4 border-background shadow-lg cursor-pointer rounded-lg bg-gray-100 border-gray-300 flex items-center justify-center">
+              <div className="h-24 w-24 border-4 border-background shadow-lg cursor-pointer rounded-lg bg-gray-100 border-gray-300 flex items-center justify-center flex-col">
                 {gameData.logo_url ? (
                   <img src={gameData.logo_url} alt={gameData.name} className="w-full h-full object-cover rounded-md" />
                 ) : (
-                  <span className="text-2xl font-bold text-gray-600">
-                    {gameData.name.charAt(0).toUpperCase()}
-                  </span>
+                  <div className="text-center">
+                    <span className="text-2xl font-bold text-gray-600">
+                      {gameData.name.charAt(0).toUpperCase()}
+                    </span>
+                    <p className="text-xs text-gray-400 mt-1">Your Event Logo</p>
+                  </div>
                 )}
               </div>
               
@@ -193,7 +196,7 @@ export function GameProfile({
         {/* Game Status and Actions */}
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="text-sm">
+            <Badge variant="secondary" className="text-base font-medium text-gray-800 bg-gray-200">
               {isPreview ? "Preview" : "Pre-Market"}
             </Badge>
             {gameData.participants_count && (
