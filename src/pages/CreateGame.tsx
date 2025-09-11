@@ -362,7 +362,7 @@ export default function CreateGame() {
                             <IconComponent className="h-6 w-6 text-orange-600" />
                           </div>
                           <div>
-                            <CardTitle className="text-lg">{template.label}</CardTitle>
+                            <CardTitle className="text-lg text-gray-700">{template.label}</CardTitle>
                             {template.tag && (
                               <Badge variant="secondary" className="mt-1 bg-orange-100 text-orange-700">
                                 {template.tag}
@@ -399,13 +399,6 @@ export default function CreateGame() {
             </p>
           </div>
           <div className="max-w-4xl mx-auto">
-            {/* Editable Notice */}
-            <Alert className="mb-6 bg-blue-50 border-blue-200">
-              <Info className="h-4 w-4 text-blue-600" />
-              <AlertDescription className="text-blue-800">
-                <strong>Don't worry</strong> — you can edit all game settings until the game starts.
-              </AlertDescription>
-            </Alert>
 
             <div className="grid lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 space-y-6">
@@ -483,7 +476,7 @@ export default function CreateGame() {
                           value={formData.currency}
                           onValueChange={(value) => setFormData({ ...formData, currency: value })}
                         >
-                          <SelectTrigger className="h-12">
+                          <SelectTrigger className="h-12 bg-white border-gray-200 text-gray-700">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -502,7 +495,7 @@ export default function CreateGame() {
                           value={formData.locale}
                           onValueChange={(value) => setFormData({ ...formData, locale: value })}
                         >
-                          <SelectTrigger className="h-12">
+                          <SelectTrigger className="h-12 bg-white border-gray-200 text-gray-700">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -524,8 +517,8 @@ export default function CreateGame() {
                             <Button
                               variant="outline"
                               className={cn(
-                                "w-full h-12 justify-start text-left font-normal",
-                                !formData.startsAt && "text-muted-foreground"
+                                "w-full h-12 justify-start text-left font-normal bg-white border-gray-200 text-gray-700",
+                                !formData.startsAt && "text-gray-500"
                               )}
                             >
                               <CalendarIcon className="mr-2 h-4 w-4" />
@@ -551,8 +544,8 @@ export default function CreateGame() {
                             <Button
                               variant="outline"
                               className={cn(
-                                "w-full h-12 justify-start text-left font-normal",
-                                !formData.endsAt && "text-muted-foreground"
+                                "w-full h-12 justify-start text-left font-normal bg-white border-gray-200 text-gray-700",
+                                !formData.endsAt && "text-gray-500"
                               )}
                             >
                               <CalendarIcon className="mr-2 h-4 w-4" />
@@ -601,7 +594,7 @@ export default function CreateGame() {
                           <Label>Allow Secondary Trading</Label>
                           <InfoTooltip content="Allow participants to trade shares with each other during the game" />
                         </div>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-gray-600">
                           Players can buy and sell shares from each other
                         </p>
                       </div>
@@ -614,7 +607,7 @@ export default function CreateGame() {
                     <div className="flex items-center justify-between">
                       <div className="space-y-0.5">
                         <Label>Public Leaderboards</Label>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-gray-600">
                           Show rankings publicly during the game
                         </p>
                       </div>
@@ -627,7 +620,7 @@ export default function CreateGame() {
                     <div className="flex items-center justify-between">
                       <div className="space-y-0.5">
                         <Label>Private Leaderboards</Label>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-gray-600">
                           Show rankings to participants only
                         </p>
                       </div>
@@ -643,7 +636,7 @@ export default function CreateGame() {
                           <Label>Circuit Breaker</Label>
                           <InfoTooltip content="Pauses trading temporarily if stock prices fluctuate too much." />
                         </div>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-gray-600">
                           Pause trading if prices change by ±{formData.circuitBreakerPercent}%
                         </p>
                       </div>
@@ -663,7 +656,7 @@ export default function CreateGame() {
                           onChange={(e) => setFormData({ ...formData, maxPricePerShare: Number(e.target.value) })}
                           min="1"
                           step="0.01"
-                          className="h-12"
+                          className="h-12 bg-white border-gray-200 text-gray-700"
                         />
                       </div>
 
@@ -676,7 +669,7 @@ export default function CreateGame() {
                           onChange={(e) => setFormData({ ...formData, initialSharePrice: Number(e.target.value) })}
                           min="0.01"
                           step="0.01"
-                          className="h-12"
+                          className="h-12 bg-white border-gray-200 text-gray-700"
                         />
                       </div>
                     </div>
@@ -691,7 +684,7 @@ export default function CreateGame() {
                           value={formData.votingMode}
                           onValueChange={(value) => setFormData({ ...formData, votingMode: value })}
                         >
-                          <SelectTrigger className="h-12">
+                          <SelectTrigger className="h-12 bg-white border-gray-200 text-gray-700">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -713,7 +706,7 @@ export default function CreateGame() {
                           value={formData.rewardSystem}
                           onValueChange={(value) => setFormData({ ...formData, rewardSystem: value })}
                         >
-                          <SelectTrigger className="h-12">
+                          <SelectTrigger className="h-12 bg-white border-gray-200 text-gray-700">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -747,9 +740,9 @@ export default function CreateGame() {
                           value={budgets.founder}
                           onChange={(e) => setBudgets({ ...budgets, founder: Number(e.target.value) })}
                           min="0"
-                          className="h-12"
+                          className="h-12 bg-white border-gray-200 text-gray-700"
                         />
-                        <p className="text-xs text-muted-foreground mt-1">
+                        <p className="text-xs text-gray-600 mt-1">
                           {formatBudget(budgets.founder)}
                         </p>
                       </div>
@@ -761,9 +754,9 @@ export default function CreateGame() {
                           value={budgets.angel}
                           onChange={(e) => setBudgets({ ...budgets, angel: Number(e.target.value) })}
                           min="0"
-                          className="h-12"
+                          className="h-12 bg-white border-gray-200 text-gray-700"
                         />
-                        <p className="text-xs text-muted-foreground mt-1">
+                        <p className="text-xs text-gray-600 mt-1">
                           {formatBudget(budgets.angel)}
                         </p>
                       </div>
@@ -775,9 +768,9 @@ export default function CreateGame() {
                           value={budgets.vc}
                           onChange={(e) => setBudgets({ ...budgets, vc: Number(e.target.value) })}
                           min="0"
-                          className="h-12"
+                          className="h-12 bg-white border-gray-200 text-gray-700"
                         />
-                        <p className="text-xs text-muted-foreground mt-1">
+                        <p className="text-xs text-gray-600 mt-1">
                           {formatBudget(budgets.vc)}
                         </p>
                       </div>
@@ -789,9 +782,9 @@ export default function CreateGame() {
                           value={budgets.team}
                           onChange={(e) => setBudgets({ ...budgets, team: Number(e.target.value) })}
                           min="0"
-                          className="h-12"
+                          className="h-12 bg-white border-gray-200 text-gray-700"
                         />
-                        <p className="text-xs text-muted-foreground mt-1">
+                        <p className="text-xs text-gray-600 mt-1">
                           {formatBudget(budgets.team)}
                         </p>
                       </div>
@@ -803,9 +796,9 @@ export default function CreateGame() {
                           value={budgets.investor}
                           onChange={(e) => setBudgets({ ...budgets, investor: Number(e.target.value) })}
                           min="0"
-                          className="h-12"
+                          className="h-12 bg-white border-gray-200 text-gray-700"
                         />
-                        <p className="text-xs text-muted-foreground mt-1">
+                        <p className="text-xs text-gray-600 mt-1">
                           {formatBudget(budgets.investor)}
                         </p>
                       </div>
@@ -840,7 +833,7 @@ export default function CreateGame() {
                           <Palette className="h-4 w-4 ml-2 text-gray-400" />
                         </Label>
                         <Select value={formData.colorTheme} onValueChange={(value) => setFormData({ ...formData, colorTheme: value })}>
-                          <SelectTrigger className="h-12">
+                          <SelectTrigger className="h-12 bg-white border-gray-200 text-gray-700">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -858,7 +851,7 @@ export default function CreateGame() {
                             Notification Settings
                             <Bell className="h-4 w-4 ml-2 text-gray-400" />
                           </Label>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="text-sm text-gray-600">
                             Send event updates to participants
                           </p>
                         </div>
@@ -925,6 +918,14 @@ export default function CreateGame() {
                 </Card>
               </div>
             </div>
+
+            {/* Editable Notice */}
+            <Alert className="mb-6 bg-blue-50 border-blue-200">
+              <Info className="h-4 w-4 text-blue-600" />
+              <AlertDescription className="text-blue-800">
+                <strong>Don't worry</strong> — you can edit all game settings until the game starts.
+              </AlertDescription>
+            </Alert>
 
             {/* Create Game Button */}
             <div className="mt-8">
