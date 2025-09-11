@@ -477,101 +477,101 @@ export default function CreateGame() {
                       />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label>Currency</Label>
-                        <Select
-                          value={formData.currency}
-                          onValueChange={(value) => setFormData({ ...formData, currency: value })}
-                        >
-                          <SelectTrigger className="h-12 bg-white border-gray-200 text-gray-700">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {CURRENCIES.map((currency) => (
-                              <SelectItem key={currency.value} value={currency.value}>
-                                {currency.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
+                     <div className="grid grid-cols-2 gap-4">
+                       <div>
+                         <Label className="text-gray-700 font-medium">Currency</Label>
+                         <Select
+                           value={formData.currency}
+                           onValueChange={(value) => setFormData({ ...formData, currency: value })}
+                         >
+                           <SelectTrigger className="h-12 bg-white border-gray-300 text-gray-700">
+                             <SelectValue />
+                           </SelectTrigger>
+                           <SelectContent>
+                             {CURRENCIES.map((currency) => (
+                               <SelectItem key={currency.value} value={currency.value}>
+                                 {currency.label}
+                               </SelectItem>
+                             ))}
+                           </SelectContent>
+                         </Select>
+                       </div>
 
-                      <div>
-                        <Label>Language</Label>
-                        <Select
-                          value={formData.locale}
-                          onValueChange={(value) => setFormData({ ...formData, locale: value })}
-                        >
-                          <SelectTrigger className="h-12 bg-white border-gray-200 text-gray-700">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {LOCALES.map((locale) => (
-                              <SelectItem key={locale.value} value={locale.value}>
-                                {locale.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
+                       <div>
+                         <Label className="text-gray-700 font-medium">Language</Label>
+                         <Select
+                           value={formData.locale}
+                           onValueChange={(value) => setFormData({ ...formData, locale: value })}
+                         >
+                           <SelectTrigger className="h-12 bg-white border-gray-300 text-gray-700">
+                             <SelectValue />
+                           </SelectTrigger>
+                           <SelectContent>
+                             {LOCALES.map((locale) => (
+                               <SelectItem key={locale.value} value={locale.value}>
+                                 {locale.label}
+                               </SelectItem>
+                             ))}
+                           </SelectContent>
+                         </Select>
+                       </div>
+                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label>Start Date</Label>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              className={cn(
-                                "w-full h-12 justify-start text-left font-normal bg-white border-gray-200 text-gray-700",
-                                !formData.startsAt && "text-gray-500"
-                              )}
-                            >
-                              <CalendarIcon className="mr-2 h-4 w-4" />
-                              {formData.startsAt ? format(formData.startsAt, "PPP") : "Pick a date"}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={formData.startsAt}
-                              onSelect={(date) => setFormData({ ...formData, startsAt: date || today })}
-                              initialFocus
-                              className="p-3 pointer-events-auto"
-                            />
-                          </PopoverContent>
-                        </Popover>
-                      </div>
+                     <div className="grid grid-cols-2 gap-4">
+                       <div>
+                         <Label className="text-gray-700 font-medium">Start Date</Label>
+                         <Popover>
+                           <PopoverTrigger asChild>
+                             <Button
+                               variant="outline"
+                               className={cn(
+                                 "w-full h-12 justify-start text-left font-normal bg-white border-gray-300 text-gray-700 hover:bg-gray-50",
+                                 !formData.startsAt && "text-gray-500"
+                               )}
+                             >
+                               <CalendarIcon className="mr-2 h-4 w-4" />
+                               {formData.startsAt ? format(formData.startsAt, "PPP") : "Pick a date"}
+                             </Button>
+                           </PopoverTrigger>
+                           <PopoverContent className="w-auto p-0 bg-white border-gray-200" align="start">
+                             <Calendar
+                               mode="single"
+                               selected={formData.startsAt}
+                               onSelect={(date) => setFormData({ ...formData, startsAt: date || today })}
+                               initialFocus
+                               className="p-3 pointer-events-auto bg-white"
+                             />
+                           </PopoverContent>
+                         </Popover>
+                       </div>
 
-                      <div>
-                        <Label>End Date</Label>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              className={cn(
-                                "w-full h-12 justify-start text-left font-normal bg-white border-gray-200 text-gray-700",
-                                !formData.endsAt && "text-gray-500"
-                              )}
-                            >
-                              <CalendarIcon className="mr-2 h-4 w-4" />
-                              {formData.endsAt ? format(formData.endsAt, "PPP") : "Pick a date"}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={formData.endsAt}
-                              onSelect={(date) => setFormData({ ...formData, endsAt: date || today })}
-                              initialFocus
-                              className="p-3 pointer-events-auto"
-                            />
-                          </PopoverContent>
-                        </Popover>
-                      </div>
-                    </div>
+                       <div>
+                         <Label className="text-gray-700 font-medium">End Date</Label>
+                         <Popover>
+                           <PopoverTrigger asChild>
+                             <Button
+                               variant="outline"
+                               className={cn(
+                                 "w-full h-12 justify-start text-left font-normal bg-white border-gray-300 text-gray-700 hover:bg-gray-50",
+                                 !formData.endsAt && "text-gray-500"
+                               )}
+                             >
+                               <CalendarIcon className="mr-2 h-4 w-4" />
+                               {formData.endsAt ? format(formData.endsAt, "PPP") : "Pick a date"}
+                             </Button>
+                           </PopoverTrigger>
+                           <PopoverContent className="w-auto p-0 bg-white border-gray-200" align="start">
+                             <Calendar
+                               mode="single"
+                               selected={formData.endsAt}
+                               onSelect={(date) => setFormData({ ...formData, endsAt: date || today })}
+                               initialFocus
+                               className="p-3 pointer-events-auto bg-white"
+                             />
+                           </PopoverContent>
+                         </Popover>
+                       </div>
+                     </div>
 
                     <div>
                       <Label htmlFor="max-participants" className="text-gray-700">Max Participants</Label>
@@ -596,105 +596,127 @@ export default function CreateGame() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <div className="flex items-center">
-                          <Label>Allow Secondary Trading</Label>
-                          <InfoTooltip content="Allow participants to trade shares with each other during the game" />
-                        </div>
-                        <p className="text-sm text-gray-600">
-                          Players can buy and sell shares from each other
-                        </p>
-                      </div>
-                      <Switch
-                        checked={formData.allowSecondary}
-                        onCheckedChange={(checked) => setFormData({ ...formData, allowSecondary: checked })}
-                      />
-                    </div>
+                     <div className="flex items-center justify-between">
+                       <div className="space-y-0.5">
+                         <div className="flex items-center">
+                           <Label className="text-gray-700 font-medium">Allow Secondary Trading</Label>
+                           <InfoTooltip content="Allow participants to trade shares with each other during the game" />
+                         </div>
+                         <p className="text-sm text-gray-600">
+                           Players can buy and sell shares from each other
+                         </p>
+                       </div>
+                       <Switch
+                         checked={formData.allowSecondary}
+                         onCheckedChange={(checked) => setFormData({ ...formData, allowSecondary: checked })}
+                       />
+                     </div>
 
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label>Public Leaderboards</Label>
-                        <p className="text-sm text-gray-600">
-                          Show rankings publicly during the game
-                        </p>
-                      </div>
-                      <Switch
-                        checked={formData.showPublicLeaderboards}
-                        onCheckedChange={(checked) => setFormData({ ...formData, showPublicLeaderboards: checked })}
-                      />
-                    </div>
+                     <div className="flex items-center justify-between">
+                       <div className="space-y-0.5">
+                         <Label className="text-gray-700 font-medium">Public Leaderboards</Label>
+                         <p className="text-sm text-gray-600">
+                           Show rankings publicly during the game
+                         </p>
+                       </div>
+                       <Switch
+                         checked={formData.showPublicLeaderboards}
+                         onCheckedChange={(checked) => setFormData({ ...formData, showPublicLeaderboards: checked })}
+                       />
+                     </div>
 
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label>Private Leaderboards</Label>
-                        <p className="text-sm text-gray-600">
-                          Show rankings to participants only
-                        </p>
-                      </div>
-                      <Switch
-                        checked={formData.showPrivateLeaderboards}
-                        onCheckedChange={(checked) => setFormData({ ...formData, showPrivateLeaderboards: checked })}
-                      />
-                    </div>
+                     <div className="flex items-center justify-between">
+                       <div className="space-y-0.5">
+                         <Label className="text-gray-700 font-medium">Private Leaderboards</Label>
+                         <p className="text-sm text-gray-600">
+                           Show rankings to participants only
+                         </p>
+                       </div>
+                       <Switch
+                         checked={formData.showPrivateLeaderboards}
+                         onCheckedChange={(checked) => setFormData({ ...formData, showPrivateLeaderboards: checked })}
+                       />
+                     </div>
 
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <div className="flex items-center">
-                          <Label>Circuit Breaker</Label>
-                          <InfoTooltip content="Pauses trading temporarily if stock prices fluctuate too much." />
-                        </div>
-                        <p className="text-sm text-gray-600">
-                          Pause trading if prices change by ±{formData.circuitBreakerPercent}%
-                        </p>
-                      </div>
-                      <Switch
-                        checked={formData.circuitBreaker}
-                        onCheckedChange={(checked) => setFormData({ ...formData, circuitBreaker: checked })}
-                      />
-                    </div>
+                     <div className="flex items-center justify-between">
+                       <div className="space-y-0.5">
+                         <div className="flex items-center">
+                           <Label className="text-gray-700 font-medium">Circuit Breaker</Label>
+                           <InfoTooltip content="Pauses trading temporarily if stock prices fluctuate too much." />
+                         </div>
+                         <p className="text-sm text-gray-600">
+                           Pause trading if prices change by ±{formData.circuitBreakerPercent}%
+                         </p>
+                       </div>
+                       <Switch
+                         checked={formData.circuitBreaker}
+                         onCheckedChange={(checked) => setFormData({ ...formData, circuitBreaker: checked })}
+                       />
+                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="maxPrice">Max Price Per Share</Label>
-                        <Input
-                          id="maxPrice"
-                          type="number"
-                          value={formData.maxPricePerShare}
-                          onChange={(e) => setFormData({ ...formData, maxPricePerShare: Number(e.target.value) })}
-                          min="1"
-                          step="0.01"
-                          className="h-12 bg-white border-gray-200 text-gray-700"
-                        />
-                      </div>
+                     <div className="grid grid-cols-2 gap-4">
+                       <div>
+                         <Label htmlFor="maxPrice" className="text-gray-700 font-medium">Max Price Per Share</Label>
+                         <Input
+                           id="maxPrice"
+                           type="number"
+                           value={formData.maxPricePerShare}
+                           onChange={(e) => setFormData({ ...formData, maxPricePerShare: Number(e.target.value) })}
+                           min="1"
+                           step="0.01"
+                           className="h-12 bg-white border-gray-300 text-gray-700 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+                         />
+                       </div>
 
-                      <div>
-                        <Label htmlFor="initialPrice">Initial Share Price</Label>
-                        <Input
-                          id="initialPrice"
-                          type="number"
-                          value={formData.initialSharePrice}
-                          onChange={(e) => setFormData({ ...formData, initialSharePrice: Number(e.target.value) })}
-                          min="0.01"
-                          step="0.01"
-                          className="h-12 bg-white border-gray-200 text-gray-700"
-                        />
-                      </div>
-                    </div>
+                       <div>
+                         <Label htmlFor="initialPrice" className="text-gray-700 font-medium">Initial Share Price</Label>
+                         <Input
+                           id="initialPrice"
+                           type="number"
+                           value={formData.initialSharePrice}
+                           onChange={(e) => setFormData({ ...formData, initialSharePrice: Number(e.target.value) })}
+                           min="0.01"
+                           step="0.01"
+                           className="h-12 bg-white border-gray-300 text-gray-700 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+                         />
+                       </div>
+                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <div className="flex items-center">
-                          <Label>Voting / Investment Mode</Label>
-                          <InfoTooltip content="Choose how participants invest: real-looking virtual money, points system, or a mix of both" />
-                        </div>
-                        <Select
-                          value={formData.votingMode}
-                          onValueChange={(value) => setFormData({ ...formData, votingMode: value })}
-                        >
-                          <SelectTrigger className="h-12 bg-white border-gray-200 text-gray-700">
-                            <SelectValue />
-                          </SelectTrigger>
+                     <div className="grid grid-cols-2 gap-4">
+                       <div>
+                         <div className="flex items-center">
+                           <Label className="text-gray-700 font-medium">Voting / Investment Mode</Label>
+                           <InfoTooltip content="Choose how participants invest: real-looking virtual money, points system, or a mix of both" />
+                         </div>
+                         <Select
+                           value={formData.votingMode}
+                           onValueChange={(value) => setFormData({ ...formData, votingMode: value })}
+                         >
+                           <SelectTrigger className="h-12 bg-white border-gray-300 text-gray-700">
+                             <SelectValue />
+                           </SelectTrigger>
+                           <SelectContent>
+                             {VOTING_MODES.map((mode) => (
+                               <SelectItem key={mode.value} value={mode.value}>
+                                 {mode.label}
+                               </SelectItem>
+                             ))}
+                           </SelectContent>
+                         </Select>
+                       </div>
+
+                       <div>
+                         <div className="flex items-center">
+                           <Label className="text-gray-700 font-medium">Reward System</Label>
+                           <InfoTooltip content="How winners will be rewarded: no rewards, manual distribution by organizer, or integrated with prize platform" />
+                         </div>
+                         <Select
+                           value={formData.rewardSystem}
+                           onValueChange={(value) => setFormData({ ...formData, rewardSystem: value })}
+                         >
+                           <SelectTrigger className="h-12 bg-white border-gray-300 text-gray-700">
+                             <SelectValue />
+                           </SelectTrigger>
                           <SelectContent>
                             {VOTING_MODES.map((mode) => (
                               <SelectItem key={mode.value} value={mode.value}>
