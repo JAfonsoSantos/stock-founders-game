@@ -143,6 +143,7 @@ export default function CreateGame() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<"template" | "form">("template");
+  const [howItWorksOpen, setHowItWorksOpen] = useState(true);
   const [selectedTemplate, setSelectedTemplate] = useState<string>("");
 
   const today = new Date();
@@ -351,8 +352,8 @@ export default function CreateGame() {
             <h1 className="text-2xl font-bold text-gray-900">Create New Game</h1>
             <p className="text-gray-600 mt-2">Choose a template to get started</p>
           </div>
-          <div className="max-w-6xl mx-auto">
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {GAME_TEMPLATES.map((template) => {
                 const IconComponent = template.icon;
                 return (
@@ -404,10 +405,70 @@ export default function CreateGame() {
               {GAME_TEMPLATES.find(t => t.value === selectedTemplate)?.label || "Custom Game"}
             </p>
           </div>
-          <div className="max-w-4xl mx-auto">
+          
+          <div className="max-w-7xl mx-auto">
+            {/* How it works - Collapsible */}
+            <Card className="bg-[#f9f9f9] border-gray-200 shadow-sm mb-6">
+              <CardHeader 
+                className="cursor-pointer" 
+                onClick={() => setHowItWorksOpen(!howItWorksOpen)}
+              >
+                <CardTitle className="text-gray-900 flex items-center justify-between">
+                  <span className="flex items-center">
+                    📘 How it works
+                  </span>
+                  <div className={`transition-transform ${howItWorksOpen ? 'rotate-180' : ''}`}>
+                    ▼
+                  </div>
+                </CardTitle>
+              </CardHeader>
+              {howItWorksOpen && (
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <div>
+                      <h4 className="font-semibold text-gray-900 mb-1">1️⃣ Pre-Market Phase</h4>
+                      <ul className="text-sm text-gray-600 space-y-1">
+                        <li>• After creating the game, all players are notified.</li>
+                        <li>• Players can create their projects/startups/ideas.</li>
+                        <li>• Trading is locked (no buy/sell yet).</li>
+                      </ul>
+                    </div>
+                    
+                    <div>
+                      <h4 className="font-semibold text-gray-900 mb-1">2️⃣ Open Market</h4>
+                      <ul className="text-sm text-gray-600 space-y-1">
+                        <li>• On Start Date & Time → trading opens.</li>
+                        <li>• Players can pitch, buy and sell shares.</li>
+                        <li>• Valuations and leaderboards update in real time.</li>
+                      </ul>
+                    </div>
+                    
+                    <div>
+                      <h4 className="font-semibold text-gray-900 mb-1">3️⃣ Market Close</h4>
+                      <ul className="text-sm text-gray-600 space-y-1">
+                        <li>• On End Date & Time → trading stops.</li>
+                        <li>• Winners are announced:</li>
+                      </ul>
+                      <div className="ml-4 mt-2 space-y-1 text-sm text-gray-600">
+                        <div>🏆 Most Valued Startup</div>
+                        <div>💰 Best Investor (highest portfolio gain)</div>
+                        <div>🔄 Most Active Trader</div>
+                        <div>🚀 Rising Star (fastest growth)</div>
+                        <div>⭐ People's Choice (most unique investors)</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white rounded-lg p-3 mt-4 border border-gray-200">
+                    <p className="text-sm text-gray-600">
+                      ℹ️ <strong>Note:</strong> You can customize winners, rewards, and categories later.
+                    </p>
+                  </div>
+                </CardContent>
+              )}
+            </Card>
 
-            <div className="grid lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 space-y-6">
+            <div className="space-y-6">
                 {/* Event Details */}
                 <Card className="bg-white border-gray-200 shadow-sm">
                   <CardHeader>
@@ -892,82 +953,28 @@ export default function CreateGame() {
                       </div>
                     </div>
                   </CardContent>
-                </Card>
-              </div>
-
-              {/* Sidebar - How it works */}
-              <div className="lg:col-span-1">
-                <Card className="bg-[#f9f9f9] border-gray-200 shadow-sm sticky top-6">
-                  <CardHeader>
-                    <CardTitle className="text-gray-900 flex items-center">
-                      📘 How it works
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-3">
-                      <div>
-                        <h4 className="font-semibold text-gray-900 mb-1">1️⃣ Pre-Market Phase</h4>
-                        <ul className="text-sm text-gray-600 space-y-1">
-                          <li>• After creating the game, all players are notified.</li>
-                          <li>• Players can create their projects/startups/ideas.</li>
-                          <li>• Trading is locked (no buy/sell yet).</li>
-                        </ul>
+                 </Card>
+               
+                {/* Create Game Button */}
+                <div className="mt-8">
+                  <Card className="bg-white border-gray-200 shadow-sm">
+                    <CardContent className="pt-6 space-y-4">
+                      <div className="flex items-center space-x-2 mb-4">
+                        <Info className="h-4 w-4 text-blue-600" />
+                        <p className="text-sm text-gray-600">
+                          <strong>Don't worry</strong> — you can edit all game settings until the game starts.
+                        </p>
                       </div>
-                      
-                      <div>
-                        <h4 className="font-semibold text-gray-900 mb-1">2️⃣ Open Market</h4>
-                        <ul className="text-sm text-gray-600 space-y-1">
-                          <li>• On Start Date & Time → trading opens.</li>
-                          <li>• Players can pitch, buy and sell shares.</li>
-                          <li>• Valuations and leaderboards update in real time.</li>
-                        </ul>
-                      </div>
-                      
-                      <div>
-                        <h4 className="font-semibold text-gray-900 mb-1">3️⃣ Market Close</h4>
-                        <ul className="text-sm text-gray-600 space-y-1">
-                          <li>• On End Date & Time → trading stops.</li>
-                          <li>• Winners are announced:</li>
-                        </ul>
-                        <div className="ml-4 mt-2 space-y-1 text-sm text-gray-600">
-                          <div>🏆 Most Valued Startup</div>
-                          <div>💰 Best Investor (highest portfolio gain)</div>
-                          <div>🔄 Most Active Trader</div>
-                          <div>🚀 Rising Star (fastest growth)</div>
-                          <div>⭐ People's Choice (most unique investors)</div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="bg-white rounded-lg p-3 mt-4 border border-gray-200">
-                      <p className="text-sm text-gray-600">
-                        ℹ️ <strong>Note:</strong> You can customize winners, rewards, and categories later.
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-
-            {/* Create Game Button */}
-            <div className="mt-8">
-              <Card className="bg-white border-gray-200 shadow-sm">
-                <CardContent className="pt-6 space-y-4">
-                  <div className="flex items-center space-x-2 mb-4">
-                    <Info className="h-4 w-4 text-blue-600" />
-                    <p className="text-sm text-gray-600">
-                      <strong>Don't worry</strong> — you can edit all game settings until the game starts.
-                    </p>
-                  </div>
-                  <Button 
-                    onClick={handleSubmit}
-                    className="w-full h-14 bg-[#FF6B35] hover:bg-[#E55A2B] text-white font-semibold text-lg" 
-                    disabled={loading}
-                  >
-                    {loading ? "Creating Game..." : "Create Game"}
-                  </Button>
-                </CardContent>
-              </Card>
+                      <Button 
+                        onClick={handleSubmit}
+                        className="w-full h-14 bg-[#FF6B35] hover:bg-[#E55A2B] text-white font-semibold text-lg" 
+                        disabled={loading}
+                      >
+                        {loading ? "Creating Game..." : "Create Game"}
+                      </Button>
+                    </CardContent>
+                  </Card>
+                 </div>
             </div>
           </div>
         </div>
