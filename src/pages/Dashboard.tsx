@@ -294,7 +294,7 @@ export default function Dashboard() {
                       Create New Game
                     </Button>
                     <Button 
-                      variant="outline" 
+                      variant="surface" 
                       onClick={createDemoGame}
                       size="lg"
                     >
@@ -330,7 +330,7 @@ export default function Dashboard() {
                 </div>
                 <h3 className="font-semibold text-gray-900 mb-2">Startup Pitch Day</h3>
                 <p className="text-sm text-gray-600 mb-4">Perfect for startup events and pitch competitions with multiple founders presenting.</p>
-                <Button variant="outline" className="w-full">
+                <Button variant="surface" className="w-full">
                   Use Template
                 </Button>
               </CardContent>
@@ -346,7 +346,7 @@ export default function Dashboard() {
                 </div>
                 <h3 className="font-semibold text-gray-900 mb-2">VC Investment Simulation</h3>
                 <p className="text-sm text-gray-600 mb-4">Designed for investor events with angel investors and VCs evaluating opportunities.</p>
-                <Button variant="outline" className="w-full">
+                <Button variant="surface" className="w-full">
                   Use Template
                 </Button>
               </CardContent>
@@ -361,7 +361,7 @@ export default function Dashboard() {
                 </div>
                 <h3 className="font-semibold text-gray-900 mb-2">Innovation Challenge</h3>
                 <p className="text-sm text-gray-600 mb-4">Corporate innovation challenges with multiple teams competing for investment.</p>
-                <Button variant="outline" className="w-full">
+                <Button variant="surface" className="w-full">
                   Use Template
                 </Button>
               </CardContent>
@@ -418,7 +418,7 @@ export default function Dashboard() {
                         <Plus className="h-4 w-4 mr-2" />
                         Create Game
                       </Button>
-                      <Button variant="outline" onClick={createDemoGame}>
+                      <Button variant="surface" onClick={createDemoGame}>
                         <Sparkles className="h-4 w-4 mr-2" />
                         Try Demo
                       </Button>
