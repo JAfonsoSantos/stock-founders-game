@@ -272,26 +272,117 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold mb-2 text-gray-900">
-            Welcome back! 👋
-          </h2>
-          <p className="text-gray-600 mb-4">
-            Manage your games and track your investments in the startup ecosystem
-          </p>
-          
-          {ownedGames.length === 0 && participations.length === 0 && (
+        {/* Hero Section */}
+        <div className="mb-12">
+          <Card className="bg-white border-gray-200 shadow-sm">
+            <CardContent className="p-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                <div>
+                  <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+                    Build your startup investment portfolio
+                  </h1>
+                  <p className="text-lg text-gray-600 mb-6">
+                    Create games, discover startups, and simulate investment strategies in a realistic market environment.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Button 
+                      onClick={() => navigate("/games/new")} 
+                      className="bg-[#FF6B35] hover:bg-[#E55A2B] text-white px-6 py-3"
+                      size="lg"
+                    >
+                      <Plus className="h-5 w-5 mr-2" />
+                      Create New Game
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={createDemoGame}
+                      className="border-gray-200 text-gray-700 hover:bg-gray-50 px-6 py-3"
+                      size="lg"
+                    >
+                      <Play className="h-5 w-5 mr-2" />
+                      Try Demo Game
+                    </Button>
+                  </div>
+                </div>
+                <div className="hidden lg:block">
+                  <div className="bg-gradient-to-br from-orange-100 to-orange-50 rounded-xl p-6 h-64 flex items-center justify-center">
+                    <div className="text-center">
+                      <TrendingUp className="h-16 w-16 text-orange-600 mx-auto mb-4" />
+                      <p className="text-gray-600 font-medium">Investment Simulation Platform</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Templates Section */}
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Start with a popular template</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card className="bg-white border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <Users className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">Popular</span>
+                </div>
+                <h3 className="font-semibold text-gray-900 mb-2">Startup Pitch Day</h3>
+                <p className="text-sm text-gray-600 mb-4">Perfect for startup events and pitch competitions with multiple founders presenting.</p>
+                <Button variant="outline" className="w-full border-gray-200 text-gray-700 hover:bg-gray-50">
+                  Use Template
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <Crown className="h-6 w-6 text-purple-600" />
+                  </div>
+                  <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full font-medium">New</span>
+                </div>
+                <h3 className="font-semibold text-gray-900 mb-2">VC Investment Simulation</h3>
+                <p className="text-sm text-gray-600 mb-4">Designed for investor events with angel investors and VCs evaluating opportunities.</p>
+                <Button variant="outline" className="w-full border-gray-200 text-gray-700 hover:bg-gray-50">
+                  Use Template
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                    <Sparkles className="h-6 w-6 text-green-600" />
+                  </div>
+                </div>
+                <h3 className="font-semibold text-gray-900 mb-2">Innovation Challenge</h3>
+                <p className="text-sm text-gray-600 mb-4">Corporate innovation challenges with multiple teams competing for investment.</p>
+                <Button variant="outline" className="w-full border-gray-200 text-gray-700 hover:bg-gray-50">
+                  Use Template
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Welcome Message for Empty State */}
+        {ownedGames.length === 0 && participations.length === 0 && (
+          <div className="mb-8">
             <Card className="bg-gradient-to-r from-orange-50 to-orange-100 border-orange-200 shadow-sm">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-semibold mb-2 flex items-center text-gray-900">
                       <Crown className="h-5 w-5 mr-2 text-orange-600" />
-                      Try our Demo Game!
+                      Get Started with Demo Data
                     </h4>
                     <p className="text-sm text-gray-600">
-                      Experience the full Stox with pre-configured startups and demo data.
+                      Experience the full platform with pre-configured startups and demo data.
                     </p>
                   </div>
                   <Button onClick={createDemoGame} className="shrink-0 bg-[#FF6B35] hover:bg-[#E55A2B] text-white">
@@ -301,8 +392,8 @@ export default function Dashboard() {
                 </div>
               </CardContent>
             </Card>
-          )}
-        </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Owned Games */}
