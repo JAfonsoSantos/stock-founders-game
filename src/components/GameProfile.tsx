@@ -177,10 +177,10 @@ export function GameProfile({
               )}
             </div>
             <div className="pb-2">
-              <h1 className="text-3xl font-bold text-background drop-shadow-lg">
+              <h1 className="text-3xl font-bold text-white drop-shadow-lg">
                 {gameData.name}
               </h1>
-              <p className="text-background/90 font-medium drop-shadow">
+              <p className="text-white/90 font-medium drop-shadow">
                 Investment Game
               </p>
             </div>
@@ -212,13 +212,13 @@ export function GameProfile({
           
           <div className="flex gap-2">
             {isPreview && onCreateGame && (
-              <Button onClick={onCreateGame} className="bg-primary text-primary-foreground">
+              <Button onClick={onCreateGame} className="bg-orange-500 hover:bg-orange-600 text-white">
                 <Play className="h-4 w-4 mr-2" />
                 Create Game
               </Button>
             )}
             {!isPreview && onJoinGame && (
-              <Button onClick={onJoinGame} className="bg-primary text-primary-foreground">
+              <Button onClick={onJoinGame} className="bg-orange-500 hover:bg-orange-600 text-white">
                 Join Game
               </Button>
             )}
