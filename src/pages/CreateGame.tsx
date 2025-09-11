@@ -847,78 +847,103 @@ export default function CreateGame() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                       <div>
-                         <Label htmlFor="founderBudget" className="text-gray-700 font-medium">{getTemplateLabels().primary} Budget</Label>
-                         <Input
-                           id="founderBudget"
-                           type="number"
-                           value={budgets.founder}
-                           onChange={(e) => setBudgets({ ...budgets, founder: Number(e.target.value) })}
-                           min="0"
-                           className="h-12 bg-white border-gray-300 text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
-                         />
-                         <p className="text-xs text-gray-600 mt-1">
-                           {formatBudget(budgets.founder)}
-                         </p>
-                       </div>
-                       <div>
-                         <Label htmlFor="angelBudget" className="text-gray-700 font-medium">Angel Budget</Label>
-                         <Input
-                           id="angelBudget"
-                           type="number"
-                           value={budgets.angel}
-                           onChange={(e) => setBudgets({ ...budgets, angel: Number(e.target.value) })}
-                           min="0"
-                           className="h-12 bg-white border-gray-300 text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
-                         />
-                         <p className="text-xs text-gray-600 mt-1">
-                           {formatBudget(budgets.angel)}
-                         </p>
-                       </div>
-                       <div>
-                         <Label htmlFor="vcBudget" className="text-gray-700 font-medium">VC Budget</Label>
-                         <Input
-                           id="vcBudget"
-                           type="number"
-                           value={budgets.vc}
-                           onChange={(e) => setBudgets({ ...budgets, vc: Number(e.target.value) })}
-                           min="0"
-                           className="h-12 bg-white border-gray-300 text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
-                         />
-                         <p className="text-xs text-gray-600 mt-1">
-                           {formatBudget(budgets.vc)}
-                         </p>
-                       </div>
-                       <div>
-                         <Label htmlFor="teamBudget" className="text-gray-700 font-medium">{getTemplateLabels().secondary} Budget</Label>
-                         <Input
-                           id="teamBudget"
-                           type="number"
-                           value={budgets.team}
-                           onChange={(e) => setBudgets({ ...budgets, team: Number(e.target.value) })}
-                           min="0"
-                           className="h-12 bg-white border-gray-300 text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
-                         />
-                         <p className="text-xs text-gray-600 mt-1">
-                           {formatBudget(budgets.team)}
-                         </p>
-                       </div>
-                       <div>
-                         <Label htmlFor="investorBudget" className="text-gray-700 font-medium">Investor Budget</Label>
-                         <Input
-                           id="investorBudget"
-                           type="number"
-                           value={budgets.investor}
-                           onChange={(e) => setBudgets({ ...budgets, investor: Number(e.target.value) })}
-                           min="0"
-                           className="h-12 bg-white border-gray-300 text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
-                         />
-                         <p className="text-xs text-gray-600 mt-1">
-                           {formatBudget(budgets.investor)}
-                         </p>
-                       </div>
-                     </div>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <div>
+                          <Label htmlFor="founderBudget" className="text-gray-700 font-medium">{getTemplateLabels().primary} Budget</Label>
+                          <div className="relative">
+                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm font-medium">
+                              {getCurrencySymbol()}
+                            </span>
+                            <Input
+                              id="founderBudget"
+                              type="number"
+                              value={budgets.founder}
+                              onChange={(e) => setBudgets({ ...budgets, founder: Number(e.target.value) })}
+                              min="0"
+                              className="h-12 bg-white border-gray-300 text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 pl-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-inner-spin-button]:opacity-100 [&::-webkit-outer-spin-button]:opacity-100"
+                              style={{
+                                MozAppearance: 'textfield'
+                              }}
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <Label htmlFor="angelBudget" className="text-gray-700 font-medium">Angel Budget</Label>
+                          <div className="relative">
+                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm font-medium">
+                              {getCurrencySymbol()}
+                            </span>
+                            <Input
+                              id="angelBudget"
+                              type="number"
+                              value={budgets.angel}
+                              onChange={(e) => setBudgets({ ...budgets, angel: Number(e.target.value) })}
+                              min="0"
+                              className="h-12 bg-white border-gray-300 text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 pl-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-inner-spin-button]:opacity-100 [&::-webkit-outer-spin-button]:opacity-100"
+                              style={{
+                                MozAppearance: 'textfield'
+                              }}
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <Label htmlFor="vcBudget" className="text-gray-700 font-medium">VC Budget</Label>
+                          <div className="relative">
+                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm font-medium">
+                              {getCurrencySymbol()}
+                            </span>
+                            <Input
+                              id="vcBudget"
+                              type="number"
+                              value={budgets.vc}
+                              onChange={(e) => setBudgets({ ...budgets, vc: Number(e.target.value) })}
+                              min="0"
+                              className="h-12 bg-white border-gray-300 text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 pl-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-inner-spin-button]:opacity-100 [&::-webkit-outer-spin-button]:opacity-100"
+                              style={{
+                                MozAppearance: 'textfield'
+                              }}
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <Label htmlFor="teamBudget" className="text-gray-700 font-medium">{getTemplateLabels().secondary} Budget</Label>
+                          <div className="relative">
+                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm font-medium">
+                              {getCurrencySymbol()}
+                            </span>
+                            <Input
+                              id="teamBudget"
+                              type="number"
+                              value={budgets.team}
+                              onChange={(e) => setBudgets({ ...budgets, team: Number(e.target.value) })}
+                              min="0"
+                              className="h-12 bg-white border-gray-300 text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 pl-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-inner-spin-button]:opacity-100 [&::-webkit-outer-spin-button]:opacity-100"
+                              style={{
+                                MozAppearance: 'textfield'
+                              }}
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <Label htmlFor="investorBudget" className="text-gray-700 font-medium">Investor Budget</Label>
+                          <div className="relative">
+                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm font-medium">
+                              {getCurrencySymbol()}
+                            </span>
+                            <Input
+                              id="investorBudget"
+                              type="number"
+                              value={budgets.investor}
+                              onChange={(e) => setBudgets({ ...budgets, investor: Number(e.target.value) })}
+                              min="0"
+                              className="h-12 bg-white border-gray-300 text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 pl-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-inner-spin-button]:opacity-100 [&::-webkit-outer-spin-button]:opacity-100"
+                              style={{
+                                MozAppearance: 'textfield'
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </div>
                   </CardContent>
                 </Card>
 
