@@ -229,7 +229,7 @@ export function GameProfile({
         {gameData.description && (
           <Card className="bg-white shadow-md border border-gray-200">
             <CardContent className="pt-6">
-              <p className="text-muted-foreground leading-relaxed">
+              <p className="text-gray-600 leading-relaxed">
                 {gameData.description}
               </p>
             </CardContent>
@@ -248,7 +248,7 @@ export function GameProfile({
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
+                <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
                   <Clock className="h-4 w-4" />
                   Starts
                 </div>
@@ -256,7 +256,7 @@ export function GameProfile({
               </div>
               <Separator />
               <div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
+                <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
                   <Clock className="h-4 w-4" />
                   Ends
                 </div>
@@ -264,7 +264,7 @@ export function GameProfile({
               </div>
               <Separator />
               <div>
-                <div className="text-sm text-muted-foreground mb-1">Duration</div>
+                <div className="text-sm text-gray-600 mb-1">Duration</div>
                 <p className="font-medium">{getDuration()}</p>
               </div>
             </CardContent>
@@ -280,7 +280,7 @@ export function GameProfile({
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Currency</span>
+                <span className="text-sm text-gray-600">Currency</span>
                 <div className="flex items-center gap-1">
                   <DollarSign className="h-4 w-4" />
                   <span className="font-medium">{gameData.currency}</span>
@@ -288,7 +288,7 @@ export function GameProfile({
               </div>
               <Separator />
               <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Language</span>
+                <span className="text-sm text-gray-600">Language</span>
                 <div className="flex items-center gap-1">
                   <Globe className="h-4 w-4" />
                   <span className="font-medium">{gameData.locale.toUpperCase()}</span>
@@ -296,24 +296,24 @@ export function GameProfile({
               </div>
               <Separator />
               <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Secondary Trading</span>
-                <Badge variant={gameData.allow_secondary ? "default" : "secondary"}>
+                <span className="text-sm text-gray-600">Secondary Trading</span>
+                <Badge variant={gameData.allow_secondary ? "default" : "secondary"} className={gameData.allow_secondary ? "bg-orange-500 text-white" : ""}>
                   {gameData.allow_secondary ? "Enabled" : "Disabled"}
                 </Badge>
               </div>
               <Separator />
               <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Public Leaderboards</span>
-                <Badge variant={gameData.show_public_leaderboards ? "default" : "secondary"}>
+                <span className="text-sm text-gray-600">Public Leaderboards</span>
+                <Badge variant={gameData.show_public_leaderboards ? "default" : "secondary"} className={gameData.show_public_leaderboards ? "bg-orange-500 text-white" : ""}>
                   {gameData.show_public_leaderboards ? "Public" : "Private"}
                 </Badge>
               </div>
               <Separator />
               <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Circuit Breaker</span>
+                <span className="text-sm text-gray-600">Circuit Breaker</span>
                 <div className="flex items-center gap-1">
                   <Zap className="h-4 w-4" />
-                  <Badge variant={gameData.circuit_breaker ? "default" : "secondary"}>
+                  <Badge variant={gameData.circuit_breaker ? "default" : "secondary"} className={gameData.circuit_breaker ? "bg-orange-500 text-white" : ""}>
                     {gameData.circuit_breaker ? "Active" : "Inactive"}
                   </Badge>
                 </div>
@@ -322,7 +322,7 @@ export function GameProfile({
                 <>
                   <Separator />
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Max Price Per Share</span>
+                    <span className="text-sm text-gray-600">Max Price Per Share</span>
                     <span className="font-medium">{formatCurrency(gameData.max_price_per_share)}</span>
                   </div>
                 </>
@@ -341,19 +341,19 @@ export function GameProfile({
           </CardHeader>
           <CardContent>
             <div className="grid md:grid-cols-3 gap-4">
-              <div className="text-center p-4 rounded-lg bg-muted/50">
+              <div className="text-center p-4 rounded-lg bg-white border border-gray-200 shadow-sm">
                 <Crown className="h-8 w-8 text-amber-500 mx-auto mb-2" />
-                <div className="text-sm text-muted-foreground mb-1">Founder</div>
+                <div className="text-sm text-gray-600 mb-1">Founder</div>
                 <div className="text-xl font-bold">{formatCurrency(gameData.default_budgets.founder)}</div>
               </div>
-              <div className="text-center p-4 rounded-lg bg-muted/50">
+              <div className="text-center p-4 rounded-lg bg-white border border-gray-200 shadow-sm">
                 <Shield className="h-8 w-8 text-blue-500 mx-auto mb-2" />
-                <div className="text-sm text-muted-foreground mb-1">Angel</div>
+                <div className="text-sm text-gray-600 mb-1">Angel</div>
                 <div className="text-xl font-bold">{formatCurrency(gameData.default_budgets.angel)}</div>
               </div>
-              <div className="text-center p-4 rounded-lg bg-muted/50">
+              <div className="text-center p-4 rounded-lg bg-white border border-gray-200 shadow-sm">
                 <Building className="h-8 w-8 text-emerald-500 mx-auto mb-2" />
-                <div className="text-sm text-muted-foreground mb-1">VC</div>
+                <div className="text-sm text-gray-600 mb-1">VC</div>
                 <div className="text-xl font-bold">{formatCurrency(gameData.default_budgets.vc)}</div>
               </div>
             </div>
@@ -379,7 +379,7 @@ export function GameProfile({
                 </Avatar>
                 <div>
                   <p className="font-medium">{gameData.organizer.name}</p>
-                  <p className="text-sm text-muted-foreground">Event Organizer</p>
+                  <p className="text-sm text-gray-600">Event Organizer</p>
                 </div>
               </div>
             </CardContent>
