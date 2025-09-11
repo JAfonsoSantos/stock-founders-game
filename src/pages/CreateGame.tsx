@@ -480,27 +480,52 @@ export default function CreateGame() {
                   <CardContent className="space-y-4">
                     <div>
                       <Label className="text-gray-700 font-medium">Selected Template</Label>
-                      <div className="p-3 bg-gray-50 rounded-lg border">
-                        <div className="flex items-center space-x-2">
-                          {(() => {
-                            const template = GAME_TEMPLATES.find(t => t.value === selectedTemplate);
-                            const IconComponent = template?.icon || Plus;
-                            return (
-                              <>
-                                <div className={`p-2 ${template?.colors?.iconBg || 'bg-gray-500'} rounded-lg`}>
-                                  <IconComponent className="h-5 w-5 text-white" />
+                      <Select
+                        value={selectedTemplate}
+                        onValueChange={(value) => applyTemplate(value)}
+                      >
+                        <SelectTrigger className="h-12 bg-white border-gray-300 text-gray-700">
+                          <SelectValue>
+                            {(() => {
+                              const template = GAME_TEMPLATES.find(t => t.value === selectedTemplate);
+                              const IconComponent = template?.icon || Plus;
+                              return (
+                                <div className="flex items-center space-x-2">
+                                  <div className={`p-1.5 ${template?.colors?.iconBg || 'bg-gray-500'} rounded-md`}>
+                                    <IconComponent className="h-4 w-4 text-white" />
+                                  </div>
+                                  <span className="font-medium">{template?.label || "Custom Game"}</span>
+                                  {template?.tag && (
+                                    <Badge variant="secondary" className="bg-orange-100 text-orange-700 text-xs">
+                                      {template.tag}
+                                    </Badge>
+                                  )}
                                 </div>
-                                <span className="font-medium text-gray-900">{template?.label || "Custom Game"}</span>
-                                {template?.tag && (
-                                  <Badge variant="secondary" className="bg-orange-100 text-orange-700">
-                                    {template.tag}
-                                  </Badge>
-                                )}
-                              </>
+                              );
+                            })()}
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                          {GAME_TEMPLATES.map((template) => {
+                            const IconComponent = template.icon;
+                            return (
+                              <SelectItem key={template.value} value={template.value}>
+                                <div className="flex items-center space-x-2">
+                                  <div className={`p-1.5 ${template.colors.iconBg} rounded-md`}>
+                                    <IconComponent className="h-4 w-4 text-white" />
+                                  </div>
+                                  <span className="font-medium">{template.label}</span>
+                                  {template.tag && (
+                                    <Badge variant="secondary" className="bg-orange-100 text-orange-700 text-xs ml-2">
+                                      {template.tag}
+                                    </Badge>
+                                  )}
+                                </div>
+                              </SelectItem>
                             );
-                          })()}
-                        </div>
-                      </div>
+                          })}
+                        </SelectContent>
+                      </Select>
                     </div>
 
                     <div>
