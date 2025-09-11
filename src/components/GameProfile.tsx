@@ -100,7 +100,7 @@ export function GameProfile({
       <div className="relative">
         {/* Background Image */}
         <div 
-          className="h-48 w-full bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600"
+          className="h-48 w-full bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600 group cursor-pointer relative"
           style={{
             backgroundImage: gameData.hero_image_url ? `url(${gameData.hero_image_url})` : undefined,
             backgroundSize: 'cover',
@@ -108,6 +108,20 @@ export function GameProfile({
           }}
         >
           <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+          
+          {/* Edit Cover Image Button */}
+          {isPreview && onEdit && (
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+              <Button
+                variant="secondary"
+                size="sm"
+                className="bg-background/90 text-foreground hover:bg-background"
+              >
+                <Edit className="h-4 w-4 mr-2" />
+                Edit cover image
+              </Button>
+            </div>
+          )}
         </div>
         
         {/* Header Controls */}
@@ -138,12 +152,27 @@ export function GameProfile({
         {/* Game Logo and Title */}
         <div className="absolute -bottom-12 left-6">
           <div className="flex items-end gap-4">
-            <Avatar className="h-24 w-24 border-4 border-background shadow-lg">
-              <AvatarImage src={gameData.logo_url} alt={gameData.name} />
-              <AvatarFallback className="text-2xl font-bold bg-primary text-primary-foreground">
-                {gameData.name.charAt(0).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
+            <div className="relative group">
+              <Avatar className="h-24 w-24 border-4 border-background shadow-lg cursor-pointer">
+                <AvatarImage src={gameData.logo_url} alt={gameData.name} />
+                <AvatarFallback className="text-2xl font-bold bg-primary text-primary-foreground">
+                  {gameData.name.charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              
+              {/* Edit Logo Button */}
+              {isPreview && onEdit && (
+                <div className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="bg-background/90 text-foreground hover:bg-background p-2 h-8 w-8"
+                  >
+                    <Edit className="h-3 w-3" />
+                  </Button>
+                </div>
+              )}
+            </div>
             <div className="pb-2">
               <h1 className="text-3xl font-bold text-background drop-shadow-lg">
                 {gameData.name}
