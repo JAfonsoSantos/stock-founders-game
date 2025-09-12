@@ -54,8 +54,8 @@ export function Step6PreviewCreate({ formData }: Step6Props) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2 text-foreground">Preview & Criar</h2>
-        <p className="text-foreground">Reveja os detalhes e crie o seu evento</p>
+        <h2 className="text-2xl font-bold mb-2 text-gray-700">Preview & Criar</h2>
+        <p className="text-gray-600">Reveja os detalhes e crie o seu evento</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

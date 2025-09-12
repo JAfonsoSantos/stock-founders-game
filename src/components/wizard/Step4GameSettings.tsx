@@ -48,14 +48,14 @@ export function Step4GameSettings({ formData, setFormData }: Step4Props) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2 text-foreground">Configurações do Jogo</h2>
-        <p className="text-foreground">Configure as regras e mecânicas do evento</p>
+        <h2 className="text-2xl font-bold mb-2 text-gray-700">Configurações do Jogo</h2>
+        <p className="text-gray-600">Configure as regras e mecânicas do evento</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-4">
           <div>
-            <Label>Idioma</Label>
+            <Label className="text-gray-600">Idioma</Label>
             <Select value={formData.language} onValueChange={(value) => setFormData(prev => ({ ...prev, language: value }))}>
               <SelectTrigger>
                 <SelectValue />

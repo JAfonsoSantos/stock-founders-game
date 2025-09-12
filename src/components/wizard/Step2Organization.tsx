@@ -36,13 +36,13 @@ export function Step2Organization({ formData, setFormData }: Step2Props) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2 text-foreground">Organização</h2>
-        <p className="text-foreground">Informações sobre a organização e equipa</p>
+        <h2 className="text-2xl font-bold mb-2 text-gray-700">Organização</h2>
+        <p className="text-gray-600">Informações sobre a organização e equipa</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <Label htmlFor="organizerName">Nome do Organizador *</Label>
+          <Label htmlFor="organizerName" className="text-gray-600">Nome do Organizador *</Label>
           <Input
             id="organizerName"
             value={formData.organizerName}
@@ -51,7 +51,7 @@ export function Step2Organization({ formData, setFormData }: Step2Props) {
           />
         </div>
         <div>
-          <Label htmlFor="organizerCompany">Empresa/Organização</Label>
+          <Label htmlFor="organizerCompany" className="text-gray-600">Empresa/Organização</Label>
           <Input
             id="organizerCompany"
             value={formData.organizerCompany}
@@ -62,7 +62,7 @@ export function Step2Organization({ formData, setFormData }: Step2Props) {
       </div>
 
       <div>
-        <Label htmlFor="eventWebsite">Website do Evento</Label>
+        <Label htmlFor="eventWebsite" className="text-gray-600">Website do Evento</Label>
         <Input
           id="eventWebsite"
           value={formData.eventWebsite}
@@ -73,7 +73,7 @@ export function Step2Organization({ formData, setFormData }: Step2Props) {
 
       <div>
         <div className="flex items-center justify-between mb-4">
-          <Label>Membros da Equipa</Label>
+          <Label className="text-gray-600">Membros da Equipa</Label>
           <Button type="button" variant="outline" size="sm" onClick={addTeamMember}>
             <Plus className="h-4 w-4 mr-2" />
             Adicionar Membro

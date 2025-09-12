@@ -49,8 +49,8 @@ export function Step5HowItWorks({ formData }: Step5Props) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2 text-foreground">Como Funciona</h2>
-        <p className="text-foreground">Visão geral do funcionamento do jogo</p>
+        <h2 className="text-2xl font-bold mb-2 text-gray-700">Como Funciona</h2>
+        <p className="text-gray-600">Visão geral do funcionamento do jogo</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

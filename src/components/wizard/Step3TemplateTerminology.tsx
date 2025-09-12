@@ -192,12 +192,12 @@ export function Step3TemplateTerminology({ formData, setFormData }: Step3Props) 
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2 text-foreground">Template & Terminologia</h2>
-        <p className="text-foreground">Escolha o tipo de evento e configure os termos</p>
+        <h2 className="text-2xl font-bold mb-2 text-gray-700">Template & Terminologia</h2>
+        <p className="text-gray-600">Escolha o tipo de evento e configure os termos</p>
       </div>
 
       <div>
-        <Label className="text-base font-semibold mb-4 block">Selecionar Template</Label>
+        <Label className="text-base font-semibold mb-4 block text-gray-600">Selecionar Template</Label>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {MACRO_TEMPLATES.map(template => {
             const IconComponent = template.icon;
@@ -238,7 +238,7 @@ export function Step3TemplateTerminology({ formData, setFormData }: Step3Props) 
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <Label htmlFor="assetSingular">Nome do Asset (singular) *</Label>
+              <Label htmlFor="assetSingular" className="text-gray-600">Nome do Asset (singular) *</Label>
               <Input
                 id="assetSingular"
                 value={formData.assetSingular}
@@ -247,7 +247,7 @@ export function Step3TemplateTerminology({ formData, setFormData }: Step3Props) 
               />
             </div>
             <div>
-              <Label htmlFor="assetPlural">Nome do Asset (plural) *</Label>
+              <Label htmlFor="assetPlural" className="text-gray-600">Nome do Asset (plural) *</Label>
               <Input
                 id="assetPlural"
                 value={formData.assetPlural}
@@ -259,7 +259,7 @@ export function Step3TemplateTerminology({ formData, setFormData }: Step3Props) 
 
           <div>
             <div className="flex items-center justify-between mb-4">
-              <Label className="text-base font-semibold">Roles dos Participantes</Label>
+              <Label className="text-base font-semibold text-gray-600">Roles dos Participantes</Label>
               <div className="space-x-2">
                 <Button type="button" size="sm" variant="outline" onClick={autoBalanceBudgets}>
                   <Wallet className="h-4 w-4 mr-2" />
