@@ -937,7 +937,7 @@ export default function CreateGame() {
                               onChange={(e) => setFormData({ ...formData, maxPricePerShare: Number(e.target.value) })}
                               min="1"
                               step="0.01"
-                              className="h-12 bg-white border-gray-300 text-gray-700 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 pl-8"
+                              className="h-12 !bg-white border-gray-300 text-gray-700 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 pl-8"
                             />
                           </div>
                         </div>
