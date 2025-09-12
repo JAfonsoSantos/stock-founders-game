@@ -523,7 +523,9 @@ export default function CreateGame() {
     return (
       <ImageEditor
         type={editingImageType}
-        onSave={(imageUrl: string) => {
+        onSave={(imageBlob: Blob) => {
+          // Convert blob to object URL for preview
+          const imageUrl = URL.createObjectURL(imageBlob);
           if (editingImageType === 'logo') {
             setFormData(prev => ({ ...prev, brandingLogo: imageUrl }));
           } else if (editingImageType === 'header') {
