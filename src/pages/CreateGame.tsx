@@ -139,6 +139,11 @@ export default function CreateGame() {
     // Event Description
     description: "",
 
+    // Organization
+    organizerName: profile?.first_name && profile?.last_name ? `${profile.first_name} ${profile.last_name}` : "",
+    organizerCompany: "",
+    eventWebsite: "",
+
     // Customization
     brandingLogo: "",
     profileHeader: "",
@@ -163,6 +168,7 @@ export default function CreateGame() {
     if (profile && formData.organizationTeam[0].isOwner) {
       setFormData(prev => ({
         ...prev,
+        organizerName: profile.first_name && profile.last_name ? `${profile.first_name} ${profile.last_name}` : prev.organizerName,
         organizationTeam: [
           {
             email: profile.email || user?.email || "",
@@ -200,15 +206,9 @@ export default function CreateGame() {
     return CURRENCIES.find(c => c.value === formData.currency)?.symbol || "$";
   };
 
-  const formatBudget = (amount: number) => {
-    const symbol = getCurrencySymbol();
-    if (amount >= 1000000) {
-      return `${symbol}${(amount / 1000000).toFixed(1)}M`;
-    } else if (amount >= 1000) {
-      return `${symbol}${(amount / 1000).toFixed(0)}K`;
-    } else {
-      return `${symbol}${amount}`;
-    }
+  const formatBudget = (amount: number, currency: string = formData.currency) => {
+    const symbol = CURRENCIES.find(c => c.value === currency)?.symbol || "$";
+    return `${symbol}${amount.toLocaleString()}`;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -615,40 +615,87 @@ export default function CreateGame() {
                 </CardContent>
               </Card>
 
-              {/* Organization Team */}
+              {/* Organization */}
               <Card className="bg-white border-gray-200 shadow-sm">
                 <CardHeader>
                   <CardTitle className="text-gray-900 flex items-center">
-                    <Users className="h-5 w-5 mr-2" />
-                    Organization Team
+                    <Building2 className="h-5 w-5 mr-2" />
+                    Organization
                   </CardTitle>
                   <CardDescription className="text-gray-600">
-                    Manage who has organizer access to this event
+                    Event organizer information and team management
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-3">
-                    {formData.organizationTeam.map((member, index) => (
-                      <div key={index} className={cn(
-                        "flex items-center space-x-4 p-4 rounded-lg border",
-                        member.isOwner ? "bg-orange-50 border-orange-200" : "bg-gray-50 border-gray-200"
-                      )}>
-                        {/* Avatar */}
-                        <div className="flex-shrink-0">
-                          <Avatar className="w-12 h-12">
-                            <AvatarImage src={member.avatar_url} alt={`${member.firstName} ${member.lastName}`} />
-                            <AvatarFallback className="bg-gradient-to-br from-orange-400 to-orange-600 text-white font-semibold text-lg">
-                              {member.firstName && member.lastName
-                                ? `${member.firstName[0]}${member.lastName[0]}`
-                                : member.email
-                                  ? member.email[0].toUpperCase()
-                                  : '?'}
-                            </AvatarFallback>
-                          </Avatar>
-                        </div>
+                <CardContent className="space-y-6">
+                  {/* Organizer Information */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-gray-700">
+                        Organizer Name
+                      </Label>
+                      <Input
+                        placeholder="Your name or primary organizer name"
+                        value={formData.organizerName}
+                        onChange={(e) => setFormData({ ...formData, organizerName: e.target.value })}
+                        className="bg-white border-gray-300 text-gray-900"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-gray-700">
+                        Company/Organization
+                      </Label>
+                      <Input
+                        placeholder="Your company or organization name"
+                        value={formData.organizerCompany}
+                        onChange={(e) => setFormData({ ...formData, organizerCompany: e.target.value })}
+                        className="bg-white border-gray-300 text-gray-900"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-700">
+                      Event Website
+                    </Label>
+                    <Input
+                      placeholder="https://your-event-website.com"
+                      value={formData.eventWebsite}
+                      onChange={(e) => setFormData({ ...formData, eventWebsite: e.target.value })}
+                      className="bg-white border-gray-300 text-gray-900"
+                    />
+                  </div>
 
-                        {/* Content */}
-                        <div className="flex-1 space-y-3">
+                  <Separator />
+
+                  {/* Team Management */}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-medium text-gray-900">Team Members</h4>
+                      <p className="text-sm text-gray-500">Manage organizer access</p>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      {formData.organizationTeam.map((member, index) => (
+                        <div key={index} className={cn(
+                          "flex items-center space-x-4 p-4 rounded-lg border",
+                          member.isOwner ? "bg-orange-50 border-orange-200" : "bg-gray-50 border-gray-200"
+                        )}>
+                          {/* Avatar */}
+                          <div className="flex-shrink-0">
+                            <Avatar className="w-12 h-12">
+                              <AvatarImage src={member.avatar_url} alt={`${member.firstName} ${member.lastName}`} />
+                              <AvatarFallback className="bg-gradient-to-br from-orange-400 to-orange-600 text-white font-semibold text-lg">
+                                {member.firstName && member.lastName
+                                  ? `${member.firstName[0]}${member.lastName[0]}`
+                                  : member.email
+                                    ? member.email[0].toUpperCase()
+                                    : '?'}
+                              </AvatarFallback>
+                            </Avatar>
+                          </div>
+
+                          {/* Content - keeping existing organization team functionality */}
+                          <div className="flex-1 space-y-3">
                           {/* Name and Role */}
                           <div className="flex items-center justify-between">
                             <div>
@@ -771,25 +818,159 @@ export default function CreateGame() {
                       </div>
                     ))}
 
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        const newTeam = [...formData.organizationTeam, {
-                          email: "",
-                          firstName: "",
-                          lastName: "",
-                          isOwner: false,
-                          status: 'pending' as 'pending' | 'sent' | 'active',
-                          avatar_url: ""
-                        }];
-                        setFormData({ ...formData, organizationTeam: newTeam });
-                      }}
-                      className="w-full"
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Team Member
-                    </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          const newTeam = [...formData.organizationTeam, {
+                            email: "",
+                            firstName: "",
+                            lastName: "",
+                            isOwner: false,
+                            status: 'pending' as 'pending' | 'sent' | 'active',
+                            avatar_url: ""
+                          }];
+                          setFormData({ ...formData, organizationTeam: newTeam });
+                        }}
+                        className="w-full"
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Team Member
+                      </Button>
+                    </div>
                   </div>
+                </CardContent>
+              </Card>
+
+              {/* How it Works */}
+              <Card className="bg-white border-gray-200 shadow-sm">
+                <CardHeader>
+                  <CardTitle className="text-gray-900 flex items-center">
+                    <Info className="h-5 w-5 mr-2" />
+                    How it Works
+                  </CardTitle>
+                  <CardDescription className="text-gray-600">
+                    Understanding the game mechanics and flow
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="space-y-2 p-4 border rounded-lg border-blue-200 bg-blue-50">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">1</div>
+                        <h4 className="font-medium text-blue-900">Setup</h4>
+                      </div>
+                      <p className="text-sm text-blue-800">Startups register with shares, participants get budgets</p>
+                    </div>
+                    <div className="space-y-2 p-4 border rounded-lg border-green-200 bg-green-50">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">2</div>
+                        <h4 className="font-medium text-green-900">Trading</h4>
+                      </div>
+                      <p className="text-sm text-green-800">Investors propose trades, founders accept/reject primary orders</p>
+                    </div>
+                    <div className="space-y-2 p-4 border rounded-lg border-purple-200 bg-purple-50">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-6 h-6 bg-purple-500 text-white rounded-full flex items-center justify-center text-sm font-bold">3</div>
+                        <h4 className="font-medium text-purple-900">Pricing</h4>
+                      </div>
+                      <p className="text-sm text-purple-800">VWAP of last 3 trades sets market price automatically</p>
+                    </div>
+                    <div className="space-y-2 p-4 border rounded-lg border-orange-200 bg-orange-50">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-6 h-6 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-bold">4</div>
+                        <h4 className="font-medium text-orange-900">Results</h4>
+                      </div>
+                      <p className="text-sm text-orange-800">Leaderboards show top startups and best-performing investors</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Default Budgets */}
+              <Card className="bg-white border-gray-200 shadow-sm">
+                <CardHeader>
+                  <CardTitle className="text-gray-900 flex items-center">
+                    <Wallet className="h-5 w-5 mr-2" />
+                    Default Budgets
+                  </CardTitle>
+                  <CardDescription className="text-gray-600">
+                    Set default budget amounts for each participant role
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {budgets.map((budget, index) => (
+                      <div key={budget.id} className="space-y-2">
+                        <Label className="text-sm font-medium text-gray-700 capitalize">
+                          {budget.label}
+                        </Label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
+                            {getCurrencySymbol()}
+                          </span>
+                          <Input
+                            type="number"
+                            value={budget.value}
+                            onChange={(e) => {
+                              const newBudgets = [...budgets];
+                              newBudgets[index].value = parseInt(e.target.value) || 0;
+                              setBudgets(newBudgets);
+                            }}
+                            className="bg-white border-gray-300 text-gray-900 pl-8"
+                            min="0"
+                            step="1000"
+                          />
+                        </div>
+                        <p className="text-xs text-gray-500">
+                          {formatBudget(budget.value, formData.currency)}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className="flex flex-wrap gap-2 pt-4">
+                    <p className="text-sm text-gray-600 mr-2">Add budget type:</p>
+                    {availableBudgetTypes
+                      .filter(type => !budgets.some(b => b.id === type.id))
+                      .map((type) => (
+                        <Button
+                          key={type.id}
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setBudgets([...budgets, { 
+                              id: type.id, 
+                              label: type.label, 
+                              value: 10000 
+                            }]);
+                          }}
+                          className="text-xs"
+                        >
+                          <Plus className="h-3 w-3 mr-1" />
+                          {type.label}
+                        </Button>
+                      ))}
+                  </div>
+                  
+                  {budgets.length > 3 && (
+                    <div className="flex flex-wrap gap-2 pt-2">
+                      <p className="text-sm text-gray-600 mr-2">Remove:</p>
+                      {budgets.slice(3).map((budget) => (
+                        <Button
+                          key={budget.id}
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setBudgets(budgets.filter(b => b.id !== budget.id));
+                          }}
+                          className="text-xs text-red-600 hover:text-red-800"
+                        >
+                          <X className="h-3 w-3 mr-1" />
+                          {budget.label}
+                        </Button>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
@@ -1000,11 +1181,14 @@ export default function CreateGame() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {[
                       { value: "unconference", label: "Unconference", icon: Users2 },
-                      { value: "startup_pitch", label: "Startup Pitch", icon: TrendingUp },
+                      { value: "hackathon", label: "Hackathon", icon: Lightbulb },
+                      { value: "charity", label: "Charity Event", icon: Heart },
+                      { value: "demo_day", label: "Demo Day", icon: Trophy },
                       { value: "networking", label: "Networking", icon: Handshake },
+                      { value: "custom", label: "Custom Event", icon: Plus },
                     ].map((type) => (
                       <button
                         key={type.value}
@@ -1040,17 +1224,47 @@ export default function CreateGame() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <Label className="text-sm font-medium text-gray-700">Color Theme</Label>
-                      <Select value={formData.colorTheme} onValueChange={(value) => setFormData({ ...formData, colorTheme: value })}>
-                        <SelectTrigger className="bg-white border-gray-300 text-gray-900">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="default">Default Orange</SelectItem>
-                          <SelectItem value="blue">Professional Blue</SelectItem>
-                          <SelectItem value="green">Success Green</SelectItem>
-                          <SelectItem value="purple">Creative Purple</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <div className="space-y-3">
+                        <Select value={formData.colorTheme} onValueChange={(value) => setFormData({ ...formData, colorTheme: value })}>
+                          <SelectTrigger className="bg-white border-gray-300 text-gray-900">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="default">Default Orange</SelectItem>
+                            <SelectItem value="blue">Professional Blue</SelectItem>
+                            <SelectItem value="green">Success Green</SelectItem>
+                            <SelectItem value="purple">Creative Purple</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        
+                        {/* Color Preview */}
+                        <div className="grid grid-cols-4 gap-2">
+                          {[
+                            { theme: 'default', colors: ['bg-orange-500', 'bg-orange-400', 'bg-orange-300'], name: 'Orange' },
+                            { theme: 'blue', colors: ['bg-blue-500', 'bg-blue-400', 'bg-blue-300'], name: 'Blue' },
+                            { theme: 'green', colors: ['bg-green-500', 'bg-green-400', 'bg-green-300'], name: 'Green' },
+                            { theme: 'purple', colors: ['bg-purple-500', 'bg-purple-400', 'bg-purple-300'], name: 'Purple' },
+                          ].map((colorSet) => (
+                            <div 
+                              key={colorSet.theme}
+                              className={cn(
+                                "p-2 rounded-lg border cursor-pointer transition-all",
+                                formData.colorTheme === colorSet.theme 
+                                  ? "border-gray-400 ring-2 ring-gray-300" 
+                                  : "border-gray-200 hover:border-gray-300"
+                              )}
+                              onClick={() => setFormData({ ...formData, colorTheme: colorSet.theme })}
+                            >
+                              <div className="flex space-x-1 mb-1">
+                                {colorSet.colors.map((color, index) => (
+                                  <div key={index} className={`w-3 h-3 rounded ${color}`} />
+                                ))}
+                              </div>
+                              <p className="text-xs text-gray-600 text-center">{colorSet.name}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                     
                     <div className="flex items-center justify-between">
