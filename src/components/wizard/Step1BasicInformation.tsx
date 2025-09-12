@@ -53,8 +53,8 @@ export function Step1BasicInformation({ formData, setFormData }: Step1Props) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2 text-foreground">Informações Básicas</h2>
-        <p className="text-foreground">Configure os detalhes principais do seu evento</p>
+        <h2 className="text-2xl font-bold mb-2 text-gray-700">Informações Básicas</h2>
+        <p className="text-gray-600">Configure os detalhes principais do seu evento</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -179,7 +179,7 @@ export function Step1BasicInformation({ formData, setFormData }: Step1Props) {
       </div>
 
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-foreground">Personalização</h3>
+        <h3 className="text-lg font-semibold text-gray-700">Personalização</h3>
         
         <div>
           <Label>Tema de Cores</Label>
@@ -191,7 +191,7 @@ export function Step1BasicInformation({ formData, setFormData }: Step1Props) {
               {COLOR_THEMES.map(theme => (
                 <SelectItem key={theme.id} value={theme.id} className="hover:bg-gray-50 focus:bg-gray-50">
                   <div className="flex items-center space-x-3 w-full">
-                    <span className="text-foreground">{theme.name}</span>
+                    <span className="text-gray-700">{theme.name}</span>
                     <div className="flex space-x-1 ml-auto">
                       {theme.colors.map((color, i) => (
                         <div key={i} className="w-4 h-4 rounded-full border border-gray-200" style={{ backgroundColor: color }} />

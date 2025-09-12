@@ -183,8 +183,8 @@ export default function CreateGame() {
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold text-foreground">Criar Novo Evento</h1>
-            <div className="text-sm text-foreground">
+            <h1 className="text-2xl font-bold text-gray-700">Criar Novo Evento</h1>
+            <div className="text-sm text-gray-600">
               Passo {currentStep} de {steps.length}
             </div>
           </div>
@@ -195,8 +195,8 @@ export default function CreateGame() {
                 <div className={cn(
                   "flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium",
                   currentStep === step.id ? "bg-primary text-primary-foreground" :
-                  currentStep > step.id ? "bg-green-600 text-foreground" :
-                  "bg-muted text-muted-foreground"
+                  currentStep > step.id ? "bg-green-600 text-white" :
+                  "bg-gray-300 text-gray-600"
                 )}>
                   {currentStep > step.id ? (
                     <Check className="h-4 w-4" />
@@ -216,7 +216,7 @@ export default function CreateGame() {
           
           <div className="flex items-center justify-between mt-2">
             {steps.map(step => (
-              <div key={step.id} className="text-xs text-foreground text-center" style={{ width: '12.5%' }}>
+              <div key={step.id} className="text-xs text-gray-600 text-center" style={{ width: '12.5%' }}>
                 {step.name}
               </div>
             ))}
