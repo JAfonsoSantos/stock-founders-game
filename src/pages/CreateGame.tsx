@@ -155,6 +155,7 @@ export default function CreateGame() {
     name: "",
     description: "",
     organizerName: "",
+    organizerWebsite: "",
     gameType: "custom",
     currency: "USD",
     locale: "en",
@@ -667,6 +668,18 @@ export default function CreateGame() {
                         value={formData.organizerName}
                         onChange={(e) => setFormData({ ...formData, organizerName: e.target.value })}
                         placeholder="e.g., TechCorp Inc."
+                        className="h-12 bg-white border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="website" className="text-gray-700">Website (Optional)</Label>
+                      <Input
+                        id="website"
+                        type="url"
+                        value={formData.organizerWebsite}
+                        onChange={(e) => setFormData({ ...formData, organizerWebsite: e.target.value })}
+                        placeholder="e.g., https://techcorp.com"
                         className="h-12 bg-white border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
                       />
                     </div>
