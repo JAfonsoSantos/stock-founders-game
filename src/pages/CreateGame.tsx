@@ -6,8 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { DatePicker } from "@/components/DatePicker";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -188,9 +187,6 @@ export default function CreateGame() {
     { id: 'angel', label: 'Angel Budget', value: 100000 },
     { id: 'vc', label: 'VC Budget', value: 1000000 },
   ]);
-
-  const [startDateOpen, setStartDateOpen] = useState(false);
-  const [endDateOpen, setEndDateOpen] = useState(false);
 
   const availableBudgetTypes = [
     { id: 'founder', label: 'Founder Budget' },
@@ -715,65 +711,25 @@ export default function CreateGame() {
                        </div>
                      </div>
 
-                     <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-2 gap-4">
                         <div>
                           <Label className="text-gray-700 font-medium">Start Date</Label>
-                          <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
-                            <PopoverTrigger asChild>
-                              <Button
-                                variant="outline"
-                                className={cn(
-                                  "w-full h-12 justify-start text-left font-normal bg-white border-gray-300 text-gray-700 hover:bg-gray-50",
-                                  !formData.startsAt && "text-gray-500"
-                                )}
-                              >
-                                <Calendar className="mr-2 h-4 w-4" />
-                                {formData.startsAt ? format(formData.startsAt, "PPP") : "Pick a date"}
-                              </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
-                              <Calendar
-                                mode="single"
-                                selected={formData.startsAt}
-                                onSelect={(date) => {
-                                  setFormData({ ...formData, startsAt: date || today });
-                                  setStartDateOpen(false);
-                                }}
-                                initialFocus
-                              />
-                            </PopoverContent>
-                          </Popover>
+                          <DatePicker
+                            date={formData.startsAt}
+                            onDateSelect={(date) => setFormData({ ...formData, startsAt: date })}
+                            placeholder="Pick start date"
+                          />
                         </div>
 
                         <div>
                           <Label className="text-gray-700 font-medium">End Date</Label>
-                          <Popover open={endDateOpen} onOpenChange={setEndDateOpen}>
-                            <PopoverTrigger asChild>
-                              <Button
-                                variant="outline"
-                                className={cn(
-                                  "w-full h-12 justify-start text-left font-normal bg-white border-gray-300 text-gray-700 hover:bg-gray-50",
-                                  !formData.endsAt && "text-gray-500"
-                                )}
-                              >
-                                <Calendar className="mr-2 h-4 w-4" />
-                                {formData.endsAt ? format(formData.endsAt, "PPP") : "Pick a date"}
-                              </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
-                              <Calendar
-                                mode="single"
-                                selected={formData.endsAt}
-                                onSelect={(date) => {
-                                  setFormData({ ...formData, endsAt: date || today });
-                                  setEndDateOpen(false);
-                                }}
-                                initialFocus
-                              />
-                            </PopoverContent>
-                          </Popover>
+                          <DatePicker
+                            date={formData.endsAt}
+                            onDateSelect={(date) => setFormData({ ...formData, endsAt: date })}
+                            placeholder="Pick end date"
+                          />
                         </div>
-                     </div>
+                      </div>
 
                      <div className="space-y-3">
                        <div className="flex items-center justify-between">
