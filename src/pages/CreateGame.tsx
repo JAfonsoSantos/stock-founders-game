@@ -791,6 +791,269 @@ export default function CreateGame() {
                 </CardContent>
               </Card>
 
+              {/* Event Dates & Times */}
+              <Card className="bg-white border-gray-200 shadow-sm">
+                <CardHeader>
+                  <CardTitle className="text-gray-900 flex items-center">
+                    <Calendar className="h-5 w-5 mr-2" />
+                    Event Dates & Times
+                  </CardTitle>
+                  <CardDescription className="text-gray-600">
+                    Set when your event will take place
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-gray-700">Start Date</Label>
+                      <DatePicker
+                        date={formData.startsAt}
+                        onDateSelect={(date) => setFormData({ ...formData, startsAt: date })}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-gray-700">End Date</Label>
+                      <DatePicker
+                        date={formData.endsAt}
+                        onDateSelect={(date) => setFormData({ ...formData, endsAt: date })}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      checked={formData.hasFixedTimes}
+                      onCheckedChange={(checked) => setFormData({ ...formData, hasFixedTimes: checked })}
+                    />
+                    <Label className="text-sm text-gray-700">Set specific start and end times</Label>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Game Configuration */}
+              <Card className="bg-white border-gray-200 shadow-sm">
+                <CardHeader>
+                  <CardTitle className="text-gray-900 flex items-center">
+                    <Settings className="h-5 w-5 mr-2" />
+                    Game Configuration
+                  </CardTitle>
+                  <CardDescription className="text-gray-600">
+                    Configure game mechanics and features
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <Label className="text-sm font-medium text-gray-700">Secondary Trading</Label>
+                          <p className="text-xs text-gray-500">Allow participants to trade shares with each other</p>
+                        </div>
+                        <Switch
+                          checked={formData.allowSecondary}
+                          onCheckedChange={(checked) => setFormData({ ...formData, allowSecondary: checked })}
+                        />
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <Label className="text-sm font-medium text-gray-700">Public Leaderboards</Label>
+                          <p className="text-xs text-gray-500">Show rankings publicly during the game</p>
+                        </div>
+                        <Switch
+                          checked={formData.showPublicLeaderboards}
+                          onCheckedChange={(checked) => setFormData({ ...formData, showPublicLeaderboards: checked })}
+                        />
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <Label className="text-sm font-medium text-gray-700">Circuit Breaker</Label>
+                          <p className="text-xs text-gray-500">Pause trading on extreme price movements</p>
+                        </div>
+                        <Switch
+                          checked={formData.circuitBreaker}
+                          onCheckedChange={(checked) => setFormData({ ...formData, circuitBreaker: checked })}
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="maxPrice" className="text-sm font-medium text-gray-700">Max Price Per Share</Label>
+                        <Input
+                          id="maxPrice"
+                          type="number"
+                          value={formData.maxPricePerShare}
+                          onChange={(e) => setFormData({ ...formData, maxPricePerShare: parseInt(e.target.value) || 0 })}
+                          placeholder="10000"
+                          className="bg-white border-gray-300 text-gray-900"
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="locale" className="text-sm font-medium text-gray-700">Language</Label>
+                        <Select value={formData.locale} onValueChange={(value) => setFormData({ ...formData, locale: value })}>
+                          <SelectTrigger className="bg-white border-gray-300 text-gray-900">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {LOCALES.map((locale) => (
+                              <SelectItem key={locale.value} value={locale.value}>
+                                {locale.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Contest Features */}
+              <Card className="bg-white border-gray-200 shadow-sm">
+                <CardHeader>
+                  <CardTitle className="text-gray-900 flex items-center">
+                    <Trophy className="h-5 w-5 mr-2" />
+                    Contest Features
+                  </CardTitle>
+                  <CardDescription className="text-gray-600">
+                    Add competition elements to your event
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-gray-700">Voting Mode</Label>
+                      <Select value={formData.votingMode} onValueChange={(value) => setFormData({ ...formData, votingMode: value })}>
+                        <SelectTrigger className="bg-white border-gray-300 text-gray-900">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">No Voting</SelectItem>
+                          <SelectItem value="audience">Audience Choice</SelectItem>
+                          <SelectItem value="peer">Peer Review</SelectItem>
+                          <SelectItem value="judges">Judge Scoring</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-gray-700">Reward System</Label>
+                      <Select value={formData.rewardSystem} onValueChange={(value) => setFormData({ ...formData, rewardSystem: value })}>
+                        <SelectTrigger className="bg-white border-gray-300 text-gray-900">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">No Rewards</SelectItem>
+                          <SelectItem value="winner">Winner Takes All</SelectItem>
+                          <SelectItem value="top3">Top 3 Podium</SelectItem>
+                          <SelectItem value="participation">Participation Rewards</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Event Type */}
+              <Card className="bg-white border-gray-200 shadow-sm">
+                <CardHeader>
+                  <CardTitle className="text-gray-900 flex items-center">
+                    <Briefcase className="h-5 w-5 mr-2" />
+                    Event Type
+                  </CardTitle>
+                  <CardDescription className="text-gray-600">
+                    Choose the type of event you're organizing
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {[
+                      { value: "unconference", label: "Unconference", icon: Users2 },
+                      { value: "startup_pitch", label: "Startup Pitch", icon: TrendingUp },
+                      { value: "networking", label: "Networking", icon: Handshake },
+                    ].map((type) => (
+                      <button
+                        key={type.value}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, eventType: type.value })}
+                        className={cn(
+                          "p-4 border rounded-lg text-left transition-colors",
+                          formData.eventType === type.value
+                            ? "border-orange-500 bg-orange-50 text-orange-700"
+                            : "border-gray-200 hover:border-gray-300 text-gray-700"
+                        )}
+                      >
+                        <type.icon className="h-6 w-6 mb-2" />
+                        <div className="font-medium">{type.label}</div>
+                      </button>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Customization */}
+              <Card className="bg-white border-gray-200 shadow-sm">
+                <CardHeader>
+                  <CardTitle className="text-gray-900 flex items-center">
+                    <Palette className="h-5 w-5 mr-2" />
+                    Customization
+                  </CardTitle>
+                  <CardDescription className="text-gray-600">
+                    Customize the look and feel of your event
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-gray-700">Color Theme</Label>
+                      <Select value={formData.colorTheme} onValueChange={(value) => setFormData({ ...formData, colorTheme: value })}>
+                        <SelectTrigger className="bg-white border-gray-300 text-gray-900">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="default">Default Orange</SelectItem>
+                          <SelectItem value="blue">Professional Blue</SelectItem>
+                          <SelectItem value="green">Success Green</SelectItem>
+                          <SelectItem value="purple">Creative Purple</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-1">
+                        <Label className="text-sm font-medium text-gray-700">Notifications</Label>
+                        <p className="text-xs text-gray-500">Send email updates to participants</p>
+                      </div>
+                      <Switch
+                        checked={formData.notificationSettings}
+                        onCheckedChange={(checked) => setFormData({ ...formData, notificationSettings: checked })}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <BrandingUpload
+                      type="logo"
+                      currentUrl={formData.brandingLogo}
+                      onUpload={(url) => setFormData({ ...formData, brandingLogo: url })}
+                      title="Event Logo"
+                      description="Upload your event logo (PNG, JPG - max 2MB)"
+                    />
+                    
+                    <BrandingUpload
+                      type="header"
+                      currentUrl={formData.profileHeader}
+                      onUpload={(url) => setFormData({ ...formData, profileHeader: url })}
+                      title="Header Image"
+                      description="Upload a header image for your event (PNG, JPG - max 5MB)"
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
               {/* Actions */}
               <div className="flex justify-between">
                 <Button
