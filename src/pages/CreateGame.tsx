@@ -177,39 +177,21 @@ export default function CreateGame() {
             </div>
           </div>
           
-          <div className="flex items-center space-x-2">
-            {steps.map((step, index) => (
-              <React.Fragment key={step.id}>
-                <button
-                  onClick={() => setCurrentStep(step.id)}
-                  className={cn(
-                    "flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium cursor-pointer transition-colors",
-                    currentStep === step.id ? "bg-primary text-primary-foreground" :
-                    currentStep > step.id ? "bg-green-600 text-white" :
-                    "bg-gray-300 text-gray-600 hover:bg-gray-400"
-                  )}
-                >
-                  {currentStep > step.id ? (
-                    <Check className="h-4 w-4" />
-                  ) : (
-                    step.id
-                  )}
-                </button>
-                {index < steps.length - 1 && (
-                  <div className={cn(
-                    "flex-1 h-1 rounded",
-                    currentStep > step.id ? "bg-green-600" : "bg-muted"
-                  )} />
+          <div className="flex items-center space-x-8">
+            {steps.map((step) => (
+              <button
+                key={step.id}
+                onClick={() => setCurrentStep(step.id)}
+                className={cn(
+                  "text-lg font-medium cursor-pointer transition-colors relative",
+                  currentStep === step.id ? "text-orange-500" : "text-gray-400 hover:text-gray-600"
                 )}
-              </React.Fragment>
-            ))}
-          </div>
-          
-          <div className="flex items-center justify-between mt-2">
-            {steps.map(step => (
-              <div key={step.id} className="text-xs text-gray-600 text-center" style={{ width: '12.5%' }}>
-                {step.name}
-              </div>
+              >
+                {step.id}
+                {currentStep === step.id && (
+                  <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-orange-500" />
+                )}
+              </button>
             ))}
           </div>
         </div>
