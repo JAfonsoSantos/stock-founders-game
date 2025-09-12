@@ -48,6 +48,8 @@ export function BrandingUpload({ type, currentUrl, onUpload, title, description 
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
       const bucketName = type === 'logo' ? 'logos' : 'headers';
 
+      console.log(`Uploading ${type} to bucket:`, bucketName, 'fileName:', fileName);
+
       const { error: uploadError } = await supabase.storage
         .from(bucketName)
         .upload(fileName, file);
@@ -58,13 +60,19 @@ export function BrandingUpload({ type, currentUrl, onUpload, title, description 
         .from(bucketName)
         .getPublicUrl(fileName);
 
+      console.log(`${type} uploaded successfully:`, publicUrl);
+      
       onUpload(publicUrl);
+
+      // Reset the input
+      event.target.value = '';
 
       toast({
         title: "Upload successful",
         description: `${title} uploaded successfully`,
       });
     } catch (error: any) {
+      console.error(`${type} upload error:`, error);
       toast({
         variant: "destructive",
         title: "Upload failed",
