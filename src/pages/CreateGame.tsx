@@ -518,19 +518,29 @@ export default function CreateGame() {
   if (step === "image-editor" && editingImageType) {
     const handleSaveImage = async (imageBlob: Blob) => {
       try {
+        console.log("Starting image save...", editingImageType);
         const fileExt = 'png';
         const fileName = `${Date.now()}-edited.${fileExt}`;
         const bucketName = editingImageType === 'logo' ? 'logos' : 'headers';
+
+        console.log("Uploading to bucket:", bucketName, "filename:", fileName);
 
         const { error: uploadError } = await supabase.storage
           .from(bucketName)
           .upload(fileName, imageBlob);
 
-        if (uploadError) throw uploadError;
+        if (uploadError) {
+          console.error("Upload error:", uploadError);
+          throw uploadError;
+        }
+
+        console.log("Upload successful, getting public URL...");
 
         const { data: { publicUrl } } = supabase.storage
           .from(bucketName)
           .getPublicUrl(fileName);
+
+        console.log("Public URL:", publicUrl);
 
         // Update form data with new image URL
         if (editingImageType === 'logo') {
@@ -541,11 +551,17 @@ export default function CreateGame() {
 
         setEditingImageType(null);
         setStep("preview");
+        
+        toast({
+          title: "Image saved successfully!",
+          description: `${editingImageType === 'logo' ? 'Logo' : 'Header image'} has been updated`,
+        });
       } catch (error: any) {
+        console.error("Full error:", error);
         toast({
           variant: "destructive",
           title: "Upload failed", 
-          description: error.message,
+          description: error.message || "Unknown error occurred",
         });
       }
     };
