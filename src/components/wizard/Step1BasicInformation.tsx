@@ -66,6 +66,7 @@ export function Step1BasicInformation({ formData, setFormData }: Step1Props) {
               value={formData.name}
               onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
               placeholder="Ex: Demo Day Lisboa 2024"
+              className="placeholder:text-gray-400"
             />
           </div>
 
@@ -77,6 +78,7 @@ export function Step1BasicInformation({ formData, setFormData }: Step1Props) {
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
               placeholder="Descreva o seu evento..."
               rows={3}
+              className="placeholder:text-gray-400"
             />
           </div>
 
