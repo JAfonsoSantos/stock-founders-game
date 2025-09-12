@@ -176,9 +176,6 @@ export function GameProfile({
             <div className="pb-4 flex-1">
               <div className="flex items-end justify-between">
                 <div>
-                  <h1 className="text-5xl font-bold text-white drop-shadow-lg mb-2">
-                    {gameData.name}
-                  </h1>
                   {isPreview && (
                     <Badge variant="secondary" className="text-sm font-medium text-gray-800 bg-white/90 backdrop-blur-sm">
                       Preview Mode
@@ -191,8 +188,17 @@ export function GameProfile({
         </div>
       </div>
 
+      {/* Event Title */}
+      <div className="px-8 pt-8 pb-4 bg-gradient-to-b from-white/5 to-transparent">
+        <div className="max-w-7xl mx-auto text-center">
+          <h1 className="text-5xl font-bold text-gray-900 mb-2">
+            {gameData.name}
+          </h1>
+        </div>
+      </div>
+
       {/* Content */}
-      <div className="pt-24 px-8 pb-8">
+      <div className="px-8 pb-8">
         <div className="max-w-7xl mx-auto">
           {/* Game Status and Actions */}
           <div className="flex justify-between items-center mb-8">
