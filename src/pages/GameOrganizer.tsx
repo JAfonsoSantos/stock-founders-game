@@ -385,18 +385,18 @@ export default function GameOrganizer() {
             <Card
               role="button"
               tabIndex={0}
-              onClick={() => navigate(`/games/${gameId}/discover`)}
+              onClick={() => navigate(`/games/${gameId}/preview`)}
               onKeyDown={(e) => {
-                if (e.key === "Enter") navigate(`/games/${gameId}/discover`);
+                if (e.key === "Enter") navigate(`/games/${gameId}/preview`);
               }}
               className="cursor-pointer hover:bg-orange-50 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white border-gray-200 shadow-sm"
-              aria-label="View Game"
+              aria-label="Preview Game"
             >
               <CardContent className="flex flex-col items-center justify-center p-6">
                 <Play className="h-8 w-8 mb-2 text-orange-600" />
-                <h3 className="font-semibold text-gray-900">View Game</h3>
+                <h3 className="font-semibold text-gray-900">Preview Game</h3>
                 <p className="text-sm text-gray-600 text-center">
-                  {game.status === "open" ? "Game is live!" : `Status: ${game.status}`}
+                  Preview how the game looks
                 </p>
               </CardContent>
             </Card>

@@ -27,6 +27,7 @@ import Leaderboard from "./pages/Leaderboard";
 import FounderOnboarding from "./pages/FounderOnboarding";
 import ResetPassword from "./pages/ResetPassword";
 import GameView from "./pages/GameView";
+import GamePreview from "./pages/GamePreview";
 import Setup from "./pages/Setup";
 import SetupColors from "./pages/SetupColors";
 import NotFound from "./pages/NotFound";
@@ -178,6 +179,11 @@ const App = () => (
                 <ProtectedShellRoute>
                   <FounderOnboarding />
                 </ProtectedShellRoute>
+              } />
+              <Route path="/games/:gameId/preview" element={
+                <ProtectedRoute>
+                  <GamePreview />
+                </ProtectedRoute>
               } />
               <Route path="/games/:gameId" element={
                 <ProtectedRoute>
