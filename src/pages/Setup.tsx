@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { ColorPicker } from '@/components/ColorPicker';
 import { toast } from '@/hooks/use-toast';
-import { Download, Upload, RotateCcw } from 'lucide-react';
+import { Download, Upload, RotateCcw, Search, Palette } from 'lucide-react';
 
 interface ColorConfig {
   name: string;
   description: string;
   cssVar: string;
   defaultValue: string;
-  category: 'primary' | 'neutral' | 'semantic' | 'background';
+  category: 'primary' | 'neutral' | 'semantic' | 'background' | 'navigation' | 'text' | 'buttons' | 'forms';
 }
 
 const colorConfigs: ColorConfig[] = [
@@ -42,11 +43,43 @@ const colorConfigs: ColorConfig[] = [
   // Semantic Colors
   { name: 'Destructive', description: 'Cor para ações destrutivas (erro)', cssVar: '--destructive', defaultValue: '#ef4444', category: 'semantic' },
   { name: 'Destructive Foreground', description: 'Texto em elementos destrutivos', cssVar: '--destructive-foreground', defaultValue: '#ffffff', category: 'semantic' },
+
+  // Specific Page Colors
+  { name: 'Page Background', description: 'Fundo geral das páginas (cinza claro)', cssVar: '--page-bg', defaultValue: '#f8fafc', category: 'background' },
+  { name: 'Header Background', description: 'Fundo do header/sidebar', cssVar: '--header-bg', defaultValue: '#f1f5f9', category: 'background' },
+  { name: 'Input Background', description: 'Fundo dos campos de input', cssVar: '--input-bg', defaultValue: '#ffffff', category: 'background' },
+  { name: 'Input Border', description: 'Bordas dos inputs', cssVar: '--input-border', defaultValue: '#d1d5db', category: 'neutral' },
+  { name: 'Input Placeholder', description: 'Texto placeholder nos inputs', cssVar: '--input-placeholder', defaultValue: '#9ca3af', category: 'neutral' },
+  { name: 'Input Text', description: 'Texto nos inputs', cssVar: '--input-text', defaultValue: '#374151', category: 'neutral' },
+  
+  // Navigation Colors
+  { name: 'Nav Step Active', description: 'Cor do passo ativo na navegação', cssVar: '--nav-step-active', defaultValue: '#FF6B35', category: 'primary' },
+  { name: 'Nav Step Inactive', description: 'Cor dos passos inativos', cssVar: '--nav-step-inactive', defaultValue: '#6b7280', category: 'neutral' },
+  { name: 'Nav Step Completed', description: 'Cor dos passos completos', cssVar: '--nav-step-completed', defaultValue: '#10b981', category: 'semantic' },
+  
+  // Text Variations
+  { name: 'Text Primary', description: 'Texto principal (títulos)', cssVar: '--text-primary', defaultValue: '#111827', category: 'neutral' },
+  { name: 'Text Secondary', description: 'Texto secundário (subtítulos)', cssVar: '--text-secondary', defaultValue: '#6b7280', category: 'neutral' },
+  { name: 'Text Tertiary', description: 'Texto terciário (labels)', cssVar: '--text-tertiary', defaultValue: '#9ca3af', category: 'neutral' },
+  { name: 'Text Disabled', description: 'Texto desabilitado', cssVar: '--text-disabled', defaultValue: '#d1d5db', category: 'neutral' },
+  
+  // Button Variations
+  { name: 'Button Secondary BG', description: 'Fundo botão secundário', cssVar: '--button-secondary-bg', defaultValue: '#f9fafb', category: 'background' },
+  { name: 'Button Secondary Text', description: 'Texto botão secundário', cssVar: '--button-secondary-text', defaultValue: '#374151', category: 'neutral' },
+  { name: 'Button Secondary Border', description: 'Borda botão secundário', cssVar: '--button-secondary-border', defaultValue: '#d1d5db', category: 'neutral' },
+  
+  // Form Elements
+  { name: 'Radio Active', description: 'Radio button selecionado', cssVar: '--radio-active', defaultValue: '#FF6B35', category: 'primary' },
+  { name: 'Radio Inactive', description: 'Radio button não selecionado', cssVar: '--radio-inactive', defaultValue: '#d1d5db', category: 'neutral' },
+  { name: 'Checkbox Active', description: 'Checkbox selecionado', cssVar: '--checkbox-active', defaultValue: '#FF6B35', category: 'primary' },
+  { name: 'Toggle Active', description: 'Toggle ligado', cssVar: '--toggle-active', defaultValue: '#FF6B35', category: 'primary' },
+  { name: 'Toggle Inactive', description: 'Toggle desligado', cssVar: '--toggle-inactive', defaultValue: '#d1d5db', category: 'neutral' },
 ];
 
 export default function Setup() {
   const [colors, setColors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     // Load current colors from CSS variables
@@ -185,17 +218,26 @@ export default function Setup() {
     });
   };
 
-  const groupedConfigs = colorConfigs.reduce((acc, config) => {
-    if (!acc[config.category]) acc[config.category] = [];
-    acc[config.category].push(config);
-    return acc;
-  }, {} as Record<string, ColorConfig[]>);
+  const groupedConfigs = colorConfigs
+    .filter(config => 
+      config.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      config.description.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .reduce((acc, config) => {
+      if (!acc[config.category]) acc[config.category] = [];
+      acc[config.category].push(config);
+      return acc;
+    }, {} as Record<string, ColorConfig[]>);
 
   const categoryNames = {
     primary: 'Cores Principais',
     neutral: 'Cores Neutras', 
     semantic: 'Cores Semânticas',
-    background: 'Fundos'
+    background: 'Fundos',
+    navigation: 'Navegação',
+    text: 'Variações de Texto',
+    buttons: 'Botões',
+    forms: 'Formulários'
   };
 
   if (isLoading) {
@@ -210,27 +252,71 @@ export default function Setup() {
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Configuração de Cores</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center gap-3">
+            <Palette className="w-8 h-8 text-orange-500" />
+            Configuração de Cores
+          </h1>
           <p className="text-gray-600 mb-6">Personalize todas as cores do site de forma visual e interativa.</p>
           
-          <div className="flex space-x-3">
-            <Button variant="outline" onClick={resetToDefaults}>
-              <RotateCcw className="w-4 h-4 mr-2" />
-              Restaurar Padrões
-            </Button>
-            <Button variant="outline" onClick={exportConfig}>
-              <Download className="w-4 h-4 mr-2" />
-              Exportar Configuração
-            </Button>
+          {/* Statistics */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div className="bg-white p-4 rounded-lg border border-gray-200">
+              <div className="text-2xl font-bold text-orange-500">{colorConfigs.length}</div>
+              <div className="text-sm text-gray-600">Total de Cores</div>
+            </div>
+            <div className="bg-white p-4 rounded-lg border border-gray-200">
+              <div className="text-2xl font-bold text-blue-500">{Object.keys(groupedConfigs).length}</div>
+              <div className="text-sm text-gray-600">Categorias</div>
+            </div>
+            <div className="bg-white p-4 rounded-lg border border-gray-200">
+              <div className="text-2xl font-bold text-green-500">{Object.values(groupedConfigs).flat().length}</div>
+              <div className="text-sm text-gray-600">Visíveis</div>
+            </div>
+            <div className="bg-white p-4 rounded-lg border border-gray-200">
+              <div className="text-2xl font-bold text-purple-500">{searchTerm ? 'Filtrando' : 'Todos'}</div>
+              <div className="text-sm text-gray-600">Estado</div>
+            </div>
+          </div>
+
+          {/* Search */}
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+              <Input
+                placeholder="Buscar cores por nome ou descrição..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 bg-white border-gray-200"
+              />
+            </div>
+            <div className="flex space-x-3">
+              <Button variant="outline" onClick={resetToDefaults}>
+                <RotateCcw className="w-4 h-4 mr-2" />
+                Restaurar Padrões
+              </Button>
+              <Button variant="outline" onClick={exportConfig}>
+                <Download className="w-4 h-4 mr-2" />
+                Exportar
+              </Button>
+            </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
           {Object.entries(groupedConfigs).map(([category, configs]) => (
             <Card key={category} className="bg-white border-gray-200 shadow-sm">
               <CardHeader>
-                <CardTitle className="text-lg text-gray-900">
+                <CardTitle className="text-lg text-gray-900 flex items-center gap-2">
+                  {category === 'primary' && <div className="w-3 h-3 rounded-full bg-orange-500"></div>}
+                  {category === 'background' && <div className="w-3 h-3 rounded-full bg-gray-100 border border-gray-300"></div>}
+                  {category === 'neutral' && <div className="w-3 h-3 rounded-full bg-gray-500"></div>}
+                  {category === 'semantic' && <div className="w-3 h-3 rounded-full bg-red-500"></div>}
+                  {category === 'navigation' && <div className="w-3 h-3 rounded-full bg-blue-500"></div>}
+                  {category === 'text' && <div className="w-3 h-3 rounded-full bg-gray-700"></div>}
+                  {category === 'buttons' && <div className="w-3 h-3 rounded-full bg-green-500"></div>}
+                  {category === 'forms' && <div className="w-3 h-3 rounded-full bg-purple-500"></div>}
                   {categoryNames[category as keyof typeof categoryNames]}
+                  <span className="text-sm font-normal text-gray-500">({configs.length})</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -251,26 +337,75 @@ export default function Setup() {
         <div className="mt-8">
           <Card className="bg-white border-gray-200 shadow-sm">
             <CardHeader>
-              <CardTitle className="text-lg text-gray-900">Pré-visualização</CardTitle>
+              <CardTitle className="text-lg text-gray-900">Pré-visualização Completa</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="p-4 bg-background border border-border rounded-lg">
-                  <h3 className="font-semibold text-foreground mb-2">Cartão de Exemplo</h3>
-                  <p className="text-muted-foreground text-sm mb-3">Texto secundário de exemplo</p>
-                  <Button size="sm">Botão Principal</Button>
+            <CardContent className="space-y-6">
+              {/* Header Preview */}
+              <div className="p-4 bg-gray-50 rounded-lg border">
+                <h4 className="font-medium mb-3 text-gray-900">Header & Navegação</h4>
+                <div className="bg-white p-3 rounded border border-gray-200 flex items-center justify-between">
+                  <div className="flex space-x-2">
+                    <div className="w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-bold">1</div>
+                    <div className="w-8 h-8 bg-gray-600 text-white rounded-full flex items-center justify-center text-sm">2</div>
+                    <div className="w-8 h-8 bg-gray-400 text-white rounded-full flex items-center justify-center text-sm">3</div>
+                  </div>
+                  <button className="px-3 py-1 bg-orange-500 text-white rounded text-sm">Setup</button>
                 </div>
-                
-                <div className="p-4 bg-card border border-border rounded-lg">
-                  <h3 className="font-semibold text-card-foreground mb-2">Outro Cartão</h3>
-                  <p className="text-muted-foreground text-sm mb-3">Mais texto de exemplo</p>
-                  <Button variant="secondary" size="sm">Botão Secundário</Button>
+              </div>
+
+              {/* Forms Preview */}
+              <div className="p-4 bg-gray-50 rounded-lg border">
+                <h4 className="font-medium mb-3 text-gray-900">Formulários</h4>
+                <div className="space-y-3 bg-white p-4 rounded border">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Nome do Evento</label>
+                    <input 
+                      type="text" 
+                      placeholder="Ex: Demo Day Lisboa 2024"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 text-gray-700 bg-white"
+                      readOnly
+                    />
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-4 h-4 bg-orange-500 rounded-full"></div>
+                    <span className="text-sm text-gray-700">Presencial</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-4 h-4 border-2 border-gray-300 rounded"></div>
+                    <span className="text-sm text-gray-700">Online</span>
+                  </div>
                 </div>
-                
-                <div className="p-4 bg-muted rounded-lg">
-                  <h3 className="font-semibold text-foreground mb-2">Área Muted</h3>
-                  <p className="text-muted-foreground text-sm mb-3">Texto em área neutra</p>
-                  <Button variant="destructive" size="sm">Botão Erro</Button>
+              </div>
+
+              {/* Buttons Preview */}
+              <div className="p-4 bg-gray-50 rounded-lg border">
+                <h4 className="font-medium mb-3 text-gray-900">Botões</h4>
+                <div className="flex flex-wrap gap-3 bg-white p-4 rounded border">
+                  <button className="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600">
+                    Botão Principal
+                  </button>
+                  <button className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50">
+                    Botão Secundário
+                  </button>
+                  <button className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+                    Botão Destrutivo
+                  </button>
+                  <button className="px-4 py-2 bg-gray-100 text-gray-400 rounded cursor-not-allowed" disabled>
+                    Desabilitado
+                  </button>
+                </div>
+              </div>
+
+              {/* Text Variations */}
+              <div className="p-4 bg-gray-50 rounded-lg border">
+                <h4 className="font-medium mb-3 text-gray-900">Variações de Texto</h4>
+                <div className="space-y-2 bg-white p-4 rounded border">
+                  <h1 className="text-2xl font-bold text-gray-900">Título Principal</h1>
+                  <h2 className="text-xl font-semibold text-gray-800">Subtítulo</h2>
+                  <p className="text-gray-700">Texto normal de parágrafo</p>
+                  <p className="text-gray-500">Texto secundário</p>
+                  <p className="text-gray-400">Texto terciário</p>
+                  <p className="text-gray-300">Texto desabilitado</p>
                 </div>
               </div>
             </CardContent>
