@@ -176,17 +176,14 @@ export function GameProfile({
             <div className="pb-2">
               <div className="flex items-center justify-between w-full">
                 <h1 className="text-4xl font-bold text-gray-900 drop-shadow-sm">
-                  {gameData.name}
+                  The Unconference
                 </h1>
                 {isPreview && (
-                  <Badge variant="secondary" className="text-sm font-medium text-gray-800 bg-gray-200/90 backdrop-blur-sm">
+                  <Badge variant="secondary" className="text-sm font-medium text-gray-800 bg-gray-200/90 backdrop-blur-sm mt-3">
                     Preview
                   </Badge>
                 )}
               </div>
-              <p className="text-gray-700 font-medium drop-shadow-sm text-lg">
-                Investment Game
-              </p>
             </div>
           </div>
         </div>

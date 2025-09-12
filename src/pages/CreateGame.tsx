@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { DatePicker } from "@/components/DatePicker";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/RichTextEditor";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { GameProfile } from "@/components/GameProfile";
@@ -163,6 +164,8 @@ export default function CreateGame() {
     locale: "en",
     startsAt: today,
     endsAt: today,
+    hasStartTime: false,
+    hasEndTime: false,
     maxParticipants: 100,
     unlimitedParticipants: true,
 
@@ -183,6 +186,11 @@ export default function CreateGame() {
     profileHeader: "",
     colorTheme: "default",
     notificationSettings: true,
+    
+    // Organization team
+    organizationTeam: [
+      { email: user?.email || "", firstName: "", lastName: "", isOwner: true }
+    ] as Array<{ email: string; firstName: string; lastName: string; isOwner: boolean }>
   });
 
   const [budgets, setBudgets] = useState([
@@ -730,13 +738,11 @@ export default function CreateGame() {
 
                     <div>
                       <Label htmlFor="description" className="text-gray-700">Event Description</Label>
-                      <Textarea
-                        id="description"
+                      <RichTextEditor
                         value={formData.description}
-                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                        onChange={(value) => setFormData({ ...formData, description: value })}
                         placeholder="Describe your event and what participants can expect..."
-                        className="bg-white border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
-                        rows={3}
+                        className="mt-2"
                       />
                     </div>
 
@@ -821,6 +827,25 @@ export default function CreateGame() {
                             placeholder="Pick end date"
                           />
                         </div>
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-0.5">
+                          <div className="flex items-center">
+                            <Label className="text-gray-700 font-medium">Define Starting and End Times</Label>
+                          </div>
+                          <p className="text-sm text-gray-600">
+                            By default, there is no pre-defined starting and end time - it will be manually controlled by the organizer
+                          </p>
+                        </div>
+                        <Switch
+                          checked={formData.hasStartTime || formData.hasEndTime}
+                          onCheckedChange={(checked) => setFormData({ 
+                            ...formData, 
+                            hasStartTime: checked, 
+                            hasEndTime: checked 
+                          })}
+                        />
                       </div>
 
                      <div className="space-y-3">
@@ -1171,7 +1196,96 @@ export default function CreateGame() {
                     </div>
                   </CardContent>
                  </Card>
-               
+
+                {/* Organization Team */}
+                <Card className="bg-white border-gray-200 shadow-sm">
+                  <CardHeader>
+                    <CardTitle className="text-gray-900 flex items-center">
+                      <Users className="h-5 w-5 mr-2" />
+                      Organization Team
+                    </CardTitle>
+                    <CardDescription className="text-gray-600">
+                      Manage who has organizer access to this event
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-3">
+                      {formData.organizationTeam.map((member, index) => (
+                        <div key={index} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                          <div className="flex-1 grid grid-cols-3 gap-3">
+                            <Input
+                              placeholder="First name"
+                              value={member.firstName}
+                              onChange={(e) => {
+                                const newTeam = [...formData.organizationTeam];
+                                newTeam[index].firstName = e.target.value;
+                                setFormData({ ...formData, organizationTeam: newTeam });
+                              }}
+                              className="bg-white"
+                              disabled={member.isOwner}
+                            />
+                            <Input
+                              placeholder="Last name"
+                              value={member.lastName}
+                              onChange={(e) => {
+                                const newTeam = [...formData.organizationTeam];
+                                newTeam[index].lastName = e.target.value;
+                                setFormData({ ...formData, organizationTeam: newTeam });
+                              }}
+                              className="bg-white"
+                              disabled={member.isOwner}
+                            />
+                            <Input
+                              placeholder="Email"
+                              type="email"
+                              value={member.email}
+                              onChange={(e) => {
+                                const newTeam = [...formData.organizationTeam];
+                                newTeam[index].email = e.target.value;
+                                setFormData({ ...formData, organizationTeam: newTeam });
+                              }}
+                              className="bg-white"
+                              disabled={member.isOwner}
+                            />
+                          </div>
+                          {member.isOwner ? (
+                            <Badge variant="secondary" className="text-xs">Owner</Badge>
+                          ) : (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                const newTeam = formData.organizationTeam.filter((_, i) => i !== index);
+                                setFormData({ ...formData, organizationTeam: newTeam });
+                              }}
+                              className="text-red-600 hover:text-red-800"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                      ))}
+                      
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          const newTeam = [...formData.organizationTeam, {
+                            email: "",
+                            firstName: "",
+                            lastName: "",
+                            isOwner: false
+                          }];
+                          setFormData({ ...formData, organizationTeam: newTeam });
+                        }}
+                        className="w-full"
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Team Member
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+                
                 {/* Create Game Button */}
                 <div className="mt-8">
                   <Card className="bg-white border-gray-200 shadow-sm">
