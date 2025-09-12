@@ -348,7 +348,7 @@ export default function Profile() {
                       </p>
                     </div>
 
-                    <Button type="submit" disabled={loading} className="bg-[#FF6B35] hover:bg-[#E55A2B] text-white">
+                    <Button type="submit" disabled={loading} className="bg-[#FF6B35] hover:bg-[#E55A2B] text-foreground">
                       {loading ? "Salvando..." : "Salvar Alterações"}
                     </Button>
                   </form>

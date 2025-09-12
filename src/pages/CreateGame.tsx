@@ -195,7 +195,7 @@ export default function CreateGame() {
                 <div className={cn(
                   "flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium",
                   currentStep === step.id ? "bg-primary text-primary-foreground" :
-                  currentStep > step.id ? "bg-green-600 text-white" :
+                  currentStep > step.id ? "bg-green-600 text-foreground" :
                   "bg-muted text-muted-foreground"
                 )}>
                   {currentStep > step.id ? (

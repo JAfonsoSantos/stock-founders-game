@@ -79,7 +79,7 @@ export function AppSidebar() {
                     </Avatar>
                   </button>
                 </TooltipTrigger>
-                <TooltipContent side="right" className="ml-2 bg-gray-700 text-white border-gray-600">
+                <TooltipContent side="right" className="ml-2 bg-gray-700 text-foreground border-gray-600">
                   {displayName} Profile
                 </TooltipContent>
               </Tooltip>
@@ -98,7 +98,7 @@ export function AppSidebar() {
                       <Home className="h-4 w-4" />
                     </SidebarMenuButton>
                   </TooltipTrigger>
-                  <TooltipContent side="right" className="ml-2 bg-gray-700 text-white border-gray-600">
+                  <TooltipContent side="right" className="ml-2 bg-gray-700 text-foreground border-gray-600">
                     Dashboard
                   </TooltipContent>
                 </Tooltip>
@@ -116,7 +116,7 @@ export function AppSidebar() {
                       <Store className="h-4 w-4" />
                     </SidebarMenuButton>
                   </TooltipTrigger>
-                  <TooltipContent side="right" className="ml-2 bg-gray-700 text-white border-gray-600">
+                  <TooltipContent side="right" className="ml-2 bg-gray-700 text-foreground border-gray-600">
                     Your Startup
                   </TooltipContent>
                 </Tooltip>
@@ -134,7 +134,7 @@ export function AppSidebar() {
                       <Trophy className="h-4 w-4" />
                     </SidebarMenuButton>
                   </TooltipTrigger>
-                  <TooltipContent side="right" className="ml-2 bg-gray-700 text-white border-gray-600">
+                  <TooltipContent side="right" className="ml-2 bg-gray-700 text-foreground border-gray-600">
                     Games
                   </TooltipContent>
                 </Tooltip>
@@ -152,7 +152,7 @@ export function AppSidebar() {
                       <ArrowLeftRight className="h-4 w-4" />
                     </SidebarMenuButton>
                   </TooltipTrigger>
-                  <TooltipContent side="right" className="ml-2 bg-gray-700 text-white border-gray-600">
+                  <TooltipContent side="right" className="ml-2 bg-gray-700 text-foreground border-gray-600">
                     Inbox
                   </TooltipContent>
                 </Tooltip>
@@ -174,7 +174,7 @@ export function AppSidebar() {
                   <Settings className="h-4 w-4" />
                 </button>
               </TooltipTrigger>
-              <TooltipContent side="right" className="ml-2 bg-gray-700 text-white border-gray-600">Settings</TooltipContent>
+              <TooltipContent side="right" className="ml-2 bg-gray-700 text-foreground border-gray-600">Settings</TooltipContent>
             </Tooltip>
 
             <Tooltip>
@@ -187,7 +187,7 @@ export function AppSidebar() {
                   <LogOut className="h-4 w-4" />
                 </button>
               </TooltipTrigger>
-              <TooltipContent side="right" className="ml-2 bg-gray-700 text-white border-gray-600">Log out</TooltipContent>
+              <TooltipContent side="right" className="ml-2 bg-gray-700 text-foreground border-gray-600">Log out</TooltipContent>
             </Tooltip>
           </div>
         </SidebarContent>

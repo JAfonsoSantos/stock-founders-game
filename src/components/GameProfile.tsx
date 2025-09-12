@@ -216,13 +216,13 @@ export function GameProfile({
               </Button>
             )}
             {isPreview && onCreateGame && (
-              <Button onClick={onCreateGame} className="bg-orange-500 hover:bg-orange-600 text-white">
+              <Button onClick={onCreateGame} className="bg-orange-500 hover:bg-orange-600 text-foreground">
                 <Play className="h-4 w-4 mr-2" />
                 Create Game
               </Button>
             )}
             {!isPreview && onJoinGame && (
-              <Button onClick={onJoinGame} className="bg-orange-500 hover:bg-orange-600 text-white">
+              <Button onClick={onJoinGame} className="bg-orange-500 hover:bg-orange-600 text-foreground">
                 Join Game
               </Button>
             )}
@@ -301,14 +301,14 @@ export function GameProfile({
               <Separator />
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600">Secondary Trading</span>
-                <Badge variant={gameData.allow_secondary ? "default" : "secondary"} className={gameData.allow_secondary ? "bg-orange-500 text-white" : ""}>
+                <Badge variant={gameData.allow_secondary ? "default" : "secondary"} className={gameData.allow_secondary ? "bg-orange-500 text-foreground" : ""}>
                   {gameData.allow_secondary ? "Enabled" : "Disabled"}
                 </Badge>
               </div>
               <Separator />
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600">Public Leaderboards</span>
-                <Badge variant={gameData.show_public_leaderboards ? "default" : "secondary"} className={gameData.show_public_leaderboards ? "bg-orange-500 text-white" : ""}>
+                <Badge variant={gameData.show_public_leaderboards ? "default" : "secondary"} className={gameData.show_public_leaderboards ? "bg-orange-500 text-foreground" : ""}>
                   {gameData.show_public_leaderboards ? "Public" : "Private"}
                 </Badge>
               </div>
@@ -317,7 +317,7 @@ export function GameProfile({
                 <span className="text-sm text-gray-600">Circuit Breaker</span>
                 <div className="flex items-center gap-1">
                   <Zap className="h-4 w-4" />
-                  <Badge variant={gameData.circuit_breaker ? "default" : "secondary"} className={gameData.circuit_breaker ? "bg-orange-500 text-white" : ""}>
+                  <Badge variant={gameData.circuit_breaker ? "default" : "secondary"} className={gameData.circuit_breaker ? "bg-orange-500 text-foreground" : ""}>
                     {gameData.circuit_breaker ? "Active" : "Inactive"}
                   </Badge>
                 </div>

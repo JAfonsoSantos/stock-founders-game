@@ -113,7 +113,7 @@ export function DatePicker({ date, onDateSelect, placeholder = "Pick a date", cl
                     className={cn(
                       "h-9 w-9 p-0 font-normal text-center rounded hover:bg-gray-100 w-full",
                       isToday(day) && "bg-white border border-orange-500 text-gray-900",
-                      isSelected(day) && "bg-orange-500 text-white border border-orange-500 hover:bg-orange-600"
+                      isSelected(day) && "bg-orange-500 text-foreground border border-orange-500 hover:bg-orange-600"
                     )}
                   >
                     {day.getDate()}

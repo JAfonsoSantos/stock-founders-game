@@ -287,7 +287,7 @@ export default function Dashboard() {
                   <div className="flex flex-col sm:flex-row gap-3">
                     <Button 
                       onClick={() => navigate("/games/new")} 
-                      className="bg-[#FF6B35] hover:bg-[#E55A2B] text-white px-6 py-3"
+                      className="bg-[#FF6B35] hover:bg-[#E55A2B] text-foreground px-6 py-3"
                       size="lg"
                     >
                       <Plus className="h-5 w-5 mr-2" />
@@ -384,7 +384,7 @@ export default function Dashboard() {
                       Experience the full platform with pre-configured startups and demo data.
                     </p>
                   </div>
-                  <Button onClick={createDemoGame} className="shrink-0 bg-[#FF6B35] hover:bg-[#E55A2B] text-white">
+                  <Button onClick={createDemoGame} className="shrink-0 bg-[#FF6B35] hover:bg-[#E55A2B] text-foreground">
                     <Sparkles className="h-4 w-4 mr-2" />
                     Create Demo
                   </Button>
@@ -399,7 +399,7 @@ export default function Dashboard() {
           <div>
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-semibold text-gray-900">Your Games</h3>
-              <Button onClick={() => navigate("/games/new")} className="bg-[#FF6B35] hover:bg-[#E55A2B] text-white">
+              <Button onClick={() => navigate("/games/new")} className="bg-[#FF6B35] hover:bg-[#E55A2B] text-foreground">
                 <Plus className="h-4 w-4 mr-2" />
                 New Game
               </Button>
@@ -414,7 +414,7 @@ export default function Dashboard() {
                       You haven't created any games yet.
                     </p>
                     <div className="flex gap-2 justify-center">
-                      <Button onClick={() => navigate("/games/new")} className="bg-[#FF6B35] hover:bg-[#E55A2B] text-white">
+                      <Button onClick={() => navigate("/games/new")} className="bg-[#FF6B35] hover:bg-[#E55A2B] text-foreground">
                         <Plus className="h-4 w-4 mr-2" />
                         Create Game
                       </Button>
@@ -460,7 +460,7 @@ export default function Dashboard() {
                               variant="default" 
                               size="sm"
                               onClick={() => navigate(`/games/${game.id}/discover`)}
-                              className="bg-green-600 hover:bg-green-700 text-white shadow-md"
+                              className="bg-green-600 hover:bg-green-700 text-foreground shadow-md"
                             >
                               <Play className="h-4 w-4 mr-2" />
                               Enter Game

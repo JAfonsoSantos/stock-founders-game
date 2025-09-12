@@ -214,7 +214,7 @@ export function Step3TemplateTerminology({ formData, setFormData }: Step3Props) 
                 <CardHeader className="pb-3">
                   <div className="flex items-center space-x-3">
                     <div className={`p-3 bg-gradient-to-br ${template.color} rounded-lg`}>
-                      <IconComponent className="h-6 w-6 text-white" />
+                      <IconComponent className="h-6 w-6 text-foreground" />
                     </div>
                     <div>
                       <CardTitle className="text-lg">{template.name}</CardTitle>

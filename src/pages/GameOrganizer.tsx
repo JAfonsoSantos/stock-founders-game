@@ -253,7 +253,7 @@ export default function GameOrganizer() {
                       <Button 
                         onClick={() => updateGameStatus('pre_market')}
                         disabled={actionLoading === 'status-pre_market'}
-                        className="bg-[#FF6B35] hover:bg-[#E55A2B] text-white"
+                        className="bg-[#FF6B35] hover:bg-[#E55A2B] text-foreground"
                       >
                         <Play className="h-4 w-4 mr-2" />
                         Start Pre-Market
@@ -263,7 +263,7 @@ export default function GameOrganizer() {
                       <Button 
                         onClick={() => updateGameStatus('open')}
                         disabled={actionLoading === 'status-open'}
-                        className="bg-[#FF6B35] hover:bg-[#E55A2B] text-white"
+                        className="bg-[#FF6B35] hover:bg-[#E55A2B] text-foreground"
                       >
                         <TrendingUp className="h-4 w-4 mr-2" />
                         Open Market
@@ -283,7 +283,7 @@ export default function GameOrganizer() {
                       <Button 
                         onClick={() => updateGameStatus('results')}
                         disabled={actionLoading === 'status-results'}
-                        className="bg-[#FF6B35] hover:bg-[#E55A2B] text-white"
+                        className="bg-[#FF6B35] hover:bg-[#E55A2B] text-foreground"
                       >
                         <BarChart3 className="h-4 w-4 mr-2" />
                         Show Results

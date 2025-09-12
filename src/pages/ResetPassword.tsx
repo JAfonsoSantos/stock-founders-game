@@ -102,7 +102,7 @@ export default function ResetPassword() {
 
               <Button 
                 onClick={() => navigate('/auth')}
-                className="w-full h-14 text-base font-semibold bg-[#FF6B35] hover:bg-[#E55A2B] text-white border-0 rounded-lg shadow-sm transition-all duration-200"
+                className="w-full h-14 text-base font-semibold bg-[#FF6B35] hover:bg-[#E55A2B] text-foreground border-0 rounded-lg shadow-sm transition-all duration-200"
               >
                 Go to Login
               </Button>
@@ -247,7 +247,7 @@ export default function ResetPassword() {
             {/* Submit Button */}
             <Button 
               type="submit" 
-              className="w-full h-14 text-base font-semibold bg-[#FF6B35] hover:bg-[#E55A2B] text-white border-0 rounded-lg shadow-sm transition-all duration-200"
+              className="w-full h-14 text-base font-semibold bg-[#FF6B35] hover:bg-[#E55A2B] text-foreground border-0 rounded-lg shadow-sm transition-all duration-200"
               disabled={loading || !password || !confirmPassword || password !== confirmPassword}
             >
               {loading ? "Updating Password..." : "Update Password"}

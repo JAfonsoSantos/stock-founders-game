@@ -19,17 +19,17 @@ export default function Index() {
         <div className="relative container mx-auto px-4 py-20">
           <div className="text-center max-w-4xl mx-auto">
             <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/20 border border-white/30 mb-8">
-              <Zap className="w-4 h-4 mr-2 text-white" />
-              <span className="text-sm font-medium text-white">Future of Startup Trading</span>
+              <Zap className="w-4 h-4 mr-2 text-foreground" />
+              <span className="text-sm font-medium text-foreground">Future of Startup Trading</span>
             </div>
             
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+            <h1 className="text-5xl md:text-7xl font-bold text-foreground mb-6 leading-tight">
               Startup Stock
               <br />
-              <span className="text-white/90">Market</span>
+              <span className="text-foreground/90">Market</span>
             </h1>
             
-            <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-xl text-foreground/80 mb-8 max-w-2xl mx-auto leading-relaxed">
               A revolucionária plataforma de trading para eventos onde fundadores vendem ações das suas startups a investidores anjos e VCs num mercado dinâmico e interativo.
             </p>
             
@@ -40,7 +40,7 @@ export default function Index() {
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="px-8 py-6 text-lg h-14 border-white/30 text-white hover:bg-white/10">
+              <Button asChild size="lg" variant="outline" className="px-8 py-6 text-lg h-14 border-foreground/30 text-foreground hover:bg-foreground/10">
                 <Link to="/auth">
                   Entrar na Plataforma
                 </Link>
