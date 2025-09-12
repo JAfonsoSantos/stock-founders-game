@@ -468,7 +468,7 @@ export default function CreateGame() {
       name: formData.name,
       description: formData.description,
       logo_url: formData.brandingLogo,
-      hero_image_url: undefined, // Can be added later
+      hero_image_url: formData.profileHeader,
       starts_at: formData.startsAt.toISOString(),
       ends_at: formData.endsAt.toISOString(),
       currency: formData.currency,
