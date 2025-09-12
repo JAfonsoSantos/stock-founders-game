@@ -189,6 +189,9 @@ export default function CreateGame() {
     { id: 'vc', label: 'VC Budget', value: 1000000 },
   ]);
 
+  const [startDateOpen, setStartDateOpen] = useState(false);
+  const [endDateOpen, setEndDateOpen] = useState(false);
+
   const availableBudgetTypes = [
     { id: 'founder', label: 'Founder Budget' },
     { id: 'angel', label: 'Angel Budget' },
@@ -715,7 +718,7 @@ export default function CreateGame() {
                      <div className="grid grid-cols-2 gap-4">
                         <div>
                           <Label className="text-gray-700 font-medium">Start Date</Label>
-                          <Popover>
+                          <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
                             <PopoverTrigger asChild>
                               <Button
                                 variant="outline"
@@ -734,6 +737,7 @@ export default function CreateGame() {
                                 selected={formData.startsAt}
                                 onSelect={(date) => {
                                   setFormData({ ...formData, startsAt: date || today });
+                                  setStartDateOpen(false);
                                 }}
                                 initialFocus
                               />
@@ -743,7 +747,7 @@ export default function CreateGame() {
 
                         <div>
                           <Label className="text-gray-700 font-medium">End Date</Label>
-                          <Popover>
+                          <Popover open={endDateOpen} onOpenChange={setEndDateOpen}>
                             <PopoverTrigger asChild>
                               <Button
                                 variant="outline"
@@ -762,6 +766,7 @@ export default function CreateGame() {
                                 selected={formData.endsAt}
                                 onSelect={(date) => {
                                   setFormData({ ...formData, endsAt: date || today });
+                                  setEndDateOpen(false);
                                 }}
                                 initialFocus
                               />
