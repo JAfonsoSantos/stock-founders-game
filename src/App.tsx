@@ -108,11 +108,7 @@ const App = () => (
                   <Auth />
                 </PublicRoute>
               } />
-              <Route path="/setup" element={
-                <PublicRoute>
-                  <Setup />
-                </PublicRoute>
-              } />
+              <Route path="/setup" element={<Setup />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/profile" element={
                 <ProtectedShellRoute>
