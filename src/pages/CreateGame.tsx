@@ -736,12 +736,7 @@ export default function CreateGame() {
                                   setFormData({ ...formData, startsAt: date || today });
                                 }}
                                 initialFocus
-                                className="p-3 pointer-events-auto bg-white"
-                                classNames={{
-                                  day_today: "bg-white border border-orange-500 text-gray-900",
-                                  day_selected: "bg-orange-500 text-white border border-orange-500 hover:bg-orange-600",
-                                  day: "hover:bg-gray-100"
-                                }}
+                                className="p-3 pointer-events-auto"
                               />
                             </PopoverContent>
                           </Popover>
@@ -770,12 +765,7 @@ export default function CreateGame() {
                                   setFormData({ ...formData, endsAt: date || today });
                                 }}
                                 initialFocus
-                                className="p-3 pointer-events-auto bg-white"
-                                classNames={{
-                                  day_today: "bg-white border border-orange-500 text-gray-900",
-                                  day_selected: "bg-orange-500 text-white border border-orange-500 hover:bg-orange-600",
-                                  day: "hover:bg-gray-100"
-                                }}
+                                className="p-3 pointer-events-auto"
                               />
                             </PopoverContent>
                           </Popover>
