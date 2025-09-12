@@ -13,6 +13,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { GameProfile } from "@/components/GameProfile";
 import { BrandingUpload } from "@/components/BrandingUpload";
+import { ImageEditor } from "@/components/ImageEditor";
 import { 
   ChevronDown, 
   ArrowLeft, 
@@ -144,9 +145,10 @@ export default function CreateGame() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState<"template" | "form" | "preview">("template");
+  const [step, setStep] = useState<"template" | "form" | "preview" | "image-editor">("template");
   const [howItWorksOpen, setHowItWorksOpen] = useState(true);
   const [selectedTemplate, setSelectedTemplate] = useState<string>("");
+  const [editingImageType, setEditingImageType] = useState<'logo' | 'header' | null>(null);
 
   const today = new Date();
 
@@ -493,13 +495,74 @@ export default function CreateGame() {
       handleSubmit(fakeEvent);
     };
 
+    const handleImageEdit = (type?: 'logo' | 'header') => {
+      if (type) {
+        setEditingImageType(type);
+        setStep("image-editor");
+      } else {
+        setStep("form");
+      }
+    };
+
     return (
       <GameProfile
         gameData={gameData}
         isPreview={true}
         onBack={() => setStep("form")}
-        onEdit={() => setStep("form")}
+        onEdit={handleImageEdit}
         onCreateGame={handleCreateGame}
+      />
+    );
+  }
+
+  if (step === "image-editor" && editingImageType) {
+    const handleSaveImage = async (imageBlob: Blob) => {
+      try {
+        const fileExt = 'png';
+        const fileName = `${Date.now()}-edited.${fileExt}`;
+        const bucketName = editingImageType === 'logo' ? 'logos' : 'headers';
+
+        const { error: uploadError } = await supabase.storage
+          .from(bucketName)
+          .upload(fileName, imageBlob);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from(bucketName)
+          .getPublicUrl(fileName);
+
+        // Update form data with new image URL
+        if (editingImageType === 'logo') {
+          setFormData({ ...formData, brandingLogo: publicUrl });
+        } else {
+          setFormData({ ...formData, profileHeader: publicUrl });
+        }
+
+        setEditingImageType(null);
+        setStep("preview");
+      } catch (error: any) {
+        toast({
+          variant: "destructive",
+          title: "Upload failed", 
+          description: error.message,
+        });
+      }
+    };
+
+    const currentImageUrl = editingImageType === 'logo' 
+      ? formData.brandingLogo 
+      : formData.profileHeader;
+
+    return (
+      <ImageEditor
+        imageUrl={currentImageUrl}
+        type={editingImageType}
+        onSave={handleSaveImage}
+        onCancel={() => {
+          setEditingImageType(null);
+          setStep("preview");
+        }}
       />
     );
   }

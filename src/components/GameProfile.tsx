@@ -53,7 +53,7 @@ interface GameProfileProps {
   gameData: GameData;
   isPreview?: boolean;
   onBack?: () => void;
-  onEdit?: () => void;
+  onEdit?: (type?: 'logo' | 'header') => void;
   onCreateGame?: () => void;
   onJoinGame?: () => void;
 }
@@ -111,7 +111,10 @@ export function GameProfile({
           
           {/* Edit Cover Image Button */}
           {isPreview && onEdit && (
-            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+            <div 
+              className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center"
+              onClick={() => onEdit('header')}
+            >
               <Button
                 variant="secondary"
                 size="sm"
@@ -156,7 +159,10 @@ export function GameProfile({
               
               {/* Edit Logo Button */}
               {isPreview && onEdit && (
-                <div className="absolute inset-0 rounded-lg bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+                <div 
+                  className="absolute inset-0 rounded-lg bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center"
+                  onClick={() => onEdit('logo')}
+                >
                   <Button
                     variant="secondary"
                     size="sm"
@@ -207,7 +213,7 @@ export function GameProfile({
           
           <div className="flex gap-2">
             {isPreview && onEdit && (
-              <Button onClick={onEdit} variant="outline" className="bg-white text-gray-700 border-gray-300 hover:bg-gray-50">
+              <Button onClick={() => onEdit()} variant="outline" className="bg-white text-gray-700 border-gray-300 hover:bg-gray-50">
                 <Edit className="h-4 w-4 mr-2" />
                 Keep editing
               </Button>
