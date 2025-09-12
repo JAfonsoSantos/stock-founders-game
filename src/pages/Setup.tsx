@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -77,6 +78,7 @@ const colorConfigs: ColorConfig[] = [
 ];
 
 export default function Setup() {
+  const navigate = useNavigate();
   const [colors, setColors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -294,10 +296,20 @@ export default function Setup() {
                 <RotateCcw className="w-4 h-4 mr-2" />
                 Restaurar Padrões
               </Button>
+            <div className="flex space-x-3">
+              <Button variant="outline" onClick={resetToDefaults}>
+                <RotateCcw className="w-4 h-4 mr-2" />
+                Restaurar Padrões
+              </Button>
               <Button variant="outline" onClick={exportConfig}>
                 <Download className="w-4 h-4 mr-2" />
                 Exportar
               </Button>
+              <Button variant="outline" onClick={() => navigate('/setupcolors')}>
+                <Palette className="w-4 h-4 mr-2" />
+                Editor Visual
+              </Button>
+            </div>
             </div>
           </div>
         </div>

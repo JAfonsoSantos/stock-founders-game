@@ -28,6 +28,7 @@ import FounderOnboarding from "./pages/FounderOnboarding";
 import ResetPassword from "./pages/ResetPassword";
 import GameView from "./pages/GameView";
 import Setup from "./pages/Setup";
+import SetupColors from "./pages/SetupColors";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -109,6 +110,7 @@ const App = () => (
                 </PublicRoute>
               } />
               <Route path="/setup" element={<Setup />} />
+              <Route path="/setupcolors" element={<SetupColors />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/profile" element={
                 <ProtectedShellRoute>
