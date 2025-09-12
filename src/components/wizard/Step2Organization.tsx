@@ -48,6 +48,7 @@ export function Step2Organization({ formData, setFormData }: Step2Props) {
             value={formData.organizerName}
             onChange={(e) => setFormData(prev => ({ ...prev, organizerName: e.target.value }))}
             placeholder="Seu nome"
+            className="placeholder:text-gray-400 border-gray-300 focus:border-gray-400"
           />
         </div>
         <div>
@@ -57,6 +58,7 @@ export function Step2Organization({ formData, setFormData }: Step2Props) {
             value={formData.organizerCompany}
             onChange={(e) => setFormData(prev => ({ ...prev, organizerCompany: e.target.value }))}
             placeholder="Nome da empresa"
+            className="placeholder:text-gray-400 border-gray-300 focus:border-gray-400"
           />
         </div>
       </div>
@@ -68,6 +70,7 @@ export function Step2Organization({ formData, setFormData }: Step2Props) {
           value={formData.eventWebsite}
           onChange={(e) => setFormData(prev => ({ ...prev, eventWebsite: e.target.value }))}
           placeholder="https://..."
+          className="placeholder:text-gray-400 border-gray-300 focus:border-gray-400"
         />
       </div>
 
@@ -82,7 +85,7 @@ export function Step2Organization({ formData, setFormData }: Step2Props) {
         
         <div className="space-y-3">
           {formData.teamMembers.map((member, index) => (
-            <div key={index} className="flex items-center space-x-3 p-3 border rounded-lg">
+            <div key={index} className="flex items-center space-x-3 p-3 border border-gray-300 rounded-lg bg-white">
               <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-3">
                 <Input
                   placeholder="Email"
@@ -92,6 +95,7 @@ export function Step2Organization({ formData, setFormData }: Step2Props) {
                     newMembers[index].email = e.target.value;
                     setFormData(prev => ({ ...prev, teamMembers: newMembers }));
                   }}
+                  className="placeholder:text-gray-400 border-gray-300 focus:border-gray-400"
                 />
                 <Input
                   placeholder="Nome"
@@ -101,6 +105,7 @@ export function Step2Organization({ formData, setFormData }: Step2Props) {
                     newMembers[index].name = e.target.value;
                     setFormData(prev => ({ ...prev, teamMembers: newMembers }));
                   }}
+                  className="placeholder:text-gray-400 border-gray-300 focus:border-gray-400"
                 />
                 <Input
                   placeholder="Cargo"
@@ -110,6 +115,7 @@ export function Step2Organization({ formData, setFormData }: Step2Props) {
                     newMembers[index].role = e.target.value;
                     setFormData(prev => ({ ...prev, teamMembers: newMembers }));
                   }}
+                  className="placeholder:text-gray-400 border-gray-300 focus:border-gray-400"
                 />
               </div>
               {index > 0 && (

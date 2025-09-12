@@ -57,7 +57,7 @@ export function Step4GameSettings({ formData, setFormData }: Step4Props) {
           <div>
             <Label className="text-gray-600">Idioma</Label>
             <Select value={formData.language} onValueChange={(value) => setFormData(prev => ({ ...prev, language: value }))}>
-              <SelectTrigger>
+              <SelectTrigger className="border-gray-300 focus:border-gray-400">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -70,8 +70,8 @@ export function Step4GameSettings({ formData, setFormData }: Step4Props) {
             </Select>
           </div>
 
-          <div className="space-y-3">
-            <Label className="text-base font-semibold">Fases do Mercado</Label>
+            <div className="space-y-3">
+            <Label className="text-base font-semibold text-gray-600">Fases do Mercado</Label>
             <div className="space-y-2">
               <div className="flex items-center space-x-2">
                 <Switch
@@ -79,7 +79,7 @@ export function Step4GameSettings({ formData, setFormData }: Step4Props) {
                   checked={formData.enablePrimaryMarket}
                   onCheckedChange={(checked) => setFormData(prev => ({ ...prev, enablePrimaryMarket: checked }))}
                 />
-                <Label htmlFor="primaryMarket">Mercado Primário</Label>
+                <Label htmlFor="primaryMarket" className="text-gray-600">Mercado Primário</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <Switch
@@ -87,15 +87,15 @@ export function Step4GameSettings({ formData, setFormData }: Step4Props) {
                   checked={formData.enableSecondaryMarket}
                   onCheckedChange={(checked) => setFormData(prev => ({ ...prev, enableSecondaryMarket: checked }))}
                 />
-                <Label htmlFor="secondaryMarket">Mercado Secundário</Label>
+                <Label htmlFor="secondaryMarket" className="text-gray-600">Mercado Secundário</Label>
               </div>
             </div>
           </div>
 
           <div>
-            <Label>Modo de Leaderboard</Label>
+            <Label className="text-gray-600">Modo de Leaderboard</Label>
             <Select value={formData.leaderboardMode} onValueChange={(value) => setFormData(prev => ({ ...prev, leaderboardMode: value }))}>
-              <SelectTrigger>
+              <SelectTrigger className="border-gray-300 focus:border-gray-400">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -109,9 +109,9 @@ export function Step4GameSettings({ formData, setFormData }: Step4Props) {
 
         <div className="space-y-4">
           <div>
-            <Label>Modo de Trading</Label>
+            <Label className="text-gray-600">Modo de Trading</Label>
             <Select value={formData.tradingMode} onValueChange={(value) => setFormData(prev => ({ ...prev, tradingMode: value }))}>
-              <SelectTrigger>
+              <SelectTrigger className="border-gray-300 focus:border-gray-400">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -127,17 +127,18 @@ export function Step4GameSettings({ formData, setFormData }: Step4Props) {
               checked={formData.circuitBreaker}
               onCheckedChange={(checked) => setFormData(prev => ({ ...prev, circuitBreaker: checked }))}
             />
-            <Label htmlFor="circuitBreaker">Circuit Breaker</Label>
+            <Label htmlFor="circuitBreaker" className="text-gray-600">Circuit Breaker</Label>
           </div>
 
           <div>
-            <Label htmlFor="maxPrice">Preço Máximo por Ação ({getCurrencySymbol()})</Label>
+            <Label htmlFor="maxPrice" className="text-gray-600">Preço Máximo por Ação ({getCurrencySymbol()})</Label>
             <Input
               id="maxPrice"
               type="number"
               value={formData.maxPricePerShare}
               onChange={(e) => setFormData(prev => ({ ...prev, maxPricePerShare: parseInt(e.target.value) || 10000 }))}
               min="1"
+              className="placeholder:text-gray-400 border-gray-300 focus:border-gray-400"
             />
           </div>
 
@@ -148,7 +149,7 @@ export function Step4GameSettings({ formData, setFormData }: Step4Props) {
                 checked={formData.judgesPanel}
                 onCheckedChange={(checked) => setFormData(prev => ({ ...prev, judgesPanel: checked }))}
               />
-              <Label htmlFor="judgesPanel">Ativar Painel de Juízes</Label>
+              <Label htmlFor="judgesPanel" className="text-gray-600">Ativar Painel de Juízes</Label>
             </div>
           )}
         </div>

@@ -59,46 +59,46 @@ export function Step6PreviewCreate({ formData }: Step6Props) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="p-6">
-          <h3 className="font-semibold text-lg mb-4">Informações Básicas</h3>
+        <Card className="p-6 bg-white border-gray-200">
+          <h3 className="font-semibold text-lg mb-4 text-gray-700">Informações Básicas</h3>
           <div className="space-y-2 text-sm">
-            <div><strong>Nome:</strong> {formData.name}</div>
-            <div><strong>Organizador:</strong> {formData.organizerName}</div>
-            <div><strong>Data:</strong> {format(formData.startDate, 'dd/MM/yyyy')} - {format(formData.endDate, 'dd/MM/yyyy')}</div>
-            <div><strong>Moeda:</strong> {formData.currency}</div>
+            <div><strong className="text-gray-700">Nome:</strong> <span className="text-gray-600">{formData.name}</span></div>
+            <div><strong className="text-gray-700">Organizador:</strong> <span className="text-gray-600">{formData.organizerName}</span></div>
+            <div><strong className="text-gray-700">Data:</strong> <span className="text-gray-600">{format(formData.startDate, 'dd/MM/yyyy')} - {format(formData.endDate, 'dd/MM/yyyy')}</span></div>
+            <div><strong className="text-gray-700">Moeda:</strong> <span className="text-gray-600">{formData.currency}</span></div>
           </div>
         </Card>
 
-        <Card className="p-6">
-          <h3 className="font-semibold text-lg mb-4">Terminologia</h3>
+        <Card className="p-6 bg-white border-gray-200">
+          <h3 className="font-semibold text-lg mb-4 text-gray-700">Terminologia</h3>
           <div className="space-y-2 text-sm">
-            <div><strong>Template:</strong> {MACRO_TEMPLATES.find(t => t.id === formData.templateId)?.name}</div>
-            <div><strong>Asset:</strong> {formData.assetSingular} / {formData.assetPlural}</div>
-            <div><strong>Roles:</strong> {formData.roles.length}</div>
-            <div><strong>Budget Total:</strong> {formatBudget(Object.values(formData.budgets).reduce((a, b) => a + b, 0))}</div>
+            <div><strong className="text-gray-700">Template:</strong> <span className="text-gray-600">{MACRO_TEMPLATES.find(t => t.id === formData.templateId)?.name}</span></div>
+            <div><strong className="text-gray-700">Asset:</strong> <span className="text-gray-600">{formData.assetSingular} / {formData.assetPlural}</span></div>
+            <div><strong className="text-gray-700">Roles:</strong> <span className="text-gray-600">{formData.roles.length}</span></div>
+            <div><strong className="text-gray-700">Budget Total:</strong> <span className="text-gray-600">{formatBudget(Object.values(formData.budgets).reduce((a, b) => a + b, 0))}</span></div>
           </div>
         </Card>
 
-        <Card className="p-6">
-          <h3 className="font-semibold text-lg mb-4">Configurações</h3>
+        <Card className="p-6 bg-white border-gray-200">
+          <h3 className="font-semibold text-lg mb-4 text-gray-700">Configurações</h3>
           <div className="space-y-2 text-sm">
-            <div><strong>Mercado Secundário:</strong> {formData.enableSecondaryMarket ? "Ativo" : "Inativo"}</div>
-            <div><strong>Leaderboard:</strong> {
+            <div><strong className="text-gray-700">Mercado Secundário:</strong> <span className="text-gray-600">{formData.enableSecondaryMarket ? "Ativo" : "Inativo"}</span></div>
+            <div><strong className="text-gray-700">Leaderboard:</strong> <span className="text-gray-600">{
               formData.leaderboardMode === 'public_live' ? 'Público' :
               formData.leaderboardMode === 'private' ? 'Privado' : 'Apenas no Final'
-            }</div>
-            <div><strong>Circuit Breaker:</strong> {formData.circuitBreaker ? "Ativo" : "Inativo"}</div>
-            <div><strong>Preço Máximo:</strong> {formatBudget(formData.maxPricePerShare)}</div>
+            }</span></div>
+            <div><strong className="text-gray-700">Circuit Breaker:</strong> <span className="text-gray-600">{formData.circuitBreaker ? "Ativo" : "Inativo"}</span></div>
+            <div><strong className="text-gray-700">Preço Máximo:</strong> <span className="text-gray-600">{formatBudget(formData.maxPricePerShare)}</span></div>
           </div>
         </Card>
 
-        <Card className="p-6">
-          <h3 className="font-semibold text-lg mb-4">Roles e Budgets</h3>
+        <Card className="p-6 bg-white border-gray-200">
+          <h3 className="font-semibold text-lg mb-4 text-gray-700">Roles e Budgets</h3>
           <div className="space-y-2 text-sm">
             {formData.roles.map(role => (
               <div key={role.id} className="flex justify-between">
-                <span>{role.label}:</span>
-                <span>{formatBudget(formData.budgets[role.id] || 0)}</span>
+                <span className="text-gray-700">{role.label}:</span>
+                <span className="text-gray-600">{formatBudget(formData.budgets[role.id] || 0)}</span>
               </div>
             ))}
           </div>

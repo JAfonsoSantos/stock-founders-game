@@ -213,16 +213,16 @@ export function Step3TemplateTerminology({ formData, setFormData }: Step3Props) 
                 <CardHeader className="pb-3">
                   <div className="flex items-center space-x-3">
                     <div className={`p-3 bg-gradient-to-br ${template.color} rounded-lg`}>
-                      <IconComponent className="h-6 w-6 text-foreground" />
+                      <IconComponent className="h-6 w-6 text-white" />
                     </div>
                     <div>
-                      <CardTitle className="text-lg">{template.name}</CardTitle>
+                      <CardTitle className="text-lg text-gray-700">{template.name}</CardTitle>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-foreground">{template.description}</p>
-                  <p className="text-xs text-foreground mt-2">
+                  <p className="text-sm text-gray-600">{template.description}</p>
+                  <p className="text-xs text-gray-600 mt-2">
                     Asset: {template.defaultAsset.singular}
                   </p>
                 </CardContent>
@@ -244,6 +244,7 @@ export function Step3TemplateTerminology({ formData, setFormData }: Step3Props) 
                 value={formData.assetSingular}
                 onChange={(e) => setFormData(prev => ({ ...prev, assetSingular: e.target.value }))}
                 placeholder="Ex: Startup, Ideia, Projeto"
+                className="placeholder:text-gray-400 border-gray-300 focus:border-gray-400"
               />
             </div>
             <div>
@@ -253,6 +254,7 @@ export function Step3TemplateTerminology({ formData, setFormData }: Step3Props) 
                 value={formData.assetPlural}
                 onChange={(e) => setFormData(prev => ({ ...prev, assetPlural: e.target.value }))}
                 placeholder="Ex: Startups, Ideias, Projetos"
+                className="placeholder:text-gray-400 border-gray-300 focus:border-gray-400"
               />
             </div>
           </div>
@@ -276,26 +278,28 @@ export function Step3TemplateTerminology({ formData, setFormData }: Step3Props) 
               {formData.roles.map((role, index) => (
                 <Card key={role.id} className="p-4 bg-white border-gray-200">
                   <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
-                    <div>
-                      <Label className="text-sm">Label</Label>
-                      <Input
-                        value={role.label}
-                        onChange={(e) => updateRole(role.id, 'label', e.target.value)}
-                        placeholder="Nome do role"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label className="text-sm">Budget ({getCurrencySymbol()})</Label>
-                      <Input
-                        type="number"
-                        value={formData.budgets[role.id] || 0}
-                        onChange={(e) => setFormData(prev => ({
-                          ...prev,
-                          budgets: { ...prev.budgets, [role.id]: parseInt(e.target.value) || 0 }
-                        }))}
-                      />
-                    </div>
+                     <div>
+                       <Label className="text-sm text-gray-600">Label</Label>
+                       <Input
+                         value={role.label}
+                         onChange={(e) => updateRole(role.id, 'label', e.target.value)}
+                         placeholder="Nome do role"
+                         className="placeholder:text-gray-400 border-gray-300 focus:border-gray-400"
+                       />
+                     </div>
+                     
+                     <div>
+                       <Label className="text-sm text-gray-600">Budget ({getCurrencySymbol()})</Label>
+                       <Input
+                         type="number"
+                         value={formData.budgets[role.id] || 0}
+                         onChange={(e) => setFormData(prev => ({
+                           ...prev,
+                           budgets: { ...prev.budgets, [role.id]: parseInt(e.target.value) || 0 }
+                         }))}
+                         className="placeholder:text-gray-400 border-gray-300 focus:border-gray-400"
+                       />
+                     </div>
 
                     <div className="flex items-center space-x-2">
                       <Checkbox
@@ -303,16 +307,17 @@ export function Step3TemplateTerminology({ formData, setFormData }: Step3Props) 
                         checked={role.canTrade}
                         onCheckedChange={(checked) => updateRole(role.id, 'canTrade', !!checked)}
                       />
-                      <Label htmlFor={`canTrade-${role.id}`} className="text-sm">Pode negociar?</Label>
+                      <Label htmlFor={`canTrade-${role.id}`} className="text-sm text-gray-600">Pode negociar?</Label>
                     </div>
 
                     <div>
-                      <Label className="text-sm">Peso de voto</Label>
+                      <Label className="text-sm text-gray-600">Peso de voto</Label>
                       <Input
                         type="number"
                         min="1"
                         value={role.voteWeight}
                         onChange={(e) => updateRole(role.id, 'voteWeight', parseInt(e.target.value) || 1)}
+                        className="placeholder:text-gray-400 border-gray-300 focus:border-gray-400"
                       />
                     </div>
 
@@ -323,7 +328,7 @@ export function Step3TemplateTerminology({ formData, setFormData }: Step3Props) 
                           checked={role.isIssuer}
                           onCheckedChange={(checked) => updateRole(role.id, 'isIssuer', !!checked)}
                         />
-                        <Label htmlFor={`isIssuer-${role.id}`} className="text-sm">Emissor?</Label>
+                        <Label htmlFor={`isIssuer-${role.id}`} className="text-sm text-gray-600">Emissor?</Label>
                       </div>
                       {formData.roles.length > 1 && (
                         <Button

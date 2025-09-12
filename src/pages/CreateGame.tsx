@@ -221,9 +221,9 @@ export default function CreateGame() {
               <Button
                 onClick={handleSubmit}
                 disabled={isCreating || !canProceed()}
-                className="bg-green-600 hover:bg-green-700"
+                className="bg-orange-600 hover:bg-orange-700"
               >
-                {isCreating ? "Criando..." : "Criar Evento"}
+                {isCreating ? "Criando..." : "Preview Evento"}
               </Button>
             )}
           </div>

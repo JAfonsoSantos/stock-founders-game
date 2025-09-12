@@ -57,14 +57,14 @@ export function Step5HowItWorks({ formData }: Step5Props) {
         {steps.map((step, index) => {
           const IconComponent = step.icon;
           return (
-            <Card key={index} className="p-6">
+            <Card key={index} className="p-6 bg-white border-gray-200">
               <div className="flex items-start space-x-4">
-                <div className="p-3 bg-primary/10 rounded-lg">
-                  <IconComponent className="h-6 w-6 text-primary" />
+                <div className="p-3 bg-blue-100 rounded-lg">
+                  <IconComponent className="h-6 w-6 text-blue-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg mb-2">{step.title}</h3>
-                  <p className="text-foreground">{step.description}</p>
+                  <h3 className="font-semibold text-lg mb-2 text-gray-700">{step.title}</h3>
+                  <p className="text-gray-600">{step.description}</p>
                 </div>
               </div>
             </Card>
@@ -72,25 +72,25 @@ export function Step5HowItWorks({ formData }: Step5Props) {
         })}
       </div>
 
-      <Card className="p-6 bg-primary/5 border-primary/20">
-        <h3 className="font-semibold text-lg mb-3">
+      <Card className="p-6 bg-white border-gray-200">
+        <h3 className="font-semibold text-lg mb-3 text-gray-700">
           Configuração do seu evento: {formData.name}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
           <div>
-            <strong>Asset:</strong> {formData.assetSingular} / {formData.assetPlural}
+            <strong className="text-gray-700">Asset:</strong> <span className="text-gray-600">{formData.assetSingular} / {formData.assetPlural}</span>
           </div>
           <div>
-            <strong>Roles:</strong> {formData.roles.map(r => r.label).join(", ")}
+            <strong className="text-gray-700">Roles:</strong> <span className="text-gray-600">{formData.roles.map(r => r.label).join(", ")}</span>
           </div>
           <div>
-            <strong>Mercado Secundário:</strong> {formData.enableSecondaryMarket ? "Ativo" : "Inativo"}
+            <strong className="text-gray-700">Mercado Secundário:</strong> <span className="text-gray-600">{formData.enableSecondaryMarket ? "Ativo" : "Inativo"}</span>
           </div>
           <div>
-            <strong>Leaderboard:</strong> {
+            <strong className="text-gray-700">Leaderboard:</strong> <span className="text-gray-600">{
               formData.leaderboardMode === 'public_live' ? 'Público' :
               formData.leaderboardMode === 'private' ? 'Privado' : 'Apenas no Final'
-            }
+            }</span>
           </div>
         </div>
       </Card>
