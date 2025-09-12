@@ -4,6 +4,8 @@ import { useGameContext } from "@/context/GameContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useI18n } from "@/hooks/useI18n";
+import { Button } from "@/components/ui/button";
+import { Settings } from "lucide-react";
 
 
 export function Header() {
@@ -32,6 +34,16 @@ export function Header() {
         <div className="flex-1 md:flex-none md:w-80">
           <GameSearch />
         </div>
+        
+        {/* Setup Button */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate('/setup')}
+          className="text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+        >
+          <Settings className="h-4 w-4" />
+        </Button>
         
         {/* Notifications */}
         <NotificationBell />

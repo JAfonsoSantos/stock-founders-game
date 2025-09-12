@@ -27,6 +27,7 @@ import Leaderboard from "./pages/Leaderboard";
 import FounderOnboarding from "./pages/FounderOnboarding";
 import ResetPassword from "./pages/ResetPassword";
 import GameView from "./pages/GameView";
+import Setup from "./pages/Setup";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -105,6 +106,11 @@ const App = () => (
               <Route path="/auth" element={
                 <PublicRoute>
                   <Auth />
+                </PublicRoute>
+              } />
+              <Route path="/setup" element={
+                <PublicRoute>
+                  <Setup />
                 </PublicRoute>
               } />
               <Route path="/reset-password" element={<ResetPassword />} />
