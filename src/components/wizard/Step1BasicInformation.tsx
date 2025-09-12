@@ -63,7 +63,7 @@ export function Step1BasicInformation({ formData, setFormData }: Step1Props) {
               value={formData.name}
               onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
               placeholder="Ex: Demo Day Lisboa 2024"
-              className="placeholder:text-gray-400 border-gray-300 focus:border-gray-400"
+              className="placeholder:text-gray-400 border-gray-300 focus:border-gray-400 text-gray-500"
             />
           </div>
 
@@ -75,19 +75,19 @@ export function Step1BasicInformation({ formData, setFormData }: Step1Props) {
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
               placeholder="Descreva o seu evento..."
               rows={3}
-              className="placeholder:text-gray-400 border-gray-300 focus:border-gray-400"
+              className="placeholder:text-gray-400 border-gray-300 focus:border-gray-400 text-gray-500"
             />
           </div>
 
           <div>
             <Label htmlFor="currency" className="text-gray-600">Moeda</Label>
             <Select value={formData.currency} onValueChange={(value) => setFormData(prev => ({ ...prev, currency: value }))}>
-              <SelectTrigger className="border-gray-300 focus:border-gray-400">
+              <SelectTrigger className="border-gray-300 focus:border-gray-400 text-gray-500">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white border-gray-200 shadow-lg z-50">
                 {CURRENCIES.map(currency => (
-                  <SelectItem key={currency.value} value={currency.value}>
+                  <SelectItem key={currency.value} value={currency.value} className="hover:bg-gray-50 focus:bg-gray-50 text-gray-700">
                     {currency.label}
                   </SelectItem>
                 ))}
@@ -132,7 +132,7 @@ export function Step1BasicInformation({ formData, setFormData }: Step1Props) {
                   type="time"
                   value={formData.startTime}
                   onChange={(e) => setFormData(prev => ({ ...prev, startTime: e.target.value }))}
-                  className="border-gray-300 focus:border-gray-400"
+                  className="border-gray-300 focus:border-gray-400 text-gray-500"
                 />
               </div>
               <div>
@@ -142,7 +142,7 @@ export function Step1BasicInformation({ formData, setFormData }: Step1Props) {
                   type="time"
                   value={formData.endTime}
                   onChange={(e) => setFormData(prev => ({ ...prev, endTime: e.target.value }))}
-                  className="border-gray-300 focus:border-gray-400"
+                  className="border-gray-300 focus:border-gray-400 text-gray-500"
                 />
               </div>
             </div>
@@ -155,8 +155,8 @@ export function Step1BasicInformation({ formData, setFormData }: Step1Props) {
         
         <div>
           <Label className="text-gray-600">Tema de Cores</Label>
-          <Select value={formData.colorTheme} onValueChange={(value) => setFormData(prev => ({ ...prev, colorTheme: value }))}>
-            <SelectTrigger className="w-full bg-white border-gray-300">
+            <Select value={formData.colorTheme} onValueChange={(value) => setFormData(prev => ({ ...prev, colorTheme: value }))}>
+            <SelectTrigger className="w-full bg-white border-gray-300 text-gray-500">
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="bg-white border-gray-200 shadow-lg z-50">

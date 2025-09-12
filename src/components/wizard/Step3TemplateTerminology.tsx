@@ -244,7 +244,7 @@ export function Step3TemplateTerminology({ formData, setFormData }: Step3Props) 
                 value={formData.assetSingular}
                 onChange={(e) => setFormData(prev => ({ ...prev, assetSingular: e.target.value }))}
                 placeholder="Ex: Startup, Ideia, Projeto"
-                className="placeholder:text-gray-400 border-gray-300 focus:border-gray-400"
+                className="placeholder:text-gray-400 border-gray-300 focus:border-gray-400 text-gray-500"
               />
             </div>
             <div>
@@ -254,7 +254,7 @@ export function Step3TemplateTerminology({ formData, setFormData }: Step3Props) 
                 value={formData.assetPlural}
                 onChange={(e) => setFormData(prev => ({ ...prev, assetPlural: e.target.value }))}
                 placeholder="Ex: Startups, Ideias, Projetos"
-                className="placeholder:text-gray-400 border-gray-300 focus:border-gray-400"
+                className="placeholder:text-gray-400 border-gray-300 focus:border-gray-400 text-gray-500"
               />
             </div>
           </div>
@@ -284,7 +284,7 @@ export function Step3TemplateTerminology({ formData, setFormData }: Step3Props) 
                          value={role.label}
                          onChange={(e) => updateRole(role.id, 'label', e.target.value)}
                          placeholder="Nome do role"
-                         className="placeholder:text-gray-400 border-gray-300 focus:border-gray-400"
+                         className="placeholder:text-gray-400 border-gray-300 focus:border-gray-400 text-gray-500"
                        />
                      </div>
                      
@@ -297,7 +297,7 @@ export function Step3TemplateTerminology({ formData, setFormData }: Step3Props) 
                            ...prev,
                            budgets: { ...prev.budgets, [role.id]: parseInt(e.target.value) || 0 }
                          }))}
-                         className="placeholder:text-gray-400 border-gray-300 focus:border-gray-400"
+                         className="placeholder:text-gray-400 border-gray-300 focus:border-gray-400 text-gray-500"
                        />
                      </div>
 
@@ -317,7 +317,7 @@ export function Step3TemplateTerminology({ formData, setFormData }: Step3Props) 
                         min="1"
                         value={role.voteWeight}
                         onChange={(e) => updateRole(role.id, 'voteWeight', parseInt(e.target.value) || 1)}
-                        className="placeholder:text-gray-400 border-gray-300 focus:border-gray-400"
+                        className="placeholder:text-gray-400 border-gray-300 focus:border-gray-400 text-gray-500"
                       />
                     </div>
 

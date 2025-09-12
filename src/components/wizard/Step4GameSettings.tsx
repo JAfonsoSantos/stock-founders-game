@@ -57,12 +57,12 @@ export function Step4GameSettings({ formData, setFormData }: Step4Props) {
           <div>
             <Label className="text-gray-600">Idioma</Label>
             <Select value={formData.language} onValueChange={(value) => setFormData(prev => ({ ...prev, language: value }))}>
-              <SelectTrigger className="border-gray-300 focus:border-gray-400">
+              <SelectTrigger className="border-gray-300 focus:border-gray-400 text-gray-500">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white border-gray-200 shadow-lg z-50">
                 {LANGUAGES.map(lang => (
-                  <SelectItem key={lang.value} value={lang.value}>
+                  <SelectItem key={lang.value} value={lang.value} className="hover:bg-gray-50 focus:bg-gray-50 text-gray-700">
                     {lang.label}
                   </SelectItem>
                 ))}
@@ -95,13 +95,13 @@ export function Step4GameSettings({ formData, setFormData }: Step4Props) {
           <div>
             <Label className="text-gray-600">Modo de Leaderboard</Label>
             <Select value={formData.leaderboardMode} onValueChange={(value) => setFormData(prev => ({ ...prev, leaderboardMode: value }))}>
-              <SelectTrigger className="border-gray-300 focus:border-gray-400">
+              <SelectTrigger className="border-gray-300 focus:border-gray-400 text-gray-500">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="public_live">Público em Tempo Real</SelectItem>
-                <SelectItem value="private">Privado</SelectItem>
-                <SelectItem value="final_only">Apenas no Final</SelectItem>
+              <SelectContent className="bg-white border-gray-200 shadow-lg z-50">
+                <SelectItem value="public_live" className="hover:bg-gray-50 focus:bg-gray-50 text-gray-700">Público em Tempo Real</SelectItem>
+                <SelectItem value="private" className="hover:bg-gray-50 focus:bg-gray-50 text-gray-700">Privado</SelectItem>
+                <SelectItem value="final_only" className="hover:bg-gray-50 focus:bg-gray-50 text-gray-700">Apenas no Final</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -111,12 +111,12 @@ export function Step4GameSettings({ formData, setFormData }: Step4Props) {
           <div>
             <Label className="text-gray-600">Modo de Trading</Label>
             <Select value={formData.tradingMode} onValueChange={(value) => setFormData(prev => ({ ...prev, tradingMode: value }))}>
-              <SelectTrigger className="border-gray-300 focus:border-gray-400">
+              <SelectTrigger className="border-gray-300 focus:border-gray-400 text-gray-500">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="continuous">Contínuo</SelectItem>
-                <SelectItem value="rounds">Por Rondas</SelectItem>
+              <SelectContent className="bg-white border-gray-200 shadow-lg z-50">
+                <SelectItem value="continuous" className="hover:bg-gray-50 focus:bg-gray-50 text-gray-700">Contínuo</SelectItem>
+                <SelectItem value="rounds" className="hover:bg-gray-50 focus:bg-gray-50 text-gray-700">Por Rondas</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -138,7 +138,7 @@ export function Step4GameSettings({ formData, setFormData }: Step4Props) {
               value={formData.maxPricePerShare}
               onChange={(e) => setFormData(prev => ({ ...prev, maxPricePerShare: parseInt(e.target.value) || 10000 }))}
               min="1"
-              className="placeholder:text-gray-400 border-gray-300 focus:border-gray-400"
+              className="placeholder:text-gray-400 border-gray-300 focus:border-gray-400 text-gray-500"
             />
           </div>
 
