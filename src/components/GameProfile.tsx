@@ -242,9 +242,10 @@ export function GameProfile({
           {gameData.description && (
             <Card className="bg-white shadow-sm border-gray-100 mb-8">
               <CardContent className="pt-8 pb-6 px-8">
-                <p className="text-gray-700 leading-relaxed text-lg">
-                  {gameData.description}
-                </p>
+                <div 
+                  className="text-gray-700 leading-relaxed text-lg prose prose-gray max-w-none"
+                  dangerouslySetInnerHTML={{ __html: gameData.description }}
+                />
               </CardContent>
             </Card>
           )}

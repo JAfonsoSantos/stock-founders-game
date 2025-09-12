@@ -7,6 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Switch } from '@/components/ui/switch';
 import { DatePicker } from '@/components/DatePicker';
 import { BrandingUpload } from '@/components/BrandingUpload';
+import { RichTextEditor } from '@/components/RichTextEditor';
 
 const CURRENCIES = [
   { value: "USD", label: "US Dollar (USD)", symbol: "$" },
@@ -69,13 +70,11 @@ export function Step1BasicInformation({ formData, setFormData }: Step1Props) {
 
           <div>
             <Label htmlFor="description" className="text-gray-600">Descrição *</Label>
-            <Textarea
-              id="description"
+            <RichTextEditor
               value={formData.description}
-              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              onChange={(value) => setFormData(prev => ({ ...prev, description: value }))}
               placeholder="Descreva o seu evento..."
-              rows={3}
-              className="placeholder:text-gray-400 border-gray-300 focus:border-gray-400 text-gray-500"
+              className="min-h-[120px]"
             />
           </div>
 
