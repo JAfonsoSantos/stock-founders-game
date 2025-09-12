@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,6 +39,7 @@ import {
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserProfile } from "@/hooks/useUserProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
@@ -153,6 +155,9 @@ export default function CreateGame() {
 
   const today = new Date();
 
+  // Get user profile data
+  const { profile } = useUserProfile(user);
+
   const [formData, setFormData] = useState({
     // Event Details
     name: "",
@@ -189,9 +194,32 @@ export default function CreateGame() {
     
     // Organization team
     organizationTeam: [
-      { email: user?.email || "", firstName: "", lastName: "", isOwner: true }
+      { 
+        email: profile?.email || user?.email || "", 
+        firstName: profile?.first_name || "", 
+        lastName: profile?.last_name || "", 
+        isOwner: true 
+      }
     ] as Array<{ email: string; firstName: string; lastName: string; isOwner: boolean }>
   });
+
+  // Update organization team when profile loads
+  useEffect(() => {
+    if (profile && formData.organizationTeam[0].isOwner) {
+      setFormData(prev => ({
+        ...prev,
+        organizationTeam: [
+          {
+            email: profile.email || user?.email || "",
+            firstName: profile.first_name || "",
+            lastName: profile.last_name || "",
+            isOwner: true
+          },
+          ...prev.organizationTeam.slice(1)
+        ]
+      }));
+    }
+  }, [profile, user?.email]);
 
   const [budgets, setBudgets] = useState([
     { id: 'founder', label: 'Founder Budget', value: 10000 },
@@ -1197,7 +1225,7 @@ export default function CreateGame() {
                   </CardContent>
                  </Card>
 
-                {/* Organization Team */}
+                 {/* Organization Team */}
                 <Card className="bg-white border-gray-200 shadow-sm">
                   <CardHeader>
                     <CardTitle className="text-gray-900 flex items-center">
@@ -1211,58 +1239,94 @@ export default function CreateGame() {
                   <CardContent className="space-y-4">
                     <div className="space-y-3">
                       {formData.organizationTeam.map((member, index) => (
-                        <div key={index} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                          <div className="flex-1 grid grid-cols-3 gap-3">
-                            <Input
-                              placeholder="First name"
-                              value={member.firstName}
-                              onChange={(e) => {
-                                const newTeam = [...formData.organizationTeam];
-                                newTeam[index].firstName = e.target.value;
-                                setFormData({ ...formData, organizationTeam: newTeam });
-                              }}
-                              className="bg-white"
-                              disabled={member.isOwner}
-                            />
-                            <Input
-                              placeholder="Last name"
-                              value={member.lastName}
-                              onChange={(e) => {
-                                const newTeam = [...formData.organizationTeam];
-                                newTeam[index].lastName = e.target.value;
-                                setFormData({ ...formData, organizationTeam: newTeam });
-                              }}
-                              className="bg-white"
-                              disabled={member.isOwner}
-                            />
-                            <Input
-                              placeholder="Email"
-                              type="email"
-                              value={member.email}
-                              onChange={(e) => {
-                                const newTeam = [...formData.organizationTeam];
-                                newTeam[index].email = e.target.value;
-                                setFormData({ ...formData, organizationTeam: newTeam });
-                              }}
-                              className="bg-white"
-                              disabled={member.isOwner}
-                            />
+                        <div key={index} className={cn(
+                          "flex items-center space-x-4 p-4 rounded-lg border",
+                          member.isOwner ? "bg-orange-50 border-orange-200" : "bg-gray-50 border-gray-200"
+                        )}>
+                          {/* Avatar */}
+                          <div className="flex-shrink-0">
+                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white font-semibold text-lg">
+                              {member.firstName && member.lastName 
+                                ? `${member.firstName[0]}${member.lastName[0]}` 
+                                : member.email 
+                                  ? member.email[0].toUpperCase() 
+                                  : '?'
+                              }
+                            </div>
                           </div>
-                          {member.isOwner ? (
-                            <Badge variant="secondary" className="text-xs">Owner</Badge>
-                          ) : (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => {
-                                const newTeam = formData.organizationTeam.filter((_, i) => i !== index);
-                                setFormData({ ...formData, organizationTeam: newTeam });
-                              }}
-                              className="text-red-600 hover:text-red-800"
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
-                          )}
+                          
+                          {/* Content */}
+                          <div className="flex-1 space-y-3">
+                            {/* Name and Role */}
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <div className="flex items-center space-x-2">
+                                  <h4 className="font-semibold text-gray-900">
+                                    {member.firstName && member.lastName 
+                                      ? `${member.firstName} ${member.lastName}` 
+                                      : 'Unnamed Member'
+                                    }
+                                  </h4>
+                                  {member.isOwner && (
+                                    <Badge variant="secondary" className="text-xs bg-orange-100 text-orange-800">
+                                      Event Organizer
+                                    </Badge>
+                                  )}
+                                </div>
+                                <p className="text-sm text-gray-600">{member.email}</p>
+                              </div>
+                              
+                              {/* Actions */}
+                              {!member.isOwner && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => {
+                                    const newTeam = formData.organizationTeam.filter((_, i) => i !== index);
+                                    setFormData({ ...formData, organizationTeam: newTeam });
+                                  }}
+                                  className="text-red-600 hover:text-red-800"
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              )}
+                            </div>
+                            
+                            {/* Edit Fields */}
+                            <div className="grid grid-cols-3 gap-3">
+                              <Input
+                                placeholder="First name"
+                                value={member.firstName}
+                                onChange={(e) => {
+                                  const newTeam = [...formData.organizationTeam];
+                                  newTeam[index].firstName = e.target.value;
+                                  setFormData({ ...formData, organizationTeam: newTeam });
+                                }}
+                                className="bg-white text-sm"
+                              />
+                              <Input
+                                placeholder="Last name"
+                                value={member.lastName}
+                                onChange={(e) => {
+                                  const newTeam = [...formData.organizationTeam];
+                                  newTeam[index].lastName = e.target.value;
+                                  setFormData({ ...formData, organizationTeam: newTeam });
+                                }}
+                                className="bg-white text-sm"
+                              />
+                              <Input
+                                placeholder="Email"
+                                type="email"
+                                value={member.email}
+                                onChange={(e) => {
+                                  const newTeam = [...formData.organizationTeam];
+                                  newTeam[index].email = e.target.value;
+                                  setFormData({ ...formData, organizationTeam: newTeam });
+                                }}
+                                className="bg-white text-sm"
+                              />
+                            </div>
+                          </div>
                         </div>
                       ))}
                       

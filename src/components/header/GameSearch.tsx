@@ -125,7 +125,7 @@ export function GameSearch() {
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => setOpen(true)}
           onBlur={() => setTimeout(() => setOpen(false), 200)}
-          className="pl-10 bg-white text-gray-900 placeholder:text-gray-500 flex h-10 w-full rounded-md border border-input focus-visible:outline-none focus-visible:border-orange-500 disabled:cursor-not-allowed disabled:opacity-50"
+          className="pl-10 bg-white text-gray-900 placeholder:text-gray-500 flex h-10 w-full rounded-md border border-gray-300 focus-visible:outline-none focus-visible:border-orange-500 disabled:cursor-not-allowed disabled:opacity-50"
         />
       </div>
       {open && (query.length >= 2 || loading) && (

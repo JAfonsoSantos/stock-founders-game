@@ -179,7 +179,7 @@ export function GameProfile({
                   The Unconference
                 </h1>
                 {isPreview && (
-                  <Badge variant="secondary" className="text-sm font-medium text-gray-800 bg-gray-200/90 backdrop-blur-sm mt-3">
+                  <Badge variant="secondary" className="text-sm font-medium text-gray-800 bg-gray-200/90 backdrop-blur-sm ml-2.5">
                     Preview
                   </Badge>
                 )}

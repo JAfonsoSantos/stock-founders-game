@@ -182,33 +182,50 @@ export function ImageEditor({ imageUrl, type, onSave, onCancel }: ImageEditorPro
   };
 
   const handleSave = () => {
-    if (!fabricCanvas) return;
-
-    // Convert canvas to data URL first, then to blob
-    const dataURL = fabricCanvas.toDataURL({
-      multiplier: 1,
-      format: 'png',
-      quality: 1.0
-    });
-    
-    // Convert data URL to blob
-    fetch(dataURL)
-      .then(res => res.blob())
-      .then(blob => {
-        onSave(blob);
-        toast({
-          title: "Image saved",
-          description: `${type === 'logo' ? 'Logo' : 'Header image'} has been saved successfully`,
-        });
-      })
-      .catch(error => {
-        console.error('Error converting canvas to blob:', error);
-        toast({
-          variant: "destructive",
-          title: "Save failed",
-          description: "Failed to save the edited image",
-        });
+    if (!fabricCanvas) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "No canvas available to save",
       });
+      return;
+    }
+
+    try {
+      // Convert canvas to data URL first, then to blob
+      const dataURL = fabricCanvas.toDataURL({
+        multiplier: 1,
+        format: 'png',
+        quality: 1.0
+      });
+      
+      // Convert data URL to blob
+      fetch(dataURL)
+        .then(res => res.blob())
+        .then(blob => {
+          console.log("Image blob created successfully, calling onSave");
+          onSave(blob);
+          toast({
+            title: "Image saved",
+            description: `${type === 'logo' ? 'Logo' : 'Header image'} has been saved successfully`,
+          });
+        })
+        .catch(error => {
+          console.error('Error converting canvas to blob:', error);
+          toast({
+            variant: "destructive",
+            title: "Save failed",
+            description: "Failed to save the edited image",
+          });
+        });
+    } catch (error) {
+      console.error('Error in handleSave:', error);
+      toast({
+        variant: "destructive",
+        title: "Save failed",
+        description: "An unexpected error occurred while saving",
+      });
+    }
   };
 
   return (
