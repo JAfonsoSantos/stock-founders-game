@@ -93,6 +93,7 @@ export type Database = {
           circuit_breaker_until: string | null
           created_at: string
           currency: string
+          description: string | null
           ends_at: string
           id: string
           locale: string
@@ -111,6 +112,7 @@ export type Database = {
           circuit_breaker_until?: string | null
           created_at?: string
           currency?: string
+          description?: string | null
           ends_at: string
           id?: string
           locale?: string
@@ -129,6 +131,7 @@ export type Database = {
           circuit_breaker_until?: string | null
           created_at?: string
           currency?: string
+          description?: string | null
           ends_at?: string
           id?: string
           locale?: string

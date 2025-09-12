@@ -66,6 +66,7 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
         .rich-text-editor .ql-editor {
           min-height: 100px;
           background: white;
+          color: #4b5563;
         }
         .rich-text-editor .ql-editor.ql-blank::before {
           color: #9ca3af;

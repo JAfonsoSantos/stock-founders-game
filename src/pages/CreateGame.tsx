@@ -120,8 +120,10 @@ export default function CreateGame() {
     startsAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // Tomorrow
     endsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // Next week
     hasFixedTimes: false,
+    startTime: "09:00",
+    endTime: "17:00",
 
-    // Game Configuration  
+    // Game Configuration
     allowSecondary: false,
     showPublicLeaderboards: false,
     circuitBreaker: true,
@@ -827,6 +829,35 @@ export default function CreateGame() {
                     />
                     <Label className="text-sm text-gray-700">Set specific start and end times</Label>
                   </div>
+
+                  {formData.hasFixedTimes && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-gray-700 flex items-center">
+                          <Clock className="h-4 w-4 mr-1" />
+                          Start Time
+                        </Label>
+                        <Input
+                          type="time"
+                          value={formData.startTime}
+                          onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
+                          className="bg-white border-gray-300 text-gray-900"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-gray-700 flex items-center">
+                          <Clock className="h-4 w-4 mr-1" />
+                          End Time
+                        </Label>
+                        <Input
+                          type="time"
+                          value={formData.endTime}
+                          onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
+                          className="bg-white border-gray-300 text-gray-900"
+                        />
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
