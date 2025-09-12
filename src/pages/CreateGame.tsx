@@ -12,51 +12,50 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Separator } from '@/components/ui/separator';
 import { DatePicker } from '@/components/DatePicker';
-import { RichTextEditor } from '@/components/RichTextEditor';
-import { GameProfile } from '@/components/GameProfile';
+import { LogoUpload } from '@/components/LogoUpload';
 import { BrandingUpload } from '@/components/BrandingUpload';
-import { ImageEditor } from '@/components/ImageEditor';
-import {
-  ChevronDown,
-  ArrowLeft,
-  Info,
-  Upload,
-  Palette,
-  Bell,
-  Trophy,
+import { 
+  ChevronLeft,
+  ChevronRight,
+  Check,
   Users,
-  TrendingUp,
-  Zap,
-  Crown,
-  Heart,
-  User,
-  Handshake,
-  Sparkles,
-  Lightbulb,
-  Plus,
-  X,
-  Calendar,
-  Clock,
+  Building2,
+  Code,
+  Network,
   Settings,
   Play,
   Target,
+  TrendingUp,
+  BarChart3,
+  Plus,
+  Minus,
+  X,
+  Calendar,
+  Clock,
+  Globe,
+  MapPin,
   Briefcase,
-  Users2,
-  Send,
-  Edit3,
-  Check,
-  Mail,
-  Building2,
-  Wallet
+  UserCheck,
+  Award,
+  Shield,
+  Timer,
+  Eye,
+  EyeOff,
+  Zap,
+  Wallet,
+  Crown,
+  User,
+  Trophy
 } from 'lucide-react';
-import { Separator } from '@/components/ui/separator';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { toast } from '@/hooks/use-toast';
 
+// Constants
 const CURRENCIES = [
   { value: "USD", label: "US Dollar (USD)", symbol: "$" },
   { value: "EUR", label: "Euro (EUR)", symbol: "€" },
@@ -70,17 +69,103 @@ const CURRENCIES = [
   { value: "HKD", label: "Hong Kong Dollar (HKD)", symbol: "HK$" },
 ];
 
-const LOCALES = [
+const LANGUAGES = [
   { value: "en", label: "English" },
-  { value: "zh", label: "中文" },
-  { value: "hi", label: "हिन्दी" },
-  { value: "es", label: "Español" },
-  { value: "ar", label: "العربية" },
-  { value: "bn", label: "বাংলা" },
   { value: "pt", label: "Português" },
-  { value: "ru", label: "Русский" },
-  { value: "ja", label: "日本語" },
+  { value: "es", label: "Español" },
+  { value: "fr", label: "Français" },
   { value: "de", label: "Deutsch" },
+];
+
+// Macro Templates
+const MACRO_TEMPLATES = [
+  {
+    id: 'startup',
+    name: 'Startup Event',
+    description: 'Para pitch competitions, demo days e eventos de investimento',
+    icon: TrendingUp,
+    color: 'from-blue-500 to-purple-600',
+    defaultAsset: { singular: 'Startup', plural: 'Startups' },
+    defaultRoles: [
+      { id: 'founder', label: 'Founder', canTrade: false, voteWeight: 1, isIssuer: true },
+      { id: 'angel', label: 'Angel', canTrade: true, voteWeight: 1, isIssuer: false },
+      { id: 'vc', label: 'VC', canTrade: true, voteWeight: 1, isIssuer: false }
+    ],
+    defaultBudgets: { founder: 10000, angel: 100000, vc: 1000000 }
+  },
+  {
+    id: 'corporate',
+    name: 'Corporate Event',
+    description: 'Para eventos internos corporativos e apresentação de ideias',
+    icon: Building2,
+    color: 'from-green-500 to-teal-600',
+    defaultAsset: { singular: 'Ideia', plural: 'Ideias' },
+    defaultRoles: [
+      { id: 'team', label: 'Team', canTrade: false, voteWeight: 1, isIssuer: true },
+      { id: 'employee', label: 'Employee', canTrade: true, voteWeight: 1, isIssuer: false },
+      { id: 'judge', label: 'Judge', canTrade: true, voteWeight: 2, isIssuer: false }
+    ],
+    defaultBudgets: { team: 5000, employee: 20000, judge: 50000 }
+  },
+  {
+    id: 'hackathon',
+    name: 'Hackathon',
+    description: 'Para competições de programação e inovação técnica',
+    icon: Code,
+    color: 'from-orange-500 to-red-600',
+    defaultAsset: { singular: 'Projeto', plural: 'Projetos' },
+    defaultRoles: [
+      { id: 'team', label: 'Team', canTrade: false, voteWeight: 1, isIssuer: true },
+      { id: 'judge', label: 'Judge', canTrade: true, voteWeight: 3, isIssuer: false },
+      { id: 'attendee', label: 'Attendee', canTrade: true, voteWeight: 1, isIssuer: false }
+    ],
+    defaultBudgets: { team: 0, judge: 100000, attendee: 25000 }
+  },
+  {
+    id: 'networking',
+    name: 'Networking Event',
+    description: 'Para eventos de networking onde cada pessoa é um ativo',
+    icon: Network,
+    color: 'from-purple-500 to-pink-600',
+    defaultAsset: { singular: 'Perfil', plural: 'Perfis' },
+    defaultRoles: [
+      { id: 'attendee', label: 'Attendee', canTrade: true, voteWeight: 1, isIssuer: true }
+    ],
+    defaultBudgets: { attendee: 50000 }
+  },
+  {
+    id: 'custom',
+    name: 'Custom Event',
+    description: 'Configuração totalmente personalizada',
+    icon: Settings,
+    color: 'from-gray-500 to-gray-700',
+    defaultAsset: { singular: 'Asset', plural: 'Assets' },
+    defaultRoles: [
+      { id: 'founder', label: 'Founder', canTrade: false, voteWeight: 1, isIssuer: true },
+      { id: 'investor', label: 'Investor', canTrade: true, voteWeight: 1, isIssuer: false }
+    ],
+    defaultBudgets: { founder: 10000, investor: 100000 }
+  }
+];
+
+// Global role catalog
+const ROLE_CATALOG = [
+  { id: 'founder', label: 'Founder' },
+  { id: 'angel', label: 'Angel' },
+  { id: 'vc', label: 'VC' },
+  { id: 'team', label: 'Team' },
+  { id: 'employee', label: 'Employee' },
+  { id: 'judge', label: 'Judge' },
+  { id: 'attendee', label: 'Attendee' },
+  { id: 'visitor', label: 'Visitor' }
+];
+
+// Color themes
+const COLOR_THEMES = [
+  { id: 'default', name: 'Default', colors: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444'] },
+  { id: 'purple', name: 'Purple', colors: ['#8B5CF6', '#A855F7', '#C084FC', '#DDD6FE'] },
+  { id: 'green', name: 'Green', colors: ['#10B981', '#34D399', '#6EE7B7', '#A7F3D0'] },
+  { id: 'orange', name: 'Orange', colors: ['#F59E0B', '#FBBF24', '#FCD34D', '#FDE68A'] }
 ];
 
 export default function CreateGame() {
@@ -88,134 +173,159 @@ export default function CreateGame() {
   const { profile } = useUserProfile(user);
   const navigate = useNavigate();
 
-  const [step, setStep] = useState<"template" | "form" | "preview" | "image-editor">("template");
-  const [editingImageType, setEditingImageType] = useState<'logo' | 'header' | null>(null);
+  // Wizard state
+  const [currentStep, setCurrentStep] = useState(1);
   const [isCreating, setIsCreating] = useState(false);
 
-  // Function to lookup user profile by email
-  const lookupUserByEmail = async (email: string) => {
-    if (!email.trim()) return null;
-
-    try {
-      const { data, error } = await supabase
-        .from('users')
-        .select('first_name, last_name, avatar_url')
-        .eq('email', email.trim().toLowerCase())
-        .maybeSingle();
-
-      if (error) {
-        console.error('Error looking up user:', error);
-        return null;
-      }
-
-      return data;
-    } catch (error) {
-      console.error('Error in lookupUserByEmail:', error);
-      return null;
-    }
-  };
-
+  // Form data
   const [formData, setFormData] = useState({
-    // Basic Information
+    // Step 1 - Basics
     name: "",
+    description: "",
     currency: "USD",
-    locale: "en",
-    startsAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // Tomorrow
-    endsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // Next week
-    hasFixedTimes: false,
+    startDate: new Date(Date.now() + 24 * 60 * 60 * 1000),
+    endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    hasSpecificTimes: false,
     startTime: "09:00",
     endTime: "17:00",
+    venue: "presential", // presential | online | hybrid
+    expectedParticipants: 50,
+    colorTheme: "default",
+    notifications: true,
+    logoUrl: "",
+    headerUrl: "",
 
-    // Game Configuration
-    allowSecondary: false,
-    showPublicLeaderboards: false,
-    circuitBreaker: true,
-    maxPricePerShare: 10000,
-
-    // Contest Features
-    votingMode: "none",
-    rewardSystem: "none",
-
-    // Event Type
-    eventType: "unconference",
-
-    // Event Description
-    description: "",
-
-    // Organization
+    // Step 2 - Organization
     organizerName: profile?.first_name && profile?.last_name ? `${profile.first_name} ${profile.last_name}` : "",
     organizerCompany: "",
     eventWebsite: "",
-
-    // Customization
-    brandingLogo: "",
-    profileHeader: "",
-    colorTheme: "default",
-    notificationSettings: true,
-
-    // Organization team
-    organizationTeam: [
+    teamMembers: [
       {
         email: profile?.email || user?.email || "",
-        firstName: profile?.first_name || "",
-        lastName: profile?.last_name || "",
-        isOwner: true,
-        status: 'active' as 'pending' | 'sent' | 'active',
-        avatar_url: profile?.avatar_url || user?.user_metadata?.avatar_url || ""
+        name: profile?.first_name && profile?.last_name ? `${profile.first_name} ${profile.last_name}` : "",
+        role: "Organizer"
       }
-    ] as Array<{ email: string; firstName: string; lastName: string; isOwner: boolean; status: 'pending' | 'sent' | 'active'; avatar_url?: string }>
+    ],
+
+    // Step 3 - Template & Terminology
+    templateId: "",
+    assetSingular: "",
+    assetPlural: "",
+    roles: [] as Array<{
+      id: string;
+      label: string;
+      canTrade: boolean;
+      voteWeight: number;
+      isIssuer: boolean;
+    }>,
+    budgets: {} as Record<string, number>,
+    
+    // Step 4 - Game Settings
+    language: "en",
+    enablePrimaryMarket: true,
+    enableSecondaryMarket: false,
+    leaderboardMode: "private", // public_live | private | final_only
+    tradingMode: "continuous", // continuous | rounds
+    circuitBreaker: true,
+    maxPricePerShare: 10000,
+    judgesPanel: false
   });
 
-  // Update organization team when profile loads
-  useEffect(() => {
-    if (profile && formData.organizationTeam[0].isOwner) {
-      setFormData(prev => ({
-        ...prev,
-        organizerName: profile.first_name && profile.last_name ? `${profile.first_name} ${profile.last_name}` : prev.organizerName,
-        organizationTeam: [
-          {
-            email: profile.email || user?.email || "",
-            firstName: profile.first_name || "",
-            lastName: profile.last_name || "",
-            isOwner: true,
-            status: 'active' as 'pending' | 'sent' | 'active',
-            avatar_url: profile.avatar_url || user?.user_metadata?.avatar_url || ""
-          },
-          ...prev.organizationTeam.slice(1)
-        ]
-      }));
-    }
-  }, [profile, user?.email]);
-
-  const [budgets, setBudgets] = useState([
-    { id: 'founder', label: 'Founder Budget', value: 10000 },
-    { id: 'angel', label: 'Angel Budget', value: 100000 },
-    { id: 'vc', label: 'VC Budget', value: 1000000 },
-  ]);
-
-  const availableBudgetTypes = [
-    { id: 'founder', label: 'Founder Budget' },
-    { id: 'angel', label: 'Angel Budget' },
-    { id: 'vc', label: 'VC Budget' },
-    { id: 'team', label: 'Team Budget' },
-    { id: 'investor', label: 'Investor Budget' },
-    { id: 'employee', label: 'Employee Budget' },
-    { id: 'student', label: 'Student Budget' },
-    { id: 'visitor', label: 'Visitor Budget' },
-    { id: 'booth', label: 'Booth Budget' },
-  ];
-
+  // Helper functions
   const getCurrencySymbol = () => {
     return CURRENCIES.find(c => c.value === formData.currency)?.symbol || "$";
   };
 
-  const formatBudget = (amount: number, currency: string = formData.currency) => {
-    const symbol = CURRENCIES.find(c => c.value === currency)?.symbol || "$";
+  const formatBudget = (amount: number) => {
+    const symbol = getCurrencySymbol();
     return `${symbol}${amount.toLocaleString()}`;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const replacePlaceholders = (text: string) => {
+    return text
+      .replace(/{asset_noun}/g, formData.assetSingular || 'Asset')
+      .replace(/{asset_noun_plural}/g, formData.assetPlural || 'Assets');
+  };
+
+  const applyTemplate = (templateId: string) => {
+    const template = MACRO_TEMPLATES.find(t => t.id === templateId);
+    if (!template) return;
+
+    setFormData(prev => ({
+      ...prev,
+      templateId,
+      assetSingular: template.defaultAsset.singular,
+      assetPlural: template.defaultAsset.plural,
+      roles: template.defaultRoles,
+      budgets: template.defaultBudgets,
+      judgesPanel: template.defaultRoles.some(r => r.id === 'judge')
+    }));
+  };
+
+  const autoBalanceBudgets = () => {
+    const totalParticipants = formData.expectedParticipants;
+    const roleCount = formData.roles.length;
+    const baseAmount = Math.floor(50000 / roleCount) * roleCount;
+    
+    const newBudgets = { ...formData.budgets };
+    formData.roles.forEach((role, index) => {
+      // Issuers get less, traders get more
+      const multiplier = role.isIssuer ? 0.2 : (role.id === 'judge' ? 2 : 1);
+      newBudgets[role.id] = Math.floor(baseAmount * multiplier);
+    });
+
+    setFormData(prev => ({ ...prev, budgets: newBudgets }));
+  };
+
+  const addTeamMember = () => {
+    setFormData(prev => ({
+      ...prev,
+      teamMembers: [...prev.teamMembers, { email: "", name: "", role: "" }]
+    }));
+  };
+
+  const removeTeamMember = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      teamMembers: prev.teamMembers.filter((_, i) => i !== index)
+    }));
+  };
+
+  const addRole = () => {
+    const availableRole = ROLE_CATALOG.find(r => !formData.roles.some(fr => fr.id === r.id));
+    if (availableRole) {
+      setFormData(prev => ({
+        ...prev,
+        roles: [...prev.roles, {
+          id: availableRole.id,
+          label: availableRole.label,
+          canTrade: true,
+          voteWeight: 1,
+          isIssuer: false
+        }],
+        budgets: { ...prev.budgets, [availableRole.id]: 50000 }
+      }));
+    }
+  };
+
+  const removeRole = (roleId: string) => {
+    setFormData(prev => ({
+      ...prev,
+      roles: prev.roles.filter(r => r.id !== roleId),
+      budgets: Object.fromEntries(Object.entries(prev.budgets).filter(([id]) => id !== roleId))
+    }));
+  };
+
+  const updateRole = (roleId: string, field: string, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      roles: prev.roles.map(role => 
+        role.id === roleId ? { ...role, [field]: value } : role
+      )
+    }));
+  };
+
+  const handleSubmit = async () => {
     if (!user) return;
 
     setIsCreating(true);
@@ -225,12 +335,12 @@ export default function CreateGame() {
         name: formData.name,
         description: formData.description,
         status: 'draft' as const,
-        starts_at: formData.startsAt.toISOString(),
-        ends_at: formData.endsAt.toISOString(),
+        starts_at: formData.startDate.toISOString(),
+        ends_at: formData.endDate.toISOString(),
         currency: formData.currency,
-        locale: formData.locale,
-        allow_secondary: formData.allowSecondary,
-        show_public_leaderboards: formData.showPublicLeaderboards,
+        locale: formData.language,
+        allow_secondary: formData.enableSecondaryMarket,
+        show_public_leaderboards: formData.leaderboardMode === 'public_live',
         circuit_breaker: formData.circuitBreaker,
         max_price_per_share: formData.maxPricePerShare,
       };
@@ -243,11 +353,11 @@ export default function CreateGame() {
 
       if (gameError) throw gameError;
 
-      // Create default game roles
-      const roleData = budgets.map(budget => ({
+      // Create game roles
+      const roleData = formData.roles.map(role => ({
         game_id: game.id,
-        role: budget.id as 'founder' | 'angel' | 'vc',
-        default_budget: budget.value
+        role: role.id as any,
+        default_budget: formData.budgets[role.id] || 0
       }));
 
       const { error: rolesError } = await supabase
@@ -256,7 +366,7 @@ export default function CreateGame() {
 
       if (rolesError) throw rolesError;
 
-      // Create participant entry for the organizer
+      // Create organizer participant
       const { error: participantError } = await supabase
         .from('participants')
         .insert({
@@ -288,1043 +398,805 @@ export default function CreateGame() {
     }
   };
 
-  const applyTemplate = (templateValue: string) => {
-    const template = GAME_TEMPLATES.find(t => t.value === templateValue);
-    if (!template) return;
-
-    setFormData(prev => ({
-      ...prev,
-      name: template.label,
-      eventType: templateValue,
-      ...template.config
-    }));
-
-    setStep("form");
+  const nextStep = () => {
+    if (currentStep < 6) setCurrentStep(prev => prev + 1);
   };
 
-  // Game templates data
-  const GAME_TEMPLATES = [
-    {
-      value: 'unconference',
-      label: 'Unconference',
-      tag: 'Recommended',
-      tagline: 'Open, participant-driven format',
-      defaults: 'Sessions, Networking, Polls',
-      icon: Users2,
-      colors: {
-        bg: 'bg-gradient-to-br from-blue-50 to-indigo-50',
-        iconBg: 'bg-gradient-to-br from-blue-500 to-indigo-600'
-      },
-      config: {
-        allowSecondary: false,
-        showPublicLeaderboards: true,
-        votingMode: "virtual-money",
-        rewardSystem: "badges"
-      }
-    },
-    {
-      value: 'hackathon',
-      label: 'Hackathon',
-      tagline: 'Innovation and coding competition',
-      defaults: 'Project submission, Judging, Prizes',
-      icon: Lightbulb,
-      colors: {
-        bg: 'bg-gradient-to-br from-green-50 to-emerald-50',
-        iconBg: 'bg-gradient-to-br from-green-500 to-emerald-600'
-      },
-      config: {
-        allowSecondary: false,
-        showPublicLeaderboards: true,
-        votingMode: "judges",
-        rewardSystem: "prizes"
-      }
-    },
-    {
-      value: 'charity',
-      label: 'Charity Event',
-      tagline: 'Making a positive impact together',
-      defaults: 'Fundraising, Donations, Impact tracking',
-      icon: Heart,
-      colors: {
-        bg: 'bg-gradient-to-br from-pink-50 to-rose-50',
-        iconBg: 'bg-gradient-to-br from-pink-500 to-rose-600'
-      },
-      config: {
-        allowSecondary: false,
-        showPublicLeaderboards: true,
-        votingMode: "donation",
-        rewardSystem: "impact"
-      }
-    },
-    {
-      value: 'demo_day',
-      label: 'Demo Day',
-      tagline: 'Showcase and pitch competition',
-      defaults: 'Presentations, Feedback, Awards',
-      icon: Trophy,
-      colors: {
-        bg: 'bg-gradient-to-br from-purple-50 to-violet-50',
-        iconBg: 'bg-gradient-to-br from-purple-500 to-violet-600'
-      },
-      config: {
-        allowSecondary: false,
-        showPublicLeaderboards: true,
-        votingMode: "panel",
-        rewardSystem: "awards"
-      }
-    },
-    {
-      value: 'networking',
-      label: 'Networking Event',
-      tagline: 'Building connections and relationships',
-      defaults: 'Meet & greet, Business cards, Follow-ups',
-      icon: Users,
-      colors: {
-        bg: 'bg-gradient-to-br from-orange-50 to-amber-50',
-        iconBg: 'bg-gradient-to-br from-orange-500 to-amber-600'
-      },
-      config: {
-        allowSecondary: false,
-        showPublicLeaderboards: false,
-        votingMode: "none",
-        rewardSystem: "connections"
-      }
-    },
-    {
-      value: 'custom',
-      label: 'Custom Event',
-      tagline: 'Build your own unique experience',
-      defaults: 'Fully customizable settings',
-      icon: Plus,
-      colors: {
-        bg: 'bg-gradient-to-br from-gray-50 to-slate-50',
-        iconBg: 'bg-gradient-to-br from-gray-500 to-slate-600'
-      },
-      config: {
-        allowSecondary: false,
-        showPublicLeaderboards: false,
-        votingMode: "none",
-        rewardSystem: "none"
-      }
+  const prevStep = () => {
+    if (currentStep > 1) setCurrentStep(prev => prev - 1);
+  };
+
+  const canProceed = () => {
+    switch (currentStep) {
+      case 1:
+        return formData.name && formData.description && formData.startDate && formData.endDate;
+      case 2:
+        return formData.organizerName;
+      case 3:
+        return formData.templateId && formData.assetSingular && formData.assetPlural && formData.roles.length > 0;
+      case 4:
+        return true;
+      default:
+        return true;
     }
-  ];
+  };
 
-  const CustomTooltip = ({ title, description, children }: { title: string; description: string; children: React.ReactNode }) => (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        {children}
-      </TooltipTrigger>
-      <TooltipContent className="max-w-xs p-3">
-        <div className="space-y-1">
-          <p className="font-semibold text-sm">{title}</p>
-          <p className="text-xs text-gray-600">{description}</p>
-        </div>
-      </TooltipContent>
-    </Tooltip>
-  );
+  // Step components
+  const Step1Basics = () => (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold mb-2">Informações Básicas</h2>
+        <p className="text-gray-600">Configure os detalhes principais do seu evento</p>
+      </div>
 
-  if (step === "template") {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="container mx-auto px-4 py-8">
-          <div className="mb-8">
-            <h1 className="text-2xl font-bold text-gray-900">Create New Game</h1>
-            <p className="text-gray-600 mt-2">Choose a template to get started</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="name">Nome do Evento *</Label>
+            <Input
+              id="name"
+              value={formData.name}
+              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+              placeholder="Ex: Demo Day Lisboa 2024"
+            />
           </div>
-          <div className="max-w-7xl mx-auto">
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-              {GAME_TEMPLATES.map((template) => {
-                const IconComponent = template.icon;
-                return (
-                  <Card
-                    key={template.value}
-                    className={`cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-105 border-gray-200 ${template.colors.bg}`}
-                    onClick={() => applyTemplate(template.value)}
-                  >
-                    <CardHeader className="pb-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <div className={`p-3 ${template.colors.iconBg} rounded-xl shadow-sm`}>
-                            <IconComponent className={`h-6 w-6 text-white`} />
-                          </div>
-                          <div>
-                            <CardTitle className="text-lg text-gray-700">{template.label}</CardTitle>
-                            {template.tag && (
-                              <Badge variant="secondary" className="mt-1 bg-orange-100 text-orange-700">
-                                {template.tag}
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-gray-600 mb-4">{template.tagline}</p>
-                      <div className="text-sm text-gray-500">
-                        <strong>Defaults:</strong> {template.defaults}
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
+
+          <div>
+            <Label htmlFor="description">Descrição *</Label>
+            <Textarea
+              id="description"
+              value={formData.description}
+              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              placeholder="Descreva o seu evento..."
+              rows={3}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="currency">Moeda</Label>
+            <Select value={formData.currency} onValueChange={(value) => setFormData(prev => ({ ...prev, currency: value }))}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {CURRENCIES.map(currency => (
+                  <SelectItem key={currency.value} value={currency.value}>
+                    {currency.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>Data de Início *</Label>
+              <DatePicker
+                date={formData.startDate}
+                onDateSelect={(date) => setFormData(prev => ({ ...prev, startDate: date }))}
+              />
             </div>
+            <div>
+              <Label>Data de Fim *</Label>
+              <DatePicker
+                date={formData.endDate}
+                onDateSelect={(date) => setFormData(prev => ({ ...prev, endDate: date }))}
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="specificTimes"
+              checked={formData.hasSpecificTimes}
+              onCheckedChange={(checked) => setFormData(prev => ({ ...prev, hasSpecificTimes: !!checked }))}
+            />
+            <Label htmlFor="specificTimes">Definir horários específicos</Label>
+          </div>
+
+          {formData.hasSpecificTimes && (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="startTime">Hora de Início</Label>
+                <Input
+                  id="startTime"
+                  type="time"
+                  value={formData.startTime}
+                  onChange={(e) => setFormData(prev => ({ ...prev, startTime: e.target.value }))}
+                />
+              </div>
+              <div>
+                <Label htmlFor="endTime">Hora de Fim</Label>
+                <Input
+                  id="endTime"
+                  type="time"
+                  value={formData.endTime}
+                  onChange={(e) => setFormData(prev => ({ ...prev, endTime: e.target.value }))}
+                />
+              </div>
+            </div>
+          )}
+
+          <div>
+            <Label>Local do Evento</Label>
+            <RadioGroup value={formData.venue} onValueChange={(value) => setFormData(prev => ({ ...prev, venue: value }))}>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="presential" id="presential" />
+                <Label htmlFor="presential">Presencial</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="online" id="online" />
+                <Label htmlFor="online">Online</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="hybrid" id="hybrid" />
+                <Label htmlFor="hybrid">Híbrido</Label>
+              </div>
+            </RadioGroup>
+          </div>
+
+          <div>
+            <Label htmlFor="participants">Participantes Esperados</Label>
+            <Input
+              id="participants"
+              type="number"
+              value={formData.expectedParticipants}
+              onChange={(e) => setFormData(prev => ({ ...prev, expectedParticipants: parseInt(e.target.value) || 0 }))}
+              min="1"
+            />
           </div>
         </div>
       </div>
-    );
-  }
 
-  if (step === "preview") {
-    const gameData = {
-      name: formData.name,
-      description: formData.description,
-      logo_url: formData.brandingLogo,
-      hero_image_url: formData.profileHeader,
-      starts_at: formData.startsAt.toISOString(),
-      ends_at: formData.endsAt.toISOString(),
-      currency: formData.currency,
-      locale: formData.locale,
-      allow_secondary: formData.allowSecondary,
-      show_public_leaderboards: formData.showPublicLeaderboards,
-      circuit_breaker: formData.circuitBreaker,
-      max_price_per_share: formData.maxPricePerShare,
-      default_budgets: {
-        founder: budgets.find(b => b.id === 'founder')?.value || 0,
-        angel: budgets.find(b => b.id === 'angel')?.value || 0,
-        vc: budgets.find(b => b.id === 'vc')?.value || 0,
-      },
-      organizer: {
-        name: user?.user_metadata?.full_name || user?.email || "Event Organizer",
-        avatar: user?.user_metadata?.avatar_url,
-      },
-    };
-
-    const handleCreateGame = () => {
-      const fakeEvent = { preventDefault: () => { } } as React.FormEvent;
-      handleSubmit(fakeEvent);
-    };
-
-    const handleImageEdit = (type?: 'logo' | 'header') => {
-      if (type) {
-        setEditingImageType(type);
-        setStep("image-editor");
-      } else {
-        setStep("form");
-      }
-    };
-
-    return (
-      <GameProfile
-        gameData={gameData}
-        isPreview={true}
-        onBack={() => setStep("form")}
-        onEdit={handleImageEdit}
-        onCreateGame={handleCreateGame}
-      />
-    );
-  }
-
-  if (step === "image-editor" && editingImageType) {
-    return (
-      <ImageEditor
-        type={editingImageType}
-        onSave={(imageBlob: Blob) => {
-          // Convert blob to object URL for preview
-          const imageUrl = URL.createObjectURL(imageBlob);
-          if (editingImageType === 'logo') {
-            setFormData(prev => ({ ...prev, brandingLogo: imageUrl }));
-          } else if (editingImageType === 'header') {
-            setFormData(prev => ({ ...prev, profileHeader: imageUrl }));
-          }
-          setStep("preview");
-        }}
-        onCancel={() => setStep("preview")}
-      />
-    );
-  }
-
-  return (
-    <TooltipProvider>
-      <div className="min-h-screen bg-gray-50">
-        <div className="container mx-auto px-4 py-8">
-          <div className="mb-8">
-            <div className="flex items-center space-x-4">
-              <Button
-                variant="ghost"
-                onClick={() => setStep("template")}
-                className="text-gray-600 hover:text-gray-800"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Templates
-              </Button>
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">Personalização</h3>
+        
+        <div>
+          <Label>Tema de Cores</Label>
+          <RadioGroup value={formData.colorTheme} onValueChange={(value) => setFormData(prev => ({ ...prev, colorTheme: value }))}>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-2">
+              {COLOR_THEMES.map(theme => (
+                <div key={theme.id} className="flex items-center space-x-2">
+                  <RadioGroupItem value={theme.id} id={theme.id} />
+                  <Label htmlFor={theme.id} className="flex items-center space-x-2 cursor-pointer">
+                    <span>{theme.name}</span>
+                    <div className="flex space-x-1">
+                      {theme.colors.map((color, i) => (
+                        <div key={i} className="w-4 h-4 rounded-full" style={{ backgroundColor: color }} />
+                      ))}
+                    </div>
+                  </Label>
+                </div>
+              ))}
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 mt-4">Create New Game</h1>
-            <p className="text-gray-600 mt-2">Configure your game settings</p>
+          </RadioGroup>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="notifications"
+            checked={formData.notifications}
+            onCheckedChange={(checked) => setFormData(prev => ({ ...prev, notifications: checked }))}
+          />
+          <Label htmlFor="notifications">Ativar notificações</Label>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label>Logo do Evento (até 2MB)</Label>
+            <BrandingUpload
+              type="logo"
+              title="Logo do Evento"
+              description="PNG, JPG até 2MB"
+              onUpload={(url) => setFormData(prev => ({ ...prev, logoUrl: url }))}
+              currentUrl={formData.logoUrl}
+            />
+          </div>
+          <div>
+            <Label>Imagem de Header (até 5MB)</Label>
+            <BrandingUpload
+              type="header"
+              title="Imagem de Header"
+              description="PNG, JPG até 5MB"
+              onUpload={(url) => setFormData(prev => ({ ...prev, headerUrl: url }))}
+              currentUrl={formData.headerUrl}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const Step2Organization = () => (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold mb-2">Organização</h2>
+        <p className="text-gray-600">Informações sobre a organização e equipa</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <Label htmlFor="organizerName">Nome do Organizador *</Label>
+          <Input
+            id="organizerName"
+            value={formData.organizerName}
+            onChange={(e) => setFormData(prev => ({ ...prev, organizerName: e.target.value }))}
+            placeholder="Seu nome"
+          />
+        </div>
+        <div>
+          <Label htmlFor="organizerCompany">Empresa/Organização</Label>
+          <Input
+            id="organizerCompany"
+            value={formData.organizerCompany}
+            onChange={(e) => setFormData(prev => ({ ...prev, organizerCompany: e.target.value }))}
+            placeholder="Nome da empresa"
+          />
+        </div>
+      </div>
+
+      <div>
+        <Label htmlFor="eventWebsite">Website do Evento</Label>
+        <Input
+          id="eventWebsite"
+          value={formData.eventWebsite}
+          onChange={(e) => setFormData(prev => ({ ...prev, eventWebsite: e.target.value }))}
+          placeholder="https://..."
+        />
+      </div>
+
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <Label>Membros da Equipa</Label>
+          <Button type="button" variant="outline" size="sm" onClick={addTeamMember}>
+            <Plus className="h-4 w-4 mr-2" />
+            Adicionar Membro
+          </Button>
+        </div>
+        
+        <div className="space-y-3">
+          {formData.teamMembers.map((member, index) => (
+            <div key={index} className="flex items-center space-x-3 p-3 border rounded-lg">
+              <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-3">
+                <Input
+                  placeholder="Email"
+                  value={member.email}
+                  onChange={(e) => {
+                    const newMembers = [...formData.teamMembers];
+                    newMembers[index].email = e.target.value;
+                    setFormData(prev => ({ ...prev, teamMembers: newMembers }));
+                  }}
+                />
+                <Input
+                  placeholder="Nome"
+                  value={member.name}
+                  onChange={(e) => {
+                    const newMembers = [...formData.teamMembers];
+                    newMembers[index].name = e.target.value;
+                    setFormData(prev => ({ ...prev, teamMembers: newMembers }));
+                  }}
+                />
+                <Input
+                  placeholder="Cargo"
+                  value={member.role}
+                  onChange={(e) => {
+                    const newMembers = [...formData.teamMembers];
+                    newMembers[index].role = e.target.value;
+                    setFormData(prev => ({ ...prev, teamMembers: newMembers }));
+                  }}
+                />
+              </div>
+              {index > 0 && (
+                <Button type="button" variant="ghost" size="sm" onClick={() => removeTeamMember(index)}>
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  const Step3Template = () => (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold mb-2">Template & Terminologia</h2>
+        <p className="text-gray-600">Escolha o tipo de evento e configure os termos</p>
+      </div>
+
+      <div>
+        <Label className="text-base font-semibold mb-4 block">Selecionar Template</Label>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {MACRO_TEMPLATES.map(template => {
+            const IconComponent = template.icon;
+            return (
+              <Card
+                key={template.id}
+                className={cn(
+                  "cursor-pointer hover:shadow-lg transition-all duration-300",
+                  formData.templateId === template.id ? "ring-2 ring-blue-500" : ""
+                )}
+                onClick={() => applyTemplate(template.id)}
+              >
+                <CardHeader className="pb-3">
+                  <div className="flex items-center space-x-3">
+                    <div className={`p-3 bg-gradient-to-br ${template.color} rounded-lg`}>
+                      <IconComponent className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg">{template.name}</CardTitle>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600">{template.description}</p>
+                  <p className="text-xs text-gray-500 mt-2">
+                    Asset: {template.defaultAsset.singular}
+                  </p>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      </div>
+
+      {formData.templateId && (
+        <>
+          <Separator />
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <Label htmlFor="assetSingular">Nome do Asset (singular) *</Label>
+              <Input
+                id="assetSingular"
+                value={formData.assetSingular}
+                onChange={(e) => setFormData(prev => ({ ...prev, assetSingular: e.target.value }))}
+                placeholder="Ex: Startup, Ideia, Projeto"
+              />
+            </div>
+            <div>
+              <Label htmlFor="assetPlural">Nome do Asset (plural) *</Label>
+              <Input
+                id="assetPlural"
+                value={formData.assetPlural}
+                onChange={(e) => setFormData(prev => ({ ...prev, assetPlural: e.target.value }))}
+                placeholder="Ex: Startups, Ideias, Projetos"
+              />
+            </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="max-w-4xl mx-auto">
-            <div className="space-y-8">
-
-              {/* Basic Information */}
-              <Card className="bg-white border-gray-200 shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-gray-900 flex items-center">
-                    <Info className="h-5 w-5 mr-2" />
-                    Basic Information
-                  </CardTitle>
-                  <CardDescription className="text-gray-600">
-                    Set up the fundamental details for your game
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="name" className="text-sm font-medium text-gray-700">Game Title</Label>
-                      <Input
-                        id="name"
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        placeholder="Enter game title"
-                        required
-                        className="bg-white border-gray-300 text-gray-900"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="currency" className="text-sm font-medium text-gray-700">Currency</Label>
-                      <Select value={formData.currency} onValueChange={(value) => setFormData({ ...formData, currency: value })}>
-                        <SelectTrigger className="bg-white border-gray-300 text-gray-900">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {CURRENCIES.map((currency) => (
-                            <SelectItem key={currency.value} value={currency.value}>
-                              {currency.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="description" className="text-sm font-medium text-gray-700">Event Description</Label>
-                    <RichTextEditor
-                      value={formData.description}
-                      onChange={(value) => setFormData({ ...formData, description: value })}
-                      placeholder="Describe your event..."
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Organization */}
-              <Card className="bg-white border-gray-200 shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-gray-900 flex items-center">
-                    <Building2 className="h-5 w-5 mr-2" />
-                    Organization
-                  </CardTitle>
-                  <CardDescription className="text-gray-600">
-                    Event organizer information and team management
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  {/* Organizer Information */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label className="text-sm font-medium text-gray-700">
-                        Organizer Name
-                      </Label>
-                      <Input
-                        placeholder="Your name or primary organizer name"
-                        value={formData.organizerName}
-                        onChange={(e) => setFormData({ ...formData, organizerName: e.target.value })}
-                        className="bg-white border-gray-300 text-gray-900"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="text-sm font-medium text-gray-700">
-                        Company/Organization
-                      </Label>
-                      <Input
-                        placeholder="Your company or organization name"
-                        value={formData.organizerCompany}
-                        onChange={(e) => setFormData({ ...formData, organizerCompany: e.target.value })}
-                        className="bg-white border-gray-300 text-gray-900"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium text-gray-700">
-                      Event Website
-                    </Label>
-                    <Input
-                      placeholder="https://your-event-website.com"
-                      value={formData.eventWebsite}
-                      onChange={(e) => setFormData({ ...formData, eventWebsite: e.target.value })}
-                      className="bg-white border-gray-300 text-gray-900"
-                    />
-                  </div>
-
-                  <Separator />
-
-                  {/* Team Management */}
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-medium text-gray-900">Team Members</h4>
-                      <p className="text-sm text-gray-500">Manage organizer access</p>
-                    </div>
-                    
-                    <div className="space-y-3">
-                      {formData.organizationTeam.map((member, index) => (
-                        <div key={index} className={cn(
-                          "flex items-center space-x-4 p-4 rounded-lg border",
-                          member.isOwner ? "bg-orange-50 border-orange-200" : "bg-gray-50 border-gray-200"
-                        )}>
-                          {/* Avatar */}
-                          <div className="flex-shrink-0">
-                            <Avatar className="w-12 h-12">
-                              <AvatarImage src={member.avatar_url} alt={`${member.firstName} ${member.lastName}`} />
-                              <AvatarFallback className="bg-gradient-to-br from-orange-400 to-orange-600 text-white font-semibold text-lg">
-                                {member.firstName && member.lastName
-                                  ? `${member.firstName[0]}${member.lastName[0]}`
-                                  : member.email
-                                    ? member.email[0].toUpperCase()
-                                    : '?'}
-                              </AvatarFallback>
-                            </Avatar>
-                          </div>
-
-                          {/* Content - keeping existing organization team functionality */}
-                          <div className="flex-1 space-y-3">
-                          {/* Name and Role */}
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <div className="flex items-center space-x-2">
-                                <h4 className="font-semibold text-gray-900">
-                                  {member.firstName && member.lastName
-                                    ? `${member.firstName} ${member.lastName}`
-                                    : 'Unnamed Member'
-                                  }
-                                </h4>
-                                {member.isOwner && (
-                                  <Badge variant="secondary" className="text-xs bg-orange-100 text-orange-800">
-                                    Event Organizer
-                                  </Badge>
-                                )}
-                                {!member.isOwner && (
-                                  <Badge
-                                    variant={member.status === 'active' ? 'default' : 'secondary'}
-                                    className={cn(
-                                      "text-xs ml-2",
-                                      member.status === 'active' && "bg-green-100 text-green-800",
-                                      member.status === 'sent' && "bg-blue-100 text-blue-800",
-                                      member.status === 'pending' && "bg-gray-100 text-gray-800"
-                                    )}
-                                  >
-                                    {member.status === 'active' && 'Active'}
-                                    {member.status === 'sent' && 'Invitation Sent'}
-                                    {member.status === 'pending' && 'Pending'}
-                                  </Badge>
-                                )}
-                              </div>
-                              <p className="text-sm text-gray-600">{member.email}</p>
-                            </div>
-
-                            {/* Actions */}
-                            {!member.isOwner && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => {
-                                  const newTeam = formData.organizationTeam.filter((_, i) => i !== index);
-                                  setFormData({ ...formData, organizationTeam: newTeam });
-                                }}
-                                className="text-red-600 hover:text-red-800"
-                              >
-                                <X className="h-4 w-4" />
-                              </Button>
-                            )}
-                          </div>
-
-                          {/* Edit Fields */}
-                          <div className="grid grid-cols-3 gap-3">
-                            <Input
-                              placeholder="First name"
-                              value={member.firstName}
-                              onChange={(e) => {
-                                const newTeam = [...formData.organizationTeam];
-                                newTeam[index].firstName = e.target.value;
-                                setFormData({ ...formData, organizationTeam: newTeam });
-                              }}
-                              className="bg-white text-sm"
-                            />
-                            <Input
-                              placeholder="Last name"
-                              value={member.lastName}
-                              onChange={(e) => {
-                                const newTeam = [...formData.organizationTeam];
-                                newTeam[index].lastName = e.target.value;
-                                setFormData({ ...formData, organizationTeam: newTeam });
-                              }}
-                              className="bg-white text-sm"
-                            />
-                            <div className="flex gap-2">
-                              <Input
-                                placeholder="Email"
-                                type="email"
-                                value={member.email}
-                                onChange={async (e) => {
-                                  const newTeam = [...formData.organizationTeam];
-                                  newTeam[index].email = e.target.value;
-
-                                  // Lookup user profile by email
-                                  if (e.target.value && e.target.value.includes('@')) {
-                                    const userProfile = await lookupUserByEmail(e.target.value);
-                                    if (userProfile) {
-                                      newTeam[index].firstName = userProfile.first_name || newTeam[index].firstName;
-                                      newTeam[index].lastName = userProfile.last_name || newTeam[index].lastName;
-                                      newTeam[index].avatar_url = userProfile.avatar_url || "";
-                                      newTeam[index].status = 'active';
-                                    } else {
-                                      newTeam[index].status = 'pending';
-                                      newTeam[index].avatar_url = "";
-                                    }
-                                  }
-
-                                  setFormData({ ...formData, organizationTeam: newTeam });
-                                }}
-                                className="bg-white text-sm flex-1"
-                              />
-                              {!member.isOwner && member.email && (
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => {
-                                    // Send invite logic would go here
-                                    const newTeam = [...formData.organizationTeam];
-                                    newTeam[index].status = 'sent';
-                                    setFormData({ ...formData, organizationTeam: newTeam });
-                                    // TODO: Implement actual email sending
-                                  }}
-                                  className="px-3 text-gray-600 hover:text-orange-600"
-                                >
-                                  <Mail className="h-4 w-4" />
-                                </Button>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          const newTeam = [...formData.organizationTeam, {
-                            email: "",
-                            firstName: "",
-                            lastName: "",
-                            isOwner: false,
-                            status: 'pending' as 'pending' | 'sent' | 'active',
-                            avatar_url: ""
-                          }];
-                          setFormData({ ...formData, organizationTeam: newTeam });
-                        }}
-                        className="w-full"
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Team Member
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* How it Works */}
-              <Card className="bg-white border-gray-200 shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-gray-900 flex items-center">
-                    <Info className="h-5 w-5 mr-2" />
-                    How it Works
-                  </CardTitle>
-                  <CardDescription className="text-gray-600">
-                    Understanding the game mechanics and flow
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div className="space-y-2 p-4 border rounded-lg border-blue-200 bg-blue-50">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">1</div>
-                        <h4 className="font-medium text-blue-900">Setup</h4>
-                      </div>
-                      <p className="text-sm text-blue-800">Startups register with shares, participants get budgets</p>
-                    </div>
-                    <div className="space-y-2 p-4 border rounded-lg border-green-200 bg-green-50">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">2</div>
-                        <h4 className="font-medium text-green-900">Trading</h4>
-                      </div>
-                      <p className="text-sm text-green-800">Investors propose trades, founders accept/reject primary orders</p>
-                    </div>
-                    <div className="space-y-2 p-4 border rounded-lg border-purple-200 bg-purple-50">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-6 h-6 bg-purple-500 text-white rounded-full flex items-center justify-center text-sm font-bold">3</div>
-                        <h4 className="font-medium text-purple-900">Pricing</h4>
-                      </div>
-                      <p className="text-sm text-purple-800">VWAP of last 3 trades sets market price automatically</p>
-                    </div>
-                    <div className="space-y-2 p-4 border rounded-lg border-orange-200 bg-orange-50">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-6 h-6 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-bold">4</div>
-                        <h4 className="font-medium text-orange-900">Results</h4>
-                      </div>
-                      <p className="text-sm text-orange-800">Leaderboards show top startups and best-performing investors</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Default Budgets */}
-              <Card className="bg-white border-gray-200 shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-gray-900 flex items-center">
-                    <Wallet className="h-5 w-5 mr-2" />
-                    Default Budgets
-                  </CardTitle>
-                  <CardDescription className="text-gray-600">
-                    Set default budget amounts for each participant role
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {budgets.map((budget, index) => (
-                      <div key={budget.id} className="space-y-2">
-                        <Label className="text-sm font-medium text-gray-700 capitalize">
-                          {budget.label}
-                        </Label>
-                        <div className="relative">
-                          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
-                            {getCurrencySymbol()}
-                          </span>
-                          <Input
-                            type="number"
-                            value={budget.value}
-                            onChange={(e) => {
-                              const newBudgets = [...budgets];
-                              newBudgets[index].value = parseInt(e.target.value) || 0;
-                              setBudgets(newBudgets);
-                            }}
-                            className="bg-white border-gray-300 text-gray-900 pl-8"
-                            min="0"
-                            step="1000"
-                          />
-                        </div>
-                        <p className="text-xs text-gray-500">
-                          {formatBudget(budget.value, formData.currency)}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                  
-                  <div className="flex flex-wrap gap-2 pt-4">
-                    <p className="text-sm text-gray-600 mr-2">Add budget type:</p>
-                    {availableBudgetTypes
-                      .filter(type => !budgets.some(b => b.id === type.id))
-                      .map((type) => (
-                        <Button
-                          key={type.id}
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setBudgets([...budgets, { 
-                              id: type.id, 
-                              label: type.label, 
-                              value: 10000 
-                            }]);
-                          }}
-                          className="text-xs"
-                        >
-                          <Plus className="h-3 w-3 mr-1" />
-                          {type.label}
-                        </Button>
-                      ))}
-                  </div>
-                  
-                  {budgets.length > 3 && (
-                    <div className="flex flex-wrap gap-2 pt-2">
-                      <p className="text-sm text-gray-600 mr-2">Remove:</p>
-                      {budgets.slice(3).map((budget) => (
-                        <Button
-                          key={budget.id}
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            setBudgets(budgets.filter(b => b.id !== budget.id));
-                          }}
-                          className="text-xs text-red-600 hover:text-red-800"
-                        >
-                          <X className="h-3 w-3 mr-1" />
-                          {budget.label}
-                        </Button>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Event Dates & Times */}
-              <Card className="bg-white border-gray-200 shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-gray-900 flex items-center">
-                    <Calendar className="h-5 w-5 mr-2" />
-                    Event Dates & Times
-                  </CardTitle>
-                  <CardDescription className="text-gray-600">
-                    Set when your event will take place
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label className="text-sm font-medium text-gray-700">Start Date</Label>
-                      <DatePicker
-                        date={formData.startsAt}
-                        onDateSelect={(date) => setFormData({ ...formData, startsAt: date })}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="text-sm font-medium text-gray-700">End Date</Label>
-                      <DatePicker
-                        date={formData.endsAt}
-                        onDateSelect={(date) => setFormData({ ...formData, endsAt: date })}
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      checked={formData.hasFixedTimes}
-                      onCheckedChange={(checked) => setFormData({ ...formData, hasFixedTimes: checked })}
-                    />
-                    <Label className="text-sm text-gray-700">Set specific start and end times</Label>
-                  </div>
-
-                  {formData.hasFixedTimes && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-                      <div className="space-y-2">
-                        <Label className="text-sm font-medium text-gray-700 flex items-center">
-                          <Clock className="h-4 w-4 mr-1" />
-                          Start Time
-                        </Label>
-                        <Input
-                          type="time"
-                          value={formData.startTime}
-                          onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
-                          className="bg-white border-gray-300 text-gray-900"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label className="text-sm font-medium text-gray-700 flex items-center">
-                          <Clock className="h-4 w-4 mr-1" />
-                          End Time
-                        </Label>
-                        <Input
-                          type="time"
-                          value={formData.endTime}
-                          onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
-                          className="bg-white border-gray-300 text-gray-900"
-                        />
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Game Configuration */}
-              <Card className="bg-white border-gray-200 shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-gray-900 flex items-center">
-                    <Settings className="h-5 w-5 mr-2" />
-                    Game Configuration
-                  </CardTitle>
-                  <CardDescription className="text-gray-600">
-                    Configure game mechanics and features
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-1">
-                          <Label className="text-sm font-medium text-gray-700">Secondary Trading</Label>
-                          <p className="text-xs text-gray-500">Allow participants to trade shares with each other</p>
-                        </div>
-                        <Switch
-                          checked={formData.allowSecondary}
-                          onCheckedChange={(checked) => setFormData({ ...formData, allowSecondary: checked })}
-                        />
-                      </div>
-                      
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-1">
-                          <Label className="text-sm font-medium text-gray-700">Public Leaderboards</Label>
-                          <p className="text-xs text-gray-500">Show rankings publicly during the game</p>
-                        </div>
-                        <Switch
-                          checked={formData.showPublicLeaderboards}
-                          onCheckedChange={(checked) => setFormData({ ...formData, showPublicLeaderboards: checked })}
-                        />
-                      </div>
-                      
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-1">
-                          <Label className="text-sm font-medium text-gray-700">Circuit Breaker</Label>
-                          <p className="text-xs text-gray-500">Pause trading on extreme price movements</p>
-                        </div>
-                        <Switch
-                          checked={formData.circuitBreaker}
-                          onCheckedChange={(checked) => setFormData({ ...formData, circuitBreaker: checked })}
-                        />
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="maxPrice" className="text-sm font-medium text-gray-700">Max Price Per Share</Label>
-                        <Input
-                          id="maxPrice"
-                          type="number"
-                          value={formData.maxPricePerShare}
-                          onChange={(e) => setFormData({ ...formData, maxPricePerShare: parseInt(e.target.value) || 0 })}
-                          placeholder="10000"
-                          className="bg-white border-gray-300 text-gray-900"
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="locale" className="text-sm font-medium text-gray-700">Language</Label>
-                        <Select value={formData.locale} onValueChange={(value) => setFormData({ ...formData, locale: value })}>
-                          <SelectTrigger className="bg-white border-gray-300 text-gray-900">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {LOCALES.map((locale) => (
-                              <SelectItem key={locale.value} value={locale.value}>
-                                {locale.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Contest Features */}
-              <Card className="bg-white border-gray-200 shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-gray-900 flex items-center">
-                    <Trophy className="h-5 w-5 mr-2" />
-                    Contest Features
-                  </CardTitle>
-                  <CardDescription className="text-gray-600">
-                    Add competition elements to your event
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label className="text-sm font-medium text-gray-700">Voting Mode</Label>
-                      <Select value={formData.votingMode} onValueChange={(value) => setFormData({ ...formData, votingMode: value })}>
-                        <SelectTrigger className="bg-white border-gray-300 text-gray-900">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">No Voting</SelectItem>
-                          <SelectItem value="audience">Audience Choice</SelectItem>
-                          <SelectItem value="peer">Peer Review</SelectItem>
-                          <SelectItem value="judges">Judge Scoring</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label className="text-sm font-medium text-gray-700">Reward System</Label>
-                      <Select value={formData.rewardSystem} onValueChange={(value) => setFormData({ ...formData, rewardSystem: value })}>
-                        <SelectTrigger className="bg-white border-gray-300 text-gray-900">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">No Rewards</SelectItem>
-                          <SelectItem value="winner">Winner Takes All</SelectItem>
-                          <SelectItem value="top3">Top 3 Podium</SelectItem>
-                          <SelectItem value="participation">Participation Rewards</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Event Type */}
-              <Card className="bg-white border-gray-200 shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-gray-900 flex items-center">
-                    <Briefcase className="h-5 w-5 mr-2" />
-                    Event Type
-                  </CardTitle>
-                  <CardDescription className="text-gray-600">
-                    Choose the type of event you're organizing
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {[
-                      { value: "unconference", label: "Unconference", icon: Users2 },
-                      { value: "hackathon", label: "Hackathon", icon: Lightbulb },
-                      { value: "charity", label: "Charity Event", icon: Heart },
-                      { value: "demo_day", label: "Demo Day", icon: Trophy },
-                      { value: "networking", label: "Networking", icon: Handshake },
-                      { value: "custom", label: "Custom Event", icon: Plus },
-                    ].map((type) => (
-                      <button
-                        key={type.value}
-                        type="button"
-                        onClick={() => setFormData({ ...formData, eventType: type.value })}
-                        className={cn(
-                          "p-4 border rounded-lg text-left transition-colors",
-                          formData.eventType === type.value
-                            ? "border-orange-500 bg-orange-50 text-orange-700"
-                            : "border-gray-200 hover:border-gray-300 text-gray-700"
-                        )}
-                      >
-                        <type.icon className="h-6 w-6 mb-2" />
-                        <div className="font-medium">{type.label}</div>
-                      </button>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Customization */}
-              <Card className="bg-white border-gray-200 shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-gray-900 flex items-center">
-                    <Palette className="h-5 w-5 mr-2" />
-                    Customization
-                  </CardTitle>
-                  <CardDescription className="text-gray-600">
-                    Customize the look and feel of your event
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label className="text-sm font-medium text-gray-700">Color Theme</Label>
-                      <div className="space-y-3">
-                        <Select value={formData.colorTheme} onValueChange={(value) => setFormData({ ...formData, colorTheme: value })}>
-                          <SelectTrigger className="bg-white border-gray-300 text-gray-900">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="default">Default Orange</SelectItem>
-                            <SelectItem value="blue">Professional Blue</SelectItem>
-                            <SelectItem value="green">Success Green</SelectItem>
-                            <SelectItem value="purple">Creative Purple</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        
-                        {/* Color Preview */}
-                        <div className="grid grid-cols-4 gap-2">
-                          {[
-                            { theme: 'default', colors: ['bg-orange-500', 'bg-orange-400', 'bg-orange-300'], name: 'Orange' },
-                            { theme: 'blue', colors: ['bg-blue-500', 'bg-blue-400', 'bg-blue-300'], name: 'Blue' },
-                            { theme: 'green', colors: ['bg-green-500', 'bg-green-400', 'bg-green-300'], name: 'Green' },
-                            { theme: 'purple', colors: ['bg-purple-500', 'bg-purple-400', 'bg-purple-300'], name: 'Purple' },
-                          ].map((colorSet) => (
-                            <div 
-                              key={colorSet.theme}
-                              className={cn(
-                                "p-2 rounded-lg border cursor-pointer transition-all",
-                                formData.colorTheme === colorSet.theme 
-                                  ? "border-gray-400 ring-2 ring-gray-300" 
-                                  : "border-gray-200 hover:border-gray-300"
-                              )}
-                              onClick={() => setFormData({ ...formData, colorTheme: colorSet.theme })}
-                            >
-                              <div className="flex space-x-1 mb-1">
-                                {colorSet.colors.map((color, index) => (
-                                  <div key={index} className={`w-3 h-3 rounded ${color}`} />
-                                ))}
-                              </div>
-                              <p className="text-xs text-gray-600 text-center">{colorSet.name}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-1">
-                        <Label className="text-sm font-medium text-gray-700">Notifications</Label>
-                        <p className="text-xs text-gray-500">Send email updates to participants</p>
-                      </div>
-                      <Switch
-                        checked={formData.notificationSettings}
-                        onCheckedChange={(checked) => setFormData({ ...formData, notificationSettings: checked })}
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <BrandingUpload
-                      type="logo"
-                      currentUrl={formData.brandingLogo}
-                      onUpload={(url) => setFormData({ ...formData, brandingLogo: url })}
-                      title="Event Logo"
-                      description="Upload your event logo (PNG, JPG - max 2MB)"
-                    />
-                    
-                    <BrandingUpload
-                      type="header"
-                      currentUrl={formData.profileHeader}
-                      onUpload={(url) => setFormData({ ...formData, profileHeader: url })}
-                      title="Header Image"
-                      description="Upload a header image for your event (PNG, JPG - max 5MB)"
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Actions */}
-              <div className="flex justify-between">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setStep("template")}
-                >
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back to Templates
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <Label className="text-base font-semibold">Roles dos Participantes</Label>
+              <div className="space-x-2">
+                <Button type="button" size="sm" variant="outline" onClick={autoBalanceBudgets}>
+                  <Wallet className="h-4 w-4 mr-2" />
+                  Auto-balance Budgets
                 </Button>
-                <Button
-                  type="button"
-                  onClick={() => setStep("preview")}
-                  className="bg-orange-600 hover:bg-orange-700 text-white"
-                >
-                  Preview Game
-                  <ArrowLeft className="h-4 w-4 ml-2 rotate-180" />
+                <Button type="button" size="sm" variant="outline" onClick={addRole}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Adicionar Role
                 </Button>
               </div>
             </div>
-          </form>
+
+            <div className="space-y-4">
+              {formData.roles.map((role, index) => (
+                <Card key={role.id} className="p-4">
+                  <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
+                    <div>
+                      <Label className="text-sm">Label</Label>
+                      <Input
+                        value={role.label}
+                        onChange={(e) => updateRole(role.id, 'label', e.target.value)}
+                        placeholder="Nome do role"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label className="text-sm">Budget ({getCurrencySymbol()})</Label>
+                      <Input
+                        type="number"
+                        value={formData.budgets[role.id] || 0}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          budgets: { ...prev.budgets, [role.id]: parseInt(e.target.value) || 0 }
+                        }))}
+                      />
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`canTrade-${role.id}`}
+                        checked={role.canTrade}
+                        onCheckedChange={(checked) => updateRole(role.id, 'canTrade', !!checked)}
+                      />
+                      <Label htmlFor={`canTrade-${role.id}`} className="text-sm">Pode negociar?</Label>
+                    </div>
+
+                    <div>
+                      <Label className="text-sm">Peso de voto</Label>
+                      <Input
+                        type="number"
+                        min="1"
+                        value={role.voteWeight}
+                        onChange={(e) => updateRole(role.id, 'voteWeight', parseInt(e.target.value) || 1)}
+                      />
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`isIssuer-${role.id}`}
+                          checked={role.isIssuer}
+                          onCheckedChange={(checked) => updateRole(role.id, 'isIssuer', !!checked)}
+                        />
+                        <Label htmlFor={`isIssuer-${role.id}`} className="text-sm">Emissor?</Label>
+                      </div>
+                      {formData.roles.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeRole(role.id)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+
+  const Step4Settings = () => (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold mb-2">Configurações do Jogo</h2>
+        <p className="text-gray-600">Configure as regras e mecânicas do evento</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-4">
+          <div>
+            <Label>Idioma</Label>
+            <Select value={formData.language} onValueChange={(value) => setFormData(prev => ({ ...prev, language: value }))}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {LANGUAGES.map(lang => (
+                  <SelectItem key={lang.value} value={lang.value}>
+                    {lang.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-3">
+            <Label className="text-base font-semibold">Fases do Mercado</Label>
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="primaryMarket"
+                  checked={formData.enablePrimaryMarket}
+                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, enablePrimaryMarket: checked }))}
+                />
+                <Label htmlFor="primaryMarket">Mercado Primário</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="secondaryMarket"
+                  checked={formData.enableSecondaryMarket}
+                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, enableSecondaryMarket: checked }))}
+                />
+                <Label htmlFor="secondaryMarket">Mercado Secundário</Label>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <Label>Modo de Leaderboard</Label>
+            <Select value={formData.leaderboardMode} onValueChange={(value) => setFormData(prev => ({ ...prev, leaderboardMode: value }))}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="public_live">Público em Tempo Real</SelectItem>
+                <SelectItem value="private">Privado</SelectItem>
+                <SelectItem value="final_only">Apenas no Final</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <Label>Modo de Trading</Label>
+            <Select value={formData.tradingMode} onValueChange={(value) => setFormData(prev => ({ ...prev, tradingMode: value }))}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="continuous">Contínuo</SelectItem>
+                <SelectItem value="rounds">Por Rondas</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="circuitBreaker"
+              checked={formData.circuitBreaker}
+              onCheckedChange={(checked) => setFormData(prev => ({ ...prev, circuitBreaker: checked }))}
+            />
+            <Label htmlFor="circuitBreaker">Circuit Breaker</Label>
+          </div>
+
+          <div>
+            <Label htmlFor="maxPrice">Preço Máximo por Ação ({getCurrencySymbol()})</Label>
+            <Input
+              id="maxPrice"
+              type="number"
+              value={formData.maxPricePerShare}
+              onChange={(e) => setFormData(prev => ({ ...prev, maxPricePerShare: parseInt(e.target.value) || 10000 }))}
+              min="1"
+            />
+          </div>
+
+          {formData.judgesPanel && (
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="judgesPanel"
+                checked={formData.judgesPanel}
+                onCheckedChange={(checked) => setFormData(prev => ({ ...prev, judgesPanel: checked }))}
+              />
+              <Label htmlFor="judgesPanel">Ativar Painel de Juízes</Label>
+            </div>
+          )}
         </div>
       </div>
-    </TooltipProvider>
+    </div>
+  );
+
+  const Step5HowItWorks = () => {
+    const steps = [
+      {
+        title: "Setup",
+        description: replacePlaceholders("Regista a tua {asset_noun} e configura o perfil inicial"),
+        icon: Settings
+      },
+      {
+        title: "Trading",
+        description: "Investidores propõem trades e emissores aceitam ou rejeitam ofertas",
+        icon: TrendingUp
+      },
+      {
+        title: "Pricing",
+        description: replacePlaceholders("VWAP das últimas 3 trades define o preço atual de cada {asset_noun}"),
+        icon: BarChart3
+      },
+      {
+        title: "Results",
+        description: replacePlaceholders("Leaderboard mostra top {asset_noun_plural} e melhores traders por ROI"),
+        icon: Trophy
+      }
+    ];
+
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-2xl font-bold mb-2">Como Funciona</h2>
+          <p className="text-gray-600">Visão geral do funcionamento do jogo</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {steps.map((step, index) => {
+            const IconComponent = step.icon;
+            return (
+              <Card key={index} className="p-6">
+                <div className="flex items-start space-x-4">
+                  <div className="p-3 bg-blue-100 rounded-lg">
+                    <IconComponent className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">{step.title}</h3>
+                    <p className="text-gray-600">{step.description}</p>
+                  </div>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+
+        <Card className="p-6 bg-blue-50 border-blue-200">
+          <h3 className="font-semibold text-lg mb-3">
+            Configuração do seu evento: {formData.name}
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div>
+              <strong>Asset:</strong> {formData.assetSingular} / {formData.assetPlural}
+            </div>
+            <div>
+              <strong>Roles:</strong> {formData.roles.map(r => r.label).join(", ")}
+            </div>
+            <div>
+              <strong>Mercado Secundário:</strong> {formData.enableSecondaryMarket ? "Ativo" : "Inativo"}
+            </div>
+            <div>
+              <strong>Leaderboard:</strong> {
+                formData.leaderboardMode === 'public_live' ? 'Público' :
+                formData.leaderboardMode === 'private' ? 'Privado' : 'Apenas no Final'
+              }
+            </div>
+          </div>
+        </Card>
+      </div>
+    );
+  };
+
+  const Step6Preview = () => (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold mb-2">Preview & Criar</h2>
+        <p className="text-gray-600">Reveja os detalhes e crie o seu evento</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card className="p-6">
+          <h3 className="font-semibold text-lg mb-4">Informações Básicas</h3>
+          <div className="space-y-2 text-sm">
+            <div><strong>Nome:</strong> {formData.name}</div>
+            <div><strong>Organizador:</strong> {formData.organizerName}</div>
+            <div><strong>Data:</strong> {format(formData.startDate, 'dd/MM/yyyy')} - {format(formData.endDate, 'dd/MM/yyyy')}</div>
+            <div><strong>Participantes:</strong> {formData.expectedParticipants}</div>
+            <div><strong>Moeda:</strong> {formData.currency}</div>
+          </div>
+        </Card>
+
+        <Card className="p-6">
+          <h3 className="font-semibold text-lg mb-4">Terminologia</h3>
+          <div className="space-y-2 text-sm">
+            <div><strong>Template:</strong> {MACRO_TEMPLATES.find(t => t.id === formData.templateId)?.name}</div>
+            <div><strong>Asset:</strong> {formData.assetSingular} / {formData.assetPlural}</div>
+            <div><strong>Roles:</strong> {formData.roles.length}</div>
+            <div><strong>Budget Total:</strong> {formatBudget(Object.values(formData.budgets).reduce((a, b) => a + b, 0))}</div>
+          </div>
+        </Card>
+
+        <Card className="p-6">
+          <h3 className="font-semibold text-lg mb-4">Configurações</h3>
+          <div className="space-y-2 text-sm">
+            <div><strong>Mercado Secundário:</strong> {formData.enableSecondaryMarket ? "Ativo" : "Inativo"}</div>
+            <div><strong>Leaderboard:</strong> {
+              formData.leaderboardMode === 'public_live' ? 'Público' :
+              formData.leaderboardMode === 'private' ? 'Privado' : 'Apenas no Final'
+            }</div>
+            <div><strong>Circuit Breaker:</strong> {formData.circuitBreaker ? "Ativo" : "Inativo"}</div>
+            <div><strong>Preço Máximo:</strong> {formatBudget(formData.maxPricePerShare)}</div>
+          </div>
+        </Card>
+
+        <Card className="p-6">
+          <h3 className="font-semibold text-lg mb-4">Roles e Budgets</h3>
+          <div className="space-y-2 text-sm">
+            {formData.roles.map(role => (
+              <div key={role.id} className="flex justify-between">
+                <span>{role.label}:</span>
+                <span>{formatBudget(formData.budgets[role.id] || 0)}</span>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+
+  const steps = [
+    { id: 1, name: "Básico", component: Step1Basics },
+    { id: 2, name: "Organização", component: Step2Organization },
+    { id: 3, name: "Template", component: Step3Template },
+    { id: 4, name: "Configurações", component: Step4Settings },
+    { id: 5, name: "Como Funciona", component: Step5HowItWorks },
+    { id: 6, name: "Preview", component: Step6Preview }
+  ];
+
+  const CurrentStepComponent = steps.find(s => s.id === currentStep)?.component || Step1Basics;
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 py-8">
+        {/* Progress indicator */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-2xl font-bold">Criar Novo Evento</h1>
+            <div className="text-sm text-gray-500">
+              Passo {currentStep} de {steps.length}
+            </div>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            {steps.map((step, index) => (
+              <React.Fragment key={step.id}>
+                <div className={cn(
+                  "flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium",
+                  currentStep === step.id ? "bg-blue-600 text-white" :
+                  currentStep > step.id ? "bg-green-600 text-white" :
+                  "bg-gray-200 text-gray-600"
+                )}>
+                  {currentStep > step.id ? (
+                    <Check className="h-4 w-4" />
+                  ) : (
+                    step.id
+                  )}
+                </div>
+                {index < steps.length - 1 && (
+                  <div className={cn(
+                    "flex-1 h-1 rounded",
+                    currentStep > step.id ? "bg-green-600" : "bg-gray-200"
+                  )} />
+                )}
+              </React.Fragment>
+            ))}
+          </div>
+          
+          <div className="flex items-center justify-between mt-2">
+            {steps.map(step => (
+              <div key={step.id} className="text-xs text-gray-500 text-center" style={{ width: '12.5%' }}>
+                {step.name}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Step content */}
+        <Card className="max-w-6xl mx-auto">
+          <CardContent className="p-8">
+            <CurrentStepComponent />
+          </CardContent>
+        </Card>
+
+        {/* Navigation */}
+        <div className="flex justify-between mt-8 max-w-6xl mx-auto">
+          <Button
+            variant="outline"
+            onClick={prevStep}
+            disabled={currentStep === 1}
+          >
+            <ChevronLeft className="h-4 w-4 mr-2" />
+            Anterior
+          </Button>
+          
+          <div className="space-x-2">
+            {currentStep < 6 ? (
+              <Button
+                onClick={nextStep}
+                disabled={!canProceed()}
+              >
+                Próximo
+                <ChevronRight className="h-4 w-4 ml-2" />
+              </Button>
+            ) : (
+              <Button
+                onClick={handleSubmit}
+                disabled={isCreating || !canProceed()}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                {isCreating ? "Criando..." : "Criar Evento"}
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
