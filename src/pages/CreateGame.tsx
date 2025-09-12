@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "react-day-picker/style.css";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -728,7 +729,7 @@ export default function CreateGame() {
                                 {formData.startsAt ? format(formData.startsAt, "PPP") : "Pick a date"}
                               </Button>
                             </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0 bg-white border-gray-200" align="start">
+                            <PopoverContent className="w-auto p-0" align="start">
                               <Calendar
                                 mode="single"
                                 selected={formData.startsAt}
@@ -736,7 +737,6 @@ export default function CreateGame() {
                                   setFormData({ ...formData, startsAt: date || today });
                                 }}
                                 initialFocus
-                                className="p-3 pointer-events-auto"
                               />
                             </PopoverContent>
                           </Popover>
@@ -757,7 +757,7 @@ export default function CreateGame() {
                                 {formData.endsAt ? format(formData.endsAt, "PPP") : "Pick a date"}
                               </Button>
                             </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0 bg-white border-gray-200" align="start">
+                            <PopoverContent className="w-auto p-0" align="start">
                               <Calendar
                                 mode="single"
                                 selected={formData.endsAt}
@@ -765,7 +765,6 @@ export default function CreateGame() {
                                   setFormData({ ...formData, endsAt: date || today });
                                 }}
                                 initialFocus
-                                className="p-3 pointer-events-auto"
                               />
                             </PopoverContent>
                           </Popover>
