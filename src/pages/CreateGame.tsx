@@ -172,27 +172,23 @@ export default function CreateGame() {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-2xl font-bold text-gray-700">Criar Novo Evento</h1>
-            <div className="text-sm text-gray-600">
-              Passo {currentStep} de {steps.length}
+            <div className="flex items-center space-x-8">
+              {steps.map((step) => (
+                <button
+                  key={step.id}
+                  onClick={() => setCurrentStep(step.id)}
+                  className={cn(
+                    "text-lg font-medium cursor-pointer transition-colors relative",
+                    currentStep === step.id ? "text-orange-500" : "text-gray-400 hover:text-gray-600"
+                  )}
+                >
+                  {step.id}
+                  {currentStep === step.id && (
+                    <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-orange-500" />
+                  )}
+                </button>
+              ))}
             </div>
-          </div>
-          
-          <div className="flex items-center space-x-8">
-            {steps.map((step) => (
-              <button
-                key={step.id}
-                onClick={() => setCurrentStep(step.id)}
-                className={cn(
-                  "text-lg font-medium cursor-pointer transition-colors relative",
-                  currentStep === step.id ? "text-orange-500" : "text-gray-400 hover:text-gray-600"
-                )}
-              >
-                {step.id}
-                {currentStep === step.id && (
-                  <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-orange-500" />
-                )}
-              </button>
-            ))}
           </div>
         </div>
 
