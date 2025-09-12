@@ -13,8 +13,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { GameProfile } from "@/components/GameProfile";
+import { BrandingUpload } from "@/components/BrandingUpload";
 import { 
-  CalendarIcon, 
+  ChevronDown, 
   ArrowLeft, 
   Info, 
   Upload,
@@ -30,7 +31,8 @@ import {
   Handshake,
   Sparkles,
   Lightbulb,
-  Plus
+  Plus,
+  X
 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -176,17 +178,28 @@ export default function CreateGame() {
 
     // Customization
     brandingLogo: "",
+    profileHeader: "",
     colorTheme: "default",
     notificationSettings: true,
   });
 
-  const [budgets, setBudgets] = useState({
-    founder: 10000,
-    angel: 100000,
-    vc: 1000000,
-    team: 50000,
-    investor: 25000,
-  });
+  const [budgets, setBudgets] = useState([
+    { id: 'founder', label: 'Founder Budget', value: 10000 },
+    { id: 'angel', label: 'Angel Budget', value: 100000 },
+    { id: 'vc', label: 'VC Budget', value: 1000000 },
+  ]);
+
+  const availableBudgetTypes = [
+    { id: 'founder', label: 'Founder Budget' },
+    { id: 'angel', label: 'Angel Budget' },
+    { id: 'vc', label: 'VC Budget' },
+    { id: 'team', label: 'Team Budget' },
+    { id: 'investor', label: 'Investor Budget' },
+    { id: 'employee', label: 'Employee Budget' },
+    { id: 'student', label: 'Student Budget' },
+    { id: 'visitor', label: 'Visitor Budget' },
+    { id: 'booth', label: 'Booth Budget' },
+  ];
 
   const getCurrencySymbol = () => {
     return CURRENCIES.find(c => c.value === formData.currency)?.symbol || "$";
@@ -195,6 +208,35 @@ export default function CreateGame() {
   const formatBudget = (amount: number) => {
     const symbol = getCurrencySymbol();
     return `${symbol}${amount.toLocaleString()}`;
+  };
+
+  const formatCurrency = (amount: number) => {
+    return amount.toLocaleString();
+  };
+
+  const addBudgetType = (budgetType: string) => {
+    const type = availableBudgetTypes.find(t => t.id === budgetType);
+    if (type && !budgets.find(b => b.id === budgetType)) {
+      setBudgets([...budgets, { id: type.id, label: type.label, value: 10000 }]);
+    }
+  };
+
+  const removeBudgetType = (budgetId: string) => {
+    setBudgets(budgets.filter(b => b.id !== budgetId));
+  };
+
+  const updateBudgetValue = (budgetId: string, value: number) => {
+    setBudgets(budgets.map(b => b.id === budgetId ? { ...b, value } : b));
+  };
+
+  const getColorThemeColors = (theme: string) => {
+    const themes = {
+      'default': ['#3B82F6', '#10B981', '#F59E0B', '#EF4444'],
+      'corporate': ['#1F2937', '#374151', '#6B7280', '#9CA3AF'],
+      'startup': ['#F59E0B', '#EF4444', '#EC4899', '#8B5CF6'],
+      'tech': ['#06B6D4', '#10B981', '#84CC16', '#F59E0B'],
+    };
+    return themes[theme as keyof typeof themes] || themes.default;
   };
 
   const getTemplateLabels = () => {
@@ -208,7 +250,11 @@ export default function CreateGame() {
 
     switch (templateValue) {
       case "startup-pitch":
-        setBudgets({ founder: 10000, angel: 100000, vc: 1000000, team: 50000, investor: 25000 });
+        setBudgets([
+          { id: 'founder', label: 'Founder Budget', value: 10000 },
+          { id: 'angel', label: 'Angel Budget', value: 100000 },
+          { id: 'vc', label: 'VC Budget', value: 1000000 }
+        ]);
         setFormData(prev => ({ 
           ...prev, 
           showPublicLeaderboards: true, 
@@ -218,7 +264,11 @@ export default function CreateGame() {
         }));
         break;
       case "vc-simulation":
-        setBudgets({ founder: 10000, angel: 250000, vc: 2000000, team: 50000, investor: 25000 });
+        setBudgets([
+          { id: 'founder', label: 'Founder Budget', value: 10000 },
+          { id: 'angel', label: 'Angel Budget', value: 250000 },
+          { id: 'vc', label: 'VC Budget', value: 2000000 }
+        ]);
         setFormData(prev => ({ 
           ...prev, 
           allowSecondary: true, 
@@ -227,7 +277,10 @@ export default function CreateGame() {
         }));
         break;
       case "corporate-networking":
-        setBudgets({ founder: 5000, angel: 10000, vc: 50000, team: 5000, investor: 10000 });
+        setBudgets([
+          { id: 'team', label: 'Team Budget', value: 5000 },
+          { id: 'employee', label: 'Employee Budget', value: 10000 }
+        ]);
         setFormData(prev => ({ 
           ...prev, 
           votingMode: "points", 
@@ -235,7 +288,10 @@ export default function CreateGame() {
         }));
         break;
       case "conference-expo":
-        setBudgets({ founder: 20000, angel: 50000, vc: 100000, team: 20000, investor: 50000 });
+        setBudgets([
+          { id: 'booth', label: 'Booth Budget', value: 20000 },
+          { id: 'visitor', label: 'Visitor Budget', value: 50000 }
+        ]);
         setFormData(prev => ({ 
           ...prev, 
           showPublicLeaderboards: true, 
@@ -243,7 +299,10 @@ export default function CreateGame() {
         }));
         break;
       case "hackathon-university":
-        setBudgets({ founder: 10000, angel: 20000, vc: 50000, team: 10000, investor: 20000 });
+        setBudgets([
+          { id: 'team', label: 'Team Budget', value: 10000 },
+          { id: 'student', label: 'Student Budget', value: 20000 }
+        ]);
         setFormData(prev => ({ 
           ...prev, 
           showPublicLeaderboards: true, 
@@ -304,11 +363,11 @@ export default function CreateGame() {
       if (gameError) throw gameError;
 
       // Create default role budgets
-      const roleInserts = [
-        { game_id: game.id, role: "founder" as const, default_budget: budgets.founder },
-        { game_id: game.id, role: "angel" as const, default_budget: budgets.angel },
-        { game_id: game.id, role: "vc" as const, default_budget: budgets.vc },
-      ];
+      const roleInserts = budgets.map(budget => ({
+        game_id: game.id,
+        role: budget.id as any,
+        default_budget: budget.value,
+      }));
 
       const { error: rolesError } = await supabase
         .from("game_roles")
@@ -336,12 +395,11 @@ export default function CreateGame() {
   const InfoTooltip = ({ content }: { content: string }) => (
     <Tooltip delayDuration={200}>
       <TooltipTrigger asChild>
-        <div className="inline-flex items-center justify-center w-5 h-5 ml-2 cursor-help group">
+        <div className="inline-flex items-center justify-center w-4 h-4 ml-2 cursor-help group">
           <div className="relative">
-            <div className="w-4 h-4 bg-gradient-to-br from-gray-400 to-gray-500 rounded-full flex items-center justify-center shadow-sm group-hover:shadow-md transition-all duration-200 group-hover:scale-110">
-              <Info className="h-2.5 w-2.5 text-white" />
+            <div className="w-3 h-3 bg-gray-400 rounded-full flex items-center justify-center shadow-sm group-hover:shadow-md transition-all duration-200 group-hover:scale-110">
+              <Info className="h-2 w-2 text-white" />
             </div>
-            <div className="absolute inset-0 w-4 h-4 bg-gray-300 rounded-full opacity-0 group-hover:opacity-30 animate-ping"></div>
           </div>
         </div>
       </TooltipTrigger>
@@ -420,9 +478,9 @@ export default function CreateGame() {
       circuit_breaker: formData.circuitBreaker,
       max_price_per_share: formData.maxPricePerShare,
       default_budgets: {
-        founder: budgets.founder,
-        angel: budgets.angel,
-        vc: budgets.vc,
+        founder: budgets.find(b => b.id === 'founder')?.value || 0,
+        angel: budgets.find(b => b.id === 'angel')?.value || 0,
+        vc: budgets.find(b => b.id === 'vc')?.value || 0,
       },
       organizer: {
         name: user?.user_metadata?.full_name || user?.email || "Event Organizer",
@@ -655,59 +713,73 @@ export default function CreateGame() {
                      </div>
 
                      <div className="grid grid-cols-2 gap-4">
-                       <div>
-                         <Label className="text-gray-700 font-medium">Start Date</Label>
-                         <Popover>
-                           <PopoverTrigger asChild>
-                             <Button
-                               variant="outline"
-                               className={cn(
-                                 "w-full h-12 justify-start text-left font-normal bg-white border-gray-300 text-gray-700 hover:bg-gray-50",
-                                 !formData.startsAt && "text-gray-500"
-                               )}
-                             >
-                               <CalendarIcon className="mr-2 h-4 w-4" />
-                               {formData.startsAt ? format(formData.startsAt, "PPP") : "Pick a date"}
-                             </Button>
-                           </PopoverTrigger>
-                           <PopoverContent className="w-auto p-0 bg-white border-gray-200" align="start">
-                             <Calendar
-                               mode="single"
-                               selected={formData.startsAt}
-                               onSelect={(date) => setFormData({ ...formData, startsAt: date || today })}
-                               initialFocus
-                               className="p-3 pointer-events-auto bg-white"
-                             />
-                           </PopoverContent>
-                         </Popover>
-                       </div>
+                        <div>
+                          <Label className="text-gray-700 font-medium">Start Date</Label>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant="outline"
+                                className={cn(
+                                  "w-full h-12 justify-start text-left font-normal bg-white border-gray-300 text-gray-700 hover:bg-gray-50",
+                                  !formData.startsAt && "text-gray-500"
+                                )}
+                              >
+                                <Calendar className="mr-2 h-4 w-4" />
+                                {formData.startsAt ? format(formData.startsAt, "PPP") : "Pick a date"}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0 bg-white border-gray-200" align="start">
+                              <Calendar
+                                mode="single"
+                                selected={formData.startsAt}
+                                onSelect={(date) => {
+                                  setFormData({ ...formData, startsAt: date || today });
+                                }}
+                                initialFocus
+                                className="p-3 pointer-events-auto bg-white"
+                                classNames={{
+                                  day_today: "bg-white border border-orange-500 text-gray-900",
+                                  day_selected: "bg-orange-500 text-white border border-orange-500 hover:bg-orange-600",
+                                  day: "hover:bg-gray-100"
+                                }}
+                              />
+                            </PopoverContent>
+                          </Popover>
+                        </div>
 
-                       <div>
-                         <Label className="text-gray-700 font-medium">End Date</Label>
-                         <Popover>
-                           <PopoverTrigger asChild>
-                             <Button
-                               variant="outline"
-                               className={cn(
-                                 "w-full h-12 justify-start text-left font-normal bg-white border-gray-300 text-gray-700 hover:bg-gray-50",
-                                 !formData.endsAt && "text-gray-500"
-                               )}
-                             >
-                               <CalendarIcon className="mr-2 h-4 w-4" />
-                               {formData.endsAt ? format(formData.endsAt, "PPP") : "Pick a date"}
-                             </Button>
-                           </PopoverTrigger>
-                           <PopoverContent className="w-auto p-0 bg-white border-gray-200" align="start">
-                             <Calendar
-                               mode="single"
-                               selected={formData.endsAt}
-                               onSelect={(date) => setFormData({ ...formData, endsAt: date || today })}
-                               initialFocus
-                               className="p-3 pointer-events-auto bg-white"
-                             />
-                           </PopoverContent>
-                         </Popover>
-                       </div>
+                        <div>
+                          <Label className="text-gray-700 font-medium">End Date</Label>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant="outline"
+                                className={cn(
+                                  "w-full h-12 justify-start text-left font-normal bg-white border-gray-300 text-gray-700 hover:bg-gray-50",
+                                  !formData.endsAt && "text-gray-500"
+                                )}
+                              >
+                                <Calendar className="mr-2 h-4 w-4" />
+                                {formData.endsAt ? format(formData.endsAt, "PPP") : "Pick a date"}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0 bg-white border-gray-200" align="start">
+                              <Calendar
+                                mode="single"
+                                selected={formData.endsAt}
+                                onSelect={(date) => {
+                                  setFormData({ ...formData, endsAt: date || today });
+                                }}
+                                initialFocus
+                                className="p-3 pointer-events-auto bg-white"
+                                classNames={{
+                                  day_today: "bg-white border border-orange-500 text-gray-900",
+                                  day_selected: "bg-orange-500 text-white border border-orange-500 hover:bg-orange-600",
+                                  day: "hover:bg-gray-100"
+                                }}
+                              />
+                            </PopoverContent>
+                          </Popover>
+                        </div>
                      </div>
 
                      <div className="space-y-3">
@@ -811,31 +883,41 @@ export default function CreateGame() {
                      </div>
 
                      <div className="grid grid-cols-2 gap-4">
-                       <div>
-                         <Label htmlFor="maxPrice" className="text-gray-700 font-medium">Max Price Per Share</Label>
-                         <Input
-                           id="maxPrice"
-                           type="number"
-                           value={formData.maxPricePerShare}
-                           onChange={(e) => setFormData({ ...formData, maxPricePerShare: Number(e.target.value) })}
-                           min="1"
-                           step="0.01"
-                           className="h-12 bg-white border-gray-300 text-gray-700 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
-                         />
-                       </div>
+                        <div>
+                          <Label htmlFor="maxPrice" className="text-gray-700 font-medium">Max Price Per Share</Label>
+                          <div className="relative">
+                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm font-medium">
+                              {getCurrencySymbol()}
+                            </span>
+                            <Input
+                              id="maxPrice"
+                              type="number"
+                              value={formData.maxPricePerShare}
+                              onChange={(e) => setFormData({ ...formData, maxPricePerShare: Number(e.target.value) })}
+                              min="1"
+                              step="0.01"
+                              className="h-12 bg-white border-gray-300 text-gray-700 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 pl-8"
+                            />
+                          </div>
+                        </div>
 
-                       <div>
-                         <Label htmlFor="initialPrice" className="text-gray-700 font-medium">Initial Share Price</Label>
-                         <Input
-                           id="initialPrice"
-                           type="number"
-                           value={formData.initialSharePrice}
-                           onChange={(e) => setFormData({ ...formData, initialSharePrice: Number(e.target.value) })}
-                           min="0.01"
-                           step="0.01"
-                           className="h-12 bg-white border-gray-300 text-gray-700 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
-                         />
-                       </div>
+                        <div>
+                          <Label htmlFor="initialPrice" className="text-gray-700 font-medium">Initial Share Price</Label>
+                          <div className="relative">
+                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm font-medium">
+                              {getCurrencySymbol()}
+                            </span>
+                            <Input
+                              id="initialPrice"
+                              type="number"
+                              value={formData.initialSharePrice}
+                              onChange={(e) => setFormData({ ...formData, initialSharePrice: Number(e.target.value) })}
+                              min="0.01"
+                              step="0.01"
+                              className="h-12 bg-white border-gray-300 text-gray-700 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 pl-8"
+                            />
+                          </div>
+                        </div>
                      </div>
 
                      <div className="grid grid-cols-2 gap-4">
@@ -886,7 +968,7 @@ export default function CreateGame() {
                   </CardContent>
                 </Card>
 
-                {/* Default Budgets */}
+                 {/* Default Budgets */}
                 <Card className="bg-white border-gray-200 shadow-sm">
                   <CardHeader>
                     <CardTitle className="text-gray-900">Default Budgets</CardTitle>
@@ -894,104 +976,57 @@ export default function CreateGame() {
                       Set starting budgets for each participant type
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        <div>
-                          <Label htmlFor="founderBudget" className="text-gray-700 font-medium">{getTemplateLabels().primary} Budget</Label>
-                          <div className="relative">
-                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm font-medium">
-                              {getCurrencySymbol()}
-                            </span>
-                            <Input
-                              id="founderBudget"
-                              type="number"
-                              value={budgets.founder}
-                              onChange={(e) => setBudgets({ ...budgets, founder: Number(e.target.value) })}
-                              min="0"
-                              className="h-12 bg-white border-gray-300 text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 pl-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-inner-spin-button]:opacity-100 [&::-webkit-outer-spin-button]:opacity-100"
-                              style={{
-                                MozAppearance: 'textfield'
-                              }}
-                            />
+                  <CardContent className="space-y-4">
+                    <div className="space-y-4">
+                      {budgets.map((budget) => (
+                        <div key={budget.id} className="flex items-center space-x-3 bg-gray-50 p-3 rounded-lg">
+                          <div className="flex-1">
+                            <Label className="text-gray-700 font-medium">{budget.label}</Label>
+                            <div className="relative mt-1">
+                              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm font-medium">
+                                {getCurrencySymbol()}
+                              </span>
+                              <Input
+                                type="number"
+                                value={budget.value}
+                                onChange={(e) => updateBudgetValue(budget.id, Number(e.target.value))}
+                                min="0"
+                                className="h-10 bg-white border-gray-300 text-gray-900 focus:border-orange-500 pl-8"
+                              />
+                            </div>
                           </div>
-                        </div>
-                        <div>
-                          <Label htmlFor="angelBudget" className="text-gray-700 font-medium">Angel Budget</Label>
-                          <div className="relative">
-                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm font-medium">
-                              {getCurrencySymbol()}
-                            </span>
-                            <Input
-                              id="angelBudget"
-                              type="number"
-                              value={budgets.angel}
-                              onChange={(e) => setBudgets({ ...budgets, angel: Number(e.target.value) })}
-                              min="0"
-                              className="h-12 bg-white border-gray-300 text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 pl-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-inner-spin-button]:opacity-100 [&::-webkit-outer-spin-button]:opacity-100"
-                              style={{
-                                MozAppearance: 'textfield'
-                              }}
-                            />
+                          <div className="text-sm text-gray-600 min-w-[80px]">
+                            {formatBudget(budget.value)}
                           </div>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => removeBudgetType(budget.id)}
+                            className="h-8 w-8 p-0"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
                         </div>
-                        <div>
-                          <Label htmlFor="vcBudget" className="text-gray-700 font-medium">VC Budget</Label>
-                          <div className="relative">
-                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm font-medium">
-                              {getCurrencySymbol()}
-                            </span>
-                            <Input
-                              id="vcBudget"
-                              type="number"
-                              value={budgets.vc}
-                              onChange={(e) => setBudgets({ ...budgets, vc: Number(e.target.value) })}
-                              min="0"
-                              className="h-12 bg-white border-gray-300 text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 pl-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-inner-spin-button]:opacity-100 [&::-webkit-outer-spin-button]:opacity-100"
-                              style={{
-                                MozAppearance: 'textfield'
-                              }}
-                            />
-                          </div>
-                        </div>
-                        <div>
-                          <Label htmlFor="teamBudget" className="text-gray-700 font-medium">{getTemplateLabels().secondary} Budget</Label>
-                          <div className="relative">
-                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm font-medium">
-                              {getCurrencySymbol()}
-                            </span>
-                            <Input
-                              id="teamBudget"
-                              type="number"
-                              value={budgets.team}
-                              onChange={(e) => setBudgets({ ...budgets, team: Number(e.target.value) })}
-                              min="0"
-                              className="h-12 bg-white border-gray-300 text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 pl-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-inner-spin-button]:opacity-100 [&::-webkit-outer-spin-button]:opacity-100"
-                              style={{
-                                MozAppearance: 'textfield'
-                              }}
-                            />
-                          </div>
-                        </div>
-                        <div>
-                          <Label htmlFor="investorBudget" className="text-gray-700 font-medium">Investor Budget</Label>
-                          <div className="relative">
-                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm font-medium">
-                              {getCurrencySymbol()}
-                            </span>
-                            <Input
-                              id="investorBudget"
-                              type="number"
-                              value={budgets.investor}
-                              onChange={(e) => setBudgets({ ...budgets, investor: Number(e.target.value) })}
-                              min="0"
-                              className="h-12 bg-white border-gray-300 text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 pl-8 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-inner-spin-button]:opacity-100 [&::-webkit-outer-spin-button]:opacity-100"
-                              style={{
-                                MozAppearance: 'textfield'
-                              }}
-                            />
-                          </div>
-                        </div>
-                      </div>
+                      ))}
+                    </div>
+                    
+                    <div className="pt-2">
+                      <Select onValueChange={(value) => addBudgetType(value)}>
+                        <SelectTrigger className="h-10 bg-white border-gray-300 text-gray-700">
+                          <SelectValue placeholder="Add budget type..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {availableBudgetTypes
+                            .filter(type => !budgets.find(b => b.id === type.id))
+                            .map((type) => (
+                              <SelectItem key={type.id} value={type.id}>
+                                {type.label}
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </CardContent>
                 </Card>
 
@@ -1004,51 +1039,94 @@ export default function CreateGame() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div>
-                       <Label className="text-gray-700 font-medium flex items-center">
-                         Branding / Logo Upload
-                         <Upload className="h-4 w-4 ml-2 text-gray-400" />
-                       </Label>
-                      <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center text-gray-500">
-                        <p>Click to upload or drag and drop</p>
-                        <p className="text-xs">PNG, JPG up to 2MB</p>
-                      </div>
-                    </div>
+                     <div className="space-y-4">
+                       <BrandingUpload
+                         type="logo"
+                         currentUrl={formData.brandingLogo}
+                         onUpload={(url) => setFormData({ ...formData, brandingLogo: url })}
+                         title="Branding / Logo Upload"
+                         description="PNG, JPG up to 2MB"
+                       />
+
+                       <BrandingUpload
+                         type="header"
+                         currentUrl={formData.profileHeader}
+                         onUpload={(url) => setFormData({ ...formData, profileHeader: url })}
+                         title="Profile Header Upload"
+                         description="PNG, JPG up to 5MB • Recommended: 1200x400px"
+                       />
+                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
-                      <div>
-                         <Label className="text-gray-700 font-medium flex items-center">
-                           Color Theme
-                           <Palette className="h-4 w-4 ml-2 text-gray-400" />
-                         </Label>
-                         <Select value={formData.colorTheme} onValueChange={(value) => setFormData({ ...formData, colorTheme: value })}>
-                           <SelectTrigger className="h-12 bg-white border-gray-300 text-gray-700">
-                             <SelectValue />
-                           </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="default">Default</SelectItem>
-                            <SelectItem value="corporate">Corporate</SelectItem>
-                            <SelectItem value="startup">Startup</SelectItem>
-                            <SelectItem value="tech">Tech</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
+                       <div>
+                          <Label className="text-gray-700 font-medium flex items-center">
+                            Color Theme
+                            <Palette className="h-4 w-4 ml-2 text-gray-400" />
+                          </Label>
+                          <Select value={formData.colorTheme} onValueChange={(value) => setFormData({ ...formData, colorTheme: value })}>
+                            <SelectTrigger className="h-12 bg-white border-gray-300 text-gray-700">
+                              <SelectValue />
+                            </SelectTrigger>
+                           <SelectContent>
+                             <SelectItem value="default">
+                               <div className="flex items-center space-x-2">
+                                 <span>Default</span>
+                                 <div className="flex space-x-1">
+                                   {getColorThemeColors('default').map((color, i) => (
+                                     <div key={i} className="w-3 h-3 rounded-sm" style={{ backgroundColor: color }} />
+                                   ))}
+                                 </div>
+                               </div>
+                             </SelectItem>
+                             <SelectItem value="corporate">
+                               <div className="flex items-center space-x-2">
+                                 <span>Corporate</span>
+                                 <div className="flex space-x-1">
+                                   {getColorThemeColors('corporate').map((color, i) => (
+                                     <div key={i} className="w-3 h-3 rounded-sm" style={{ backgroundColor: color }} />
+                                   ))}
+                                 </div>
+                               </div>
+                             </SelectItem>
+                             <SelectItem value="startup">
+                               <div className="flex items-center space-x-2">
+                                 <span>Startup</span>
+                                 <div className="flex space-x-1">
+                                   {getColorThemeColors('startup').map((color, i) => (
+                                     <div key={i} className="w-3 h-3 rounded-sm" style={{ backgroundColor: color }} />
+                                   ))}
+                                 </div>
+                               </div>
+                             </SelectItem>
+                             <SelectItem value="tech">
+                               <div className="flex items-center space-x-2">
+                                 <span>Tech</span>
+                                 <div className="flex space-x-1">
+                                   {getColorThemeColors('tech').map((color, i) => (
+                                     <div key={i} className="w-3 h-3 rounded-sm" style={{ backgroundColor: color }} />
+                                   ))}
+                                 </div>
+                               </div>
+                             </SelectItem>
+                           </SelectContent>
+                         </Select>
+                       </div>
 
-                      <div className="flex items-center justify-between">
-                         <div className="space-y-0.5">
-                           <Label className="text-gray-700 font-medium flex items-center">
-                             Notification Settings
-                             <Bell className="h-4 w-4 ml-2 text-gray-400" />
-                           </Label>
-                           <p className="text-sm text-gray-600">
-                             Send event updates to participants
-                           </p>
-                         </div>
-                        <Switch
-                          checked={formData.notificationSettings}
-                          onCheckedChange={(checked) => setFormData({ ...formData, notificationSettings: checked })}
-                        />
-                      </div>
+                       <div className="flex items-center justify-between">
+                          <div className="space-y-0.5">
+                            <div className="flex items-center">
+                              <Label className="text-gray-700 font-medium">Notification Settings</Label>
+                              <InfoTooltip content="Send automatic email notifications to participants about game status changes, market opens/closes, and important updates" />
+                            </div>
+                            <p className="text-sm text-gray-600">
+                              Send event updates to participants
+                            </p>
+                          </div>
+                         <Switch
+                           checked={formData.notificationSettings}
+                           onCheckedChange={(checked) => setFormData({ ...formData, notificationSettings: checked })}
+                         />
+                       </div>
                     </div>
                   </CardContent>
                  </Card>
