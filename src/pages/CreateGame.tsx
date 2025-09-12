@@ -5,9 +5,11 @@ import { useAuth } from '@/hooks/useAuth';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ChevronLeft, ChevronRight, Check } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { ChevronLeft, ChevronRight, Check, Eye } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from '@/hooks/use-toast';
+import { GameProfile } from '@/components/GameProfile';
 import { Step1BasicInformation } from '@/components/wizard/Step1BasicInformation';
 import { Step2Organization } from '@/components/wizard/Step2Organization';
 import { Step3TemplateTerminology } from '@/components/wizard/Step3TemplateTerminology';
@@ -22,6 +24,7 @@ export default function CreateGame() {
 
   const [currentStep, setCurrentStep] = useState(1);
   const [isCreating, setIsCreating] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
 
   const [formData, setFormData] = useState({
     // Step 1 - Basics
@@ -155,6 +158,34 @@ export default function CreateGame() {
     return true;
   };
 
+  const createPreviewData = () => {
+    return {
+      name: formData.name || "Nome do Evento",
+      description: formData.description || "Descrição do evento...",
+      logo_url: formData.logoUrl,
+      hero_image_url: formData.headerUrl,
+      starts_at: formData.startDate.toISOString(),
+      ends_at: formData.endDate.toISOString(),
+      currency: formData.currency,
+      locale: formData.language,
+      allow_secondary: formData.enableSecondaryMarket,
+      show_public_leaderboards: formData.leaderboardMode === 'public_live',
+      circuit_breaker: formData.circuitBreaker,
+      max_price_per_share: formData.maxPricePerShare,
+      default_budgets: {
+        founder: formData.budgets['founder'] || 10000,
+        angel: formData.budgets['angel'] || 100000,
+        vc: formData.budgets['vc'] || 1000000,
+      },
+      organizer: {
+        name: formData.organizerName || (profile?.first_name && profile?.last_name ? `${profile.first_name} ${profile.last_name}` : "Organizador"),
+        avatar: profile?.avatar_url
+      },
+      participants_count: 0,
+      startups_count: 0,
+    };
+  };
+
   const steps = [
     { id: 1, name: "Básico", component: () => <Step1BasicInformation formData={formData} setFormData={setFormData} /> },
     { id: 2, name: "Organização", component: () => <Step2Organization formData={formData} setFormData={setFormData} /> },
@@ -208,7 +239,16 @@ export default function CreateGame() {
             Anterior
           </Button>
           
-          <div className="space-x-2">
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              onClick={() => setShowPreview(true)}
+              className="border-gray-200 text-gray-700 hover:bg-gray-50"
+            >
+              <Eye className="h-4 w-4 mr-2" />
+              Preview
+            </Button>
+            
             {currentStep < 6 ? (
               <Button
                 onClick={nextStep}
@@ -223,11 +263,27 @@ export default function CreateGame() {
                 disabled={isCreating || !canProceed()}
                 className="bg-orange-600 hover:bg-orange-700"
               >
-                {isCreating ? "Criando..." : "Preview Evento"}
+                {isCreating ? "Criando..." : "Criar Evento"}
               </Button>
             )}
           </div>
         </div>
+
+        {/* Preview Modal */}
+        <Dialog open={showPreview} onOpenChange={setShowPreview}>
+          <DialogContent className="max-w-7xl max-h-[90vh] overflow-hidden p-0">
+            <DialogHeader className="p-6 pb-0">
+              <DialogTitle>Preview do Evento</DialogTitle>
+            </DialogHeader>
+            <div className="overflow-y-auto max-h-[calc(90vh-120px)]">
+              <GameProfile
+                gameData={createPreviewData()}
+                isPreview={true}
+                onBack={() => setShowPreview(false)}
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
