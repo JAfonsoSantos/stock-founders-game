@@ -179,12 +179,12 @@ export default function CreateGame() {
   const CurrentStepComponent = steps.find(s => s.id === currentStep)?.component || steps[0].component;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold">Criar Novo Evento</h1>
-            <div className="text-sm text-muted-foreground">
+            <h1 className="text-2xl font-bold text-gray-900">Criar Novo Evento</h1>
+            <div className="text-sm text-gray-600">
               Passo {currentStep} de {steps.length}
             </div>
           </div>
@@ -216,14 +216,14 @@ export default function CreateGame() {
           
           <div className="flex items-center justify-between mt-2">
             {steps.map(step => (
-              <div key={step.id} className="text-xs text-muted-foreground text-center" style={{ width: '12.5%' }}>
+              <div key={step.id} className="text-xs text-gray-600 text-center" style={{ width: '12.5%' }}>
                 {step.name}
               </div>
             ))}
           </div>
         </div>
 
-        <Card className="max-w-6xl mx-auto">
+        <Card className="max-w-6xl mx-auto bg-white border-gray-200 shadow-sm">
           <CardContent className="p-8">
             <CurrentStepComponent />
           </CardContent>

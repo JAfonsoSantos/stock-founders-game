@@ -206,7 +206,7 @@ export function Step3TemplateTerminology({ formData, setFormData }: Step3Props) 
               <Card
                 key={template.id}
                 className={cn(
-                  "cursor-pointer hover:shadow-lg transition-all duration-300",
+                  "cursor-pointer hover:shadow-lg transition-all duration-300 bg-white border-gray-200",
                   formData.templateId === template.id ? "ring-2 ring-primary" : ""
                 )}
                 onClick={() => applyTemplate(template.id)}
@@ -275,7 +275,7 @@ export function Step3TemplateTerminology({ formData, setFormData }: Step3Props) 
 
             <div className="space-y-4">
               {formData.roles.map((role, index) => (
-                <Card key={role.id} className="p-4">
+                <Card key={role.id} className="p-4 bg-white border-gray-200">
                   <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
                     <div>
                       <Label className="text-sm">Label</Label>
