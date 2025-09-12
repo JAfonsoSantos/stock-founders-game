@@ -223,7 +223,7 @@ export default function CreateGame() {
           </div>
         </div>
 
-        <Card className="max-w-6xl mx-auto bg-white border-gray-200 shadow-sm">
+        <Card className="max-w-6xl mx-auto bg-white border-gray-300 shadow-sm">
           <CardContent className="p-8">
             <CurrentStepComponent />
           </CardContent>

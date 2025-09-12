@@ -60,32 +60,32 @@ export function Step1BasicInformation({ formData, setFormData }: Step1Props) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-4">
           <div>
-            <Label htmlFor="name">Nome do Evento *</Label>
+            <Label htmlFor="name" className="text-gray-600">Nome do Evento *</Label>
             <Input
               id="name"
               value={formData.name}
               onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
               placeholder="Ex: Demo Day Lisboa 2024"
-              className="placeholder:text-gray-400"
+              className="placeholder:text-gray-400 border-gray-300 focus:border-gray-400"
             />
           </div>
 
           <div>
-            <Label htmlFor="description">Descrição *</Label>
+            <Label htmlFor="description" className="text-gray-600">Descrição *</Label>
             <Textarea
               id="description"
               value={formData.description}
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
               placeholder="Descreva o seu evento..."
               rows={3}
-              className="placeholder:text-gray-400"
+              className="placeholder:text-gray-400 border-gray-300 focus:border-gray-400"
             />
           </div>
 
           <div>
-            <Label htmlFor="currency">Moeda</Label>
+            <Label htmlFor="currency" className="text-gray-600">Moeda</Label>
             <Select value={formData.currency} onValueChange={(value) => setFormData(prev => ({ ...prev, currency: value }))}>
-              <SelectTrigger>
+              <SelectTrigger className="border-gray-300 focus:border-gray-400">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -102,14 +102,14 @@ export function Step1BasicInformation({ formData, setFormData }: Step1Props) {
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label>Data de Início *</Label>
+              <Label className="text-gray-600">Data de Início *</Label>
               <DatePicker
                 date={formData.startDate}
                 onDateSelect={(date) => setFormData(prev => ({ ...prev, startDate: date }))}
               />
             </div>
             <div>
-              <Label>Data de Fim *</Label>
+              <Label className="text-gray-600">Data de Fim *</Label>
               <DatePicker
                 date={formData.endDate}
                 onDateSelect={(date) => setFormData(prev => ({ ...prev, endDate: date }))}
@@ -123,58 +123,61 @@ export function Step1BasicInformation({ formData, setFormData }: Step1Props) {
               checked={formData.hasSpecificTimes}
               onCheckedChange={(checked) => setFormData(prev => ({ ...prev, hasSpecificTimes: !!checked }))}
             />
-            <Label htmlFor="specificTimes">Definir horários específicos</Label>
+            <Label htmlFor="specificTimes" className="text-gray-600">Definir horários específicos</Label>
           </div>
 
           {formData.hasSpecificTimes && (
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="startTime">Hora de Início</Label>
+                <Label htmlFor="startTime" className="text-gray-600">Hora de Início</Label>
                 <Input
                   id="startTime"
                   type="time"
                   value={formData.startTime}
                   onChange={(e) => setFormData(prev => ({ ...prev, startTime: e.target.value }))}
+                  className="border-gray-300 focus:border-gray-400"
                 />
               </div>
               <div>
-                <Label htmlFor="endTime">Hora de Fim</Label>
+                <Label htmlFor="endTime" className="text-gray-600">Hora de Fim</Label>
                 <Input
                   id="endTime"
                   type="time"
                   value={formData.endTime}
                   onChange={(e) => setFormData(prev => ({ ...prev, endTime: e.target.value }))}
+                  className="border-gray-300 focus:border-gray-400"
                 />
               </div>
             </div>
           )}
 
           <div>
-            <Label>Local do Evento</Label>
+            <Label className="text-gray-600">Local do Evento</Label>
             <RadioGroup value={formData.venue} onValueChange={(value) => setFormData(prev => ({ ...prev, venue: value }))}>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="presential" id="presential" />
-                <Label htmlFor="presential">Presencial</Label>
+                <Label htmlFor="presential" className="text-gray-600">Presencial</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="online" id="online" />
-                <Label htmlFor="online">Online</Label>
+                <Label htmlFor="online" className="text-gray-600">Online</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="hybrid" id="hybrid" />
-                <Label htmlFor="hybrid">Híbrido</Label>
+                <Label htmlFor="hybrid" className="text-gray-600">Híbrido</Label>
               </div>
             </RadioGroup>
           </div>
 
           <div>
-            <Label htmlFor="participants">Participantes Esperados</Label>
+            <Label htmlFor="participants" className="text-gray-600">Participantes Esperados</Label>
             <Input
               id="participants"
               type="number"
               value={formData.expectedParticipants}
               onChange={(e) => setFormData(prev => ({ ...prev, expectedParticipants: parseInt(e.target.value) || 0 }))}
               min="1"
+              className="border-gray-300 focus:border-gray-400"
             />
           </div>
         </div>
@@ -184,9 +187,9 @@ export function Step1BasicInformation({ formData, setFormData }: Step1Props) {
         <h3 className="text-lg font-semibold text-gray-700">Personalização</h3>
         
         <div>
-          <Label>Tema de Cores</Label>
+          <Label className="text-gray-600">Tema de Cores</Label>
           <Select value={formData.colorTheme} onValueChange={(value) => setFormData(prev => ({ ...prev, colorTheme: value }))}>
-            <SelectTrigger className="w-full bg-white border-gray-200">
+            <SelectTrigger className="w-full bg-white border-gray-300">
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="bg-white border-gray-200 shadow-lg z-50">
@@ -212,12 +215,12 @@ export function Step1BasicInformation({ formData, setFormData }: Step1Props) {
             checked={formData.notifications}
             onCheckedChange={(checked) => setFormData(prev => ({ ...prev, notifications: checked }))}
           />
-          <Label htmlFor="notifications">Ativar notificações</Label>
+          <Label htmlFor="notifications" className="text-gray-600">Ativar notificações</Label>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <Label>Logo do Evento (até 2MB)</Label>
+            <Label className="text-gray-600">Logo do Evento (até 2MB)</Label>
             <BrandingUpload
               type="logo"
               title="Logo do Evento"
@@ -227,7 +230,7 @@ export function Step1BasicInformation({ formData, setFormData }: Step1Props) {
             />
           </div>
           <div>
-            <Label>Imagem de Header (até 5MB)</Label>
+            <Label className="text-gray-600">Imagem de Header (até 5MB)</Label>
             <BrandingUpload
               type="header"
               title="Imagem de Header"
