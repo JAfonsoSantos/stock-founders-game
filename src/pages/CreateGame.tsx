@@ -48,8 +48,11 @@ import {
   Send,
   Edit3,
   Check,
-  Mail
+  Mail,
+  Building2,
+  Wallet
 } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { toast } from '@/hooks/use-toast';
