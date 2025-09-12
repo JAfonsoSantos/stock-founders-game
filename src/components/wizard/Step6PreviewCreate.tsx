@@ -29,7 +29,6 @@ interface Step6Props {
     organizerName: string;
     startDate: Date;
     endDate: Date;
-    expectedParticipants: number;
     currency: string;
     templateId: string;
     assetSingular: string;
@@ -66,7 +65,6 @@ export function Step6PreviewCreate({ formData }: Step6Props) {
             <div><strong>Nome:</strong> {formData.name}</div>
             <div><strong>Organizador:</strong> {formData.organizerName}</div>
             <div><strong>Data:</strong> {format(formData.startDate, 'dd/MM/yyyy')} - {format(formData.endDate, 'dd/MM/yyyy')}</div>
-            <div><strong>Participantes:</strong> {formData.expectedParticipants}</div>
             <div><strong>Moeda:</strong> {formData.currency}</div>
           </div>
         </Card>

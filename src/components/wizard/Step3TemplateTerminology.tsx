@@ -108,7 +108,6 @@ interface Step3Props {
     assetSingular: string;
     assetPlural: string;
     currency: string;
-    expectedParticipants: number;
     roles: Array<{
       id: string;
       label: string;
@@ -143,7 +142,7 @@ export function Step3TemplateTerminology({ formData, setFormData }: Step3Props) 
   };
 
   const autoBalanceBudgets = () => {
-    const totalParticipants = formData.expectedParticipants;
+    const totalParticipants = 100; // Default participants count
     const roleCount = formData.roles.length;
     const baseAmount = Math.floor(50000 / roleCount) * roleCount;
     

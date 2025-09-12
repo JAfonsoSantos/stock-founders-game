@@ -4,7 +4,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Switch } from '@/components/ui/switch';
 import { DatePicker } from '@/components/DatePicker';
 import { BrandingUpload } from '@/components/BrandingUpload';
@@ -39,8 +38,6 @@ interface Step1Props {
     hasSpecificTimes: boolean;
     startTime: string;
     endTime: string;
-    venue: string;
-    expectedParticipants: number;
     colorTheme: string;
     notifications: boolean;
     logoUrl: string;
@@ -150,36 +147,6 @@ export function Step1BasicInformation({ formData, setFormData }: Step1Props) {
               </div>
             </div>
           )}
-
-          <div>
-            <Label className="text-gray-600">Local do Evento</Label>
-            <RadioGroup value={formData.venue} onValueChange={(value) => setFormData(prev => ({ ...prev, venue: value }))}>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="presential" id="presential" />
-                <Label htmlFor="presential" className="text-gray-600">Presencial</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="online" id="online" />
-                <Label htmlFor="online" className="text-gray-600">Online</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="hybrid" id="hybrid" />
-                <Label htmlFor="hybrid" className="text-gray-600">Híbrido</Label>
-              </div>
-            </RadioGroup>
-          </div>
-
-          <div>
-            <Label htmlFor="participants" className="text-gray-600">Participantes Esperados</Label>
-            <Input
-              id="participants"
-              type="number"
-              value={formData.expectedParticipants}
-              onChange={(e) => setFormData(prev => ({ ...prev, expectedParticipants: parseInt(e.target.value) || 0 }))}
-              min="1"
-              className="border-gray-300 focus:border-gray-400"
-            />
-          </div>
         </div>
       </div>
 

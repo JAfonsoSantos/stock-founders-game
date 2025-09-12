@@ -33,8 +33,6 @@ export default function CreateGame() {
     hasSpecificTimes: false,
     startTime: "09:00",
     endTime: "17:00",
-    venue: "presential",
-    expectedParticipants: 50,
     colorTheme: "default",
     notifications: true,
     logoUrl: "",
@@ -153,18 +151,8 @@ export default function CreateGame() {
   };
 
   const canProceed = () => {
-    switch (currentStep) {
-      case 1:
-        return formData.name && formData.description && formData.startDate && formData.endDate;
-      case 2:
-        return formData.organizerName;
-      case 3:
-        return formData.templateId && formData.assetSingular && formData.assetPlural && formData.roles.length > 0;
-      case 4:
-        return true;
-      default:
-        return true;
-    }
+    // Permitir navegação livre entre passos
+    return true;
   };
 
   const steps = [
@@ -192,18 +180,21 @@ export default function CreateGame() {
           <div className="flex items-center space-x-2">
             {steps.map((step, index) => (
               <React.Fragment key={step.id}>
-                <div className={cn(
-                  "flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium",
-                  currentStep === step.id ? "bg-primary text-primary-foreground" :
-                  currentStep > step.id ? "bg-green-600 text-white" :
-                  "bg-gray-300 text-gray-600"
-                )}>
+                <button
+                  onClick={() => setCurrentStep(step.id)}
+                  className={cn(
+                    "flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium cursor-pointer transition-colors",
+                    currentStep === step.id ? "bg-primary text-primary-foreground" :
+                    currentStep > step.id ? "bg-green-600 text-white" :
+                    "bg-gray-300 text-gray-600 hover:bg-gray-400"
+                  )}
+                >
                   {currentStep > step.id ? (
                     <Check className="h-4 w-4" />
                   ) : (
                     step.id
                   )}
-                </div>
+                </button>
                 {index < steps.length - 1 && (
                   <div className={cn(
                     "flex-1 h-1 rounded",
