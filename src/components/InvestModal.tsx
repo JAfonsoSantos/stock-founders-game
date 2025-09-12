@@ -80,15 +80,15 @@ export default function InvestModal({ startup, participant, gameId, onClose, onS
             <CardContent className="pt-6">
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <span className="text-muted-foreground">Available Cash</span>
+                  <span className="text-gray-700">Available Cash</span>
                   <p className="font-semibold">${participant.current_cash.toLocaleString()}</p>
                 </div>
                 <div>
-                  <span className="text-muted-foreground">Shares Available</span>
+                  <span className="text-gray-700">Shares Available</span>
                   <p className="font-semibold">{startup.primary_shares_remaining}</p>
                 </div>
                 <div>
-                  <span className="text-muted-foreground">Last Price</span>
+                  <span className="text-gray-700">Last Price</span>
                   <p className="font-semibold">
                     {startup.last_vwap_price ? `$${startup.last_vwap_price.toFixed(2)}` : "No trades yet"}
                   </p>

@@ -224,9 +224,9 @@ export default function CSVParticipantImport({ gameId, gameRoles, onImportComple
                 onDragOver={handleDrag}
                 onDrop={handleDrop}
               >
-                <FileText className="h-10 w-10 mx-auto mb-4 text-muted-foreground" />
+                <FileText className="h-10 w-10 mx-auto mb-4 text-gray-600" />
                 <p className="text-lg font-medium mb-2">Drop your CSV file here</p>
-                <p className="text-muted-foreground mb-4">or click to browse</p>
+                <p className="text-gray-700 mb-4">or click to browse</p>
                 <Button
                   variant="outline"
                   onClick={() => fileInputRef.current?.click()}
