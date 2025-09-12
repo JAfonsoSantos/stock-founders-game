@@ -193,8 +193,8 @@ export function Step3TemplateTerminology({ formData, setFormData }: Step3Props) 
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2">Template & Terminologia</h2>
-        <p className="text-muted-foreground">Escolha o tipo de evento e configure os termos</p>
+        <h2 className="text-2xl font-bold mb-2 text-foreground">Template & Terminologia</h2>
+        <p className="text-foreground">Escolha o tipo de evento e configure os termos</p>
       </div>
 
       <div>
@@ -222,8 +222,8 @@ export function Step3TemplateTerminology({ formData, setFormData }: Step3Props) 
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground">{template.description}</p>
-                  <p className="text-xs text-muted-foreground mt-2">
+                  <p className="text-sm text-foreground">{template.description}</p>
+                  <p className="text-xs text-foreground mt-2">
                     Asset: {template.defaultAsset.singular}
                   </p>
                 </CardContent>

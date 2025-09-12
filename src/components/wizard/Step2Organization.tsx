@@ -36,8 +36,8 @@ export function Step2Organization({ formData, setFormData }: Step2Props) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2">Organização</h2>
-        <p className="text-muted-foreground">Informações sobre a organização e equipa</p>
+        <h2 className="text-2xl font-bold mb-2 text-foreground">Organização</h2>
+        <p className="text-foreground">Informações sobre a organização e equipa</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -53,8 +53,8 @@ export function Step1BasicInformation({ formData, setFormData }: Step1Props) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2">Informações Básicas</h2>
-        <p className="text-muted-foreground">Configure os detalhes principais do seu evento</p>
+        <h2 className="text-2xl font-bold mb-2 text-foreground">Informações Básicas</h2>
+        <p className="text-foreground">Configure os detalhes principais do seu evento</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -179,27 +179,29 @@ export function Step1BasicInformation({ formData, setFormData }: Step1Props) {
       </div>
 
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Personalização</h3>
+        <h3 className="text-lg font-semibold text-foreground">Personalização</h3>
         
         <div>
           <Label>Tema de Cores</Label>
-          <RadioGroup value={formData.colorTheme} onValueChange={(value) => setFormData(prev => ({ ...prev, colorTheme: value }))}>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-2">
+          <Select value={formData.colorTheme} onValueChange={(value) => setFormData(prev => ({ ...prev, colorTheme: value }))}>
+            <SelectTrigger className="w-full bg-white border-gray-200">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="bg-white border-gray-200 shadow-lg z-50">
               {COLOR_THEMES.map(theme => (
-                <div key={theme.id} className="flex items-center space-x-2">
-                  <RadioGroupItem value={theme.id} id={theme.id} />
-                  <Label htmlFor={theme.id} className="flex items-center space-x-2 cursor-pointer">
-                    <span>{theme.name}</span>
-                    <div className="flex space-x-1">
+                <SelectItem key={theme.id} value={theme.id} className="hover:bg-gray-50 focus:bg-gray-50">
+                  <div className="flex items-center space-x-3 w-full">
+                    <span className="text-foreground">{theme.name}</span>
+                    <div className="flex space-x-1 ml-auto">
                       {theme.colors.map((color, i) => (
-                        <div key={i} className="w-4 h-4 rounded-full" style={{ backgroundColor: color }} />
+                        <div key={i} className="w-4 h-4 rounded-full border border-gray-200" style={{ backgroundColor: color }} />
                       ))}
                     </div>
-                  </Label>
-                </div>
+                  </div>
+                </SelectItem>
               ))}
-            </div>
-          </RadioGroup>
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="flex items-center space-x-2">

@@ -48,8 +48,8 @@ export function Step4GameSettings({ formData, setFormData }: Step4Props) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2">Configurações do Jogo</h2>
-        <p className="text-muted-foreground">Configure as regras e mecânicas do evento</p>
+        <h2 className="text-2xl font-bold mb-2 text-foreground">Configurações do Jogo</h2>
+        <p className="text-foreground">Configure as regras e mecânicas do evento</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
