@@ -490,7 +490,7 @@ export default function Dashboard() {
             
             <div className="space-y-4">
               {participations.length === 0 ? (
-                <Card>
+                <Card className="bg-white border-gray-200 shadow-sm">
                   <CardContent className="p-6 text-center">
                     <TrendingUp className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                     <p className="text-muted-foreground">
