@@ -277,7 +277,7 @@ export default function GameOrganizer() {
         <div className="absolute -bottom-16 left-8 right-8">
           <div className="flex items-end gap-6">
             <div 
-              className="h-32 w-32 border-4 border-white shadow-xl rounded-2xl bg-white flex items-center justify-center group cursor-pointer relative flex-shrink-0"
+              className="h-32 w-32 border-4 border-gray-50 rounded-2xl bg-white flex items-center justify-center group cursor-pointer relative flex-shrink-0"
               onClick={() => setEditingImage('logo')}
             >
               {game.logo_url ? (
