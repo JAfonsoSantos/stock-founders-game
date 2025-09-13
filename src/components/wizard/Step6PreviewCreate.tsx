@@ -45,7 +45,7 @@ interface Step6Props {
   };
 }
 
-export function Step6PreviewCreate({ formData }: Step6Props) {
+export const Step6PreviewCreate = React.memo(function Step6PreviewCreate({ formData }: Step6Props) {
   const formatBudget = (amount: number) => {
     const symbol = CURRENCIES.find(c => c.value === formData.currency)?.symbol || "$";
     return `${symbol}${amount.toLocaleString()}`;
@@ -106,4 +106,4 @@ export function Step6PreviewCreate({ formData }: Step6Props) {
       </div>
     </div>
   );
-}
+});

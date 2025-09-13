@@ -121,7 +121,7 @@ interface Step3Props {
   setFormData: React.Dispatch<React.SetStateAction<any>>;
 }
 
-export function Step3TemplateTerminology({ formData, setFormData }: Step3Props) {
+export const Step3TemplateTerminology = React.memo(function Step3TemplateTerminology({ formData, setFormData }: Step3Props) {
   const getCurrencySymbol = () => {
     return CURRENCIES.find(c => c.value === formData.currency)?.symbol || "$";
   };
@@ -350,4 +350,4 @@ export function Step3TemplateTerminology({ formData, setFormData }: Step3Props) 
       )}
     </div>
   );
-}
+});

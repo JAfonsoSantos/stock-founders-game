@@ -40,7 +40,7 @@ interface Step4Props {
   setFormData: React.Dispatch<React.SetStateAction<any>>;
 }
 
-export function Step4GameSettings({ formData, setFormData }: Step4Props) {
+export const Step4GameSettings = React.memo(function Step4GameSettings({ formData, setFormData }: Step4Props) {
   const getCurrencySymbol = () => {
     return CURRENCIES.find(c => c.value === formData.currency)?.symbol || "$";
   };
@@ -156,4 +156,4 @@ export function Step4GameSettings({ formData, setFormData }: Step4Props) {
       </div>
     </div>
   );
-}
+});

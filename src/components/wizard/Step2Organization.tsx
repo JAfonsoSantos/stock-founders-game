@@ -18,7 +18,7 @@ interface Step2Props {
   setFormData: React.Dispatch<React.SetStateAction<any>>;
 }
 
-export function Step2Organization({ formData, setFormData }: Step2Props) {
+export const Step2Organization = React.memo(function Step2Organization({ formData, setFormData }: Step2Props) {
   const addTeamMember = () => {
     setFormData(prev => ({
       ...prev,
@@ -129,4 +129,4 @@ export function Step2Organization({ formData, setFormData }: Step2Props) {
       </div>
     </div>
   );
-}
+});

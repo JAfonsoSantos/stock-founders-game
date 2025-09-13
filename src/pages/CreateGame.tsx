@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -145,13 +145,13 @@ export default function CreateGame() {
     }
   };
 
-  const nextStep = () => {
+  const nextStep = useCallback(() => {
     if (currentStep < 6) setCurrentStep(prev => prev + 1);
-  };
+  }, [currentStep]);
 
-  const prevStep = () => {
+  const prevStep = useCallback(() => {
     if (currentStep > 1) setCurrentStep(prev => prev - 1);
-  };
+  }, [currentStep]);
 
   const canProceed = () => {
     // Permitir navegação livre entre passos
@@ -186,16 +186,33 @@ export default function CreateGame() {
     };
   };
 
-  const steps = [
-    { id: 1, name: "Básico", component: () => <Step1BasicInformation formData={formData} setFormData={setFormData} /> },
-    { id: 2, name: "Organização", component: () => <Step2Organization formData={formData} setFormData={setFormData} /> },
-    { id: 3, name: "Template", component: () => <Step3TemplateTerminology formData={formData} setFormData={setFormData} /> },
-    { id: 4, name: "Configurações", component: () => <Step4GameSettings formData={formData} setFormData={setFormData} /> },
-    { id: 5, name: "Como Funciona", component: () => <Step5HowItWorks formData={formData} /> },
-    { id: 6, name: "Preview", component: () => <Step6PreviewCreate formData={formData} /> }
-  ];
+  const steps = useMemo(() => [
+    { id: 1, name: "Básico" },
+    { id: 2, name: "Organização" },
+    { id: 3, name: "Template" },
+    { id: 4, name: "Configurações" },
+    { id: 5, name: "Como Funciona" },
+    { id: 6, name: "Preview" }
+  ], []);
 
-  const CurrentStepComponent = steps.find(s => s.id === currentStep)?.component || steps[0].component;
+  const getCurrentStepComponent = useCallback(() => {
+    switch (currentStep) {
+      case 1:
+        return <Step1BasicInformation formData={formData} setFormData={setFormData} />;
+      case 2:
+        return <Step2Organization formData={formData} setFormData={setFormData} />;
+      case 3:
+        return <Step3TemplateTerminology formData={formData} setFormData={setFormData} />;
+      case 4:
+        return <Step4GameSettings formData={formData} setFormData={setFormData} />;
+      case 5:
+        return <Step5HowItWorks formData={formData} />;
+      case 6:
+        return <Step6PreviewCreate formData={formData} />;
+      default:
+        return <Step1BasicInformation formData={formData} setFormData={setFormData} />;
+    }
+  }, [currentStep, formData, setFormData]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -225,7 +242,7 @@ export default function CreateGame() {
 
         <Card className="max-w-6xl mx-auto bg-white border-gray-300 shadow-sm">
           <CardContent className="p-8">
-            <CurrentStepComponent />
+            {getCurrentStepComponent()}
           </CardContent>
         </Card>
 

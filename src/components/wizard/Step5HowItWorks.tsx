@@ -16,7 +16,7 @@ interface Step5Props {
   };
 }
 
-export function Step5HowItWorks({ formData }: Step5Props) {
+export const Step5HowItWorks = React.memo(function Step5HowItWorks({ formData }: Step5Props) {
   const replacePlaceholders = (text: string) => {
     return text
       .replace(/{asset_noun}/g, formData.assetSingular || 'Asset')
@@ -96,4 +96,4 @@ export function Step5HowItWorks({ formData }: Step5Props) {
       </Card>
     </div>
   );
-}
+});

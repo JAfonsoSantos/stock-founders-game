@@ -47,7 +47,7 @@ interface Step1Props {
   setFormData: React.Dispatch<React.SetStateAction<any>>;
 }
 
-export function Step1BasicInformation({ formData, setFormData }: Step1Props) {
+export const Step1BasicInformation = React.memo(function Step1BasicInformation({ formData, setFormData }: Step1Props) {
   return (
     <div className="space-y-6">
       <div>
@@ -209,4 +209,4 @@ export function Step1BasicInformation({ formData, setFormData }: Step1Props) {
       </div>
     </div>
   );
-}
+});
