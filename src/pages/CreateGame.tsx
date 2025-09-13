@@ -94,6 +94,15 @@ export default function CreateGame() {
 
         if (gameError) throw gameError;
 
+        // Load organizer info
+        const { data: organizer, error: organizerError } = await supabase
+          .from('users')
+          .select('first_name, last_name, email')
+          .eq('id', game.owner_user_id)
+          .single();
+
+        if (organizerError) throw organizerError;
+
         // Load game roles
         const { data: roles, error: rolesError } = await supabase
           .from('game_roles')
@@ -127,6 +136,18 @@ export default function CreateGame() {
           language: game.locale || "en",
           logoUrl: game.logo_url || "",
           headerUrl: game.hero_image_url || "",
+          // Step 2 - Organization data
+          organizerName: organizer ? `${organizer.first_name} ${organizer.last_name}`.trim() : prev.organizerName,
+          organizerCompany: prev.organizerCompany, // Keep existing value since it's not stored
+          eventWebsite: prev.eventWebsite, // Keep existing value since it's not stored
+          teamMembers: [
+            {
+              email: organizer?.email || prev.teamMembers[0]?.email || "",
+              name: organizer ? `${organizer.first_name} ${organizer.last_name}`.trim() : prev.teamMembers[0]?.name || "",
+              role: "Organizer"
+            }
+          ],
+          // Step 4 - Game Settings
           enableSecondaryMarket: game.allow_secondary || false,
           leaderboardMode: game.show_public_leaderboards ? 'public_live' : 'private',
           circuitBreaker: game.circuit_breaker ?? true,
