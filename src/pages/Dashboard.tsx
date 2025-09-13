@@ -10,6 +10,7 @@ import { Plus, Users, TrendingUp, Settings, Play, Sparkles, Crown, User, LogOut 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 
 interface Game {
   id: string;
@@ -38,6 +39,7 @@ export default function Dashboard() {
   const [ownedGames, setOwnedGames] = useState<Game[]>([]);
   const [participations, setParticipations] = useState<Participation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showInDevelopmentModal, setShowInDevelopmentModal] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -97,157 +99,8 @@ export default function Dashboard() {
     }
   };
 
-  const createDemoGame = async () => {
-    if (!user) return;
-
-    try {
-      // Create demo game
-      const demoGameData = {
-        owner_user_id: user.id,
-        name: "Demo Startup Summit 2024",
-        currency: "USD",
-        locale: "en",
-        starts_at: new Date(Date.now() + 60000).toISOString(), // Start in 1 minute
-        ends_at: new Date(Date.now() + 3600000).toISOString(), // End in 1 hour
-        allow_secondary: true,
-        show_public_leaderboards: true,
-        circuit_breaker: true,
-        max_price_per_share: 10000,
-        status: 'pre_market' as const
-      };
-
-      const { data: game, error: gameError } = await supabase
-        .from("games")
-        .insert(demoGameData)
-        .select()
-        .single();
-
-      if (gameError) throw gameError;
-
-      // Create default role budgets
-      const roleInserts = [
-        { game_id: game.id, role: "founder" as const, default_budget: 10000 },
-        { game_id: game.id, role: "angel" as const, default_budget: 100000 },
-        { game_id: game.id, role: "vc" as const, default_budget: 1000000 },
-      ];
-
-      const { error: rolesError } = await supabase
-        .from("game_roles")
-        .insert(roleInserts);
-
-      if (rolesError) throw rolesError;
-
-      // Create demo startups with more realistic data
-      const startupNames = [
-        { name: "TechFlow AI", description: "AI-powered workflow automation platform for modern businesses", shares: 100, price: 50 },
-        { name: "GreenSync", description: "Sustainable energy management and optimization solutions", shares: 100, price: 25 },
-        { name: "HealthLink", description: "Digital health record integration and patient care platform", shares: 100, price: 75 },
-        { name: "EduSpace", description: "Immersive virtual reality experiences for education and training", shares: 100, price: 40 }
-      ];
-
-      const createdStartups = [];
-      for (const startup of startupNames) {
-        const { data: startupData, error: startupError } = await supabase
-          .from("startups")
-          .insert({
-            game_id: game.id,
-            name: startup.name,
-            slug: startup.name.toLowerCase().replace(/\s+/g, '-'),
-            description: startup.description,
-            total_shares: startup.shares,
-            primary_shares_remaining: Math.floor(startup.shares * 0.7), // 30% pre-sold
-            last_vwap_price: startup.price
-          })
-          .select()
-          .single();
-
-        if (startupError) throw startupError;
-        createdStartups.push({ ...startupData, initialPrice: startup.price });
-      }
-
-      // Create demo participants
-      const demoParticipants = [
-        { name: "Angel Smith", role: "angel", budget: 100000 },
-        { name: "VC Partners", role: "vc", budget: 1000000 },
-        { name: "Tech Founder", role: "founder", budget: 10000 },
-        { name: "Serial Angel", role: "angel", budget: 100000 }
-      ];
-
-      const createdParticipants = [];
-      for (const participant of demoParticipants) {
-        const demoUserId = crypto.randomUUID();
-        
-        // Create demo user
-        await supabase.from("users").insert({
-          id: demoUserId,
-          first_name: participant.name.split(' ')[0],
-          last_name: participant.name.split(' ')[1] || ''
-        });
-
-        // Create participant
-        const { data: participantData, error: participantError } = await supabase
-          .from("participants")
-          .insert({
-            game_id: game.id,
-            user_id: demoUserId,
-            role: participant.role as "founder" | "angel" | "vc" | "organizer",
-            initial_budget: participant.budget,
-            current_cash: participant.budget * 0.7 // 30% already invested
-          })
-          .select()
-          .single();
-
-        if (participantError) throw participantError;
-        createdParticipants.push(participantData);
-      }
-
-      // Create initial demo trades
-      for (let i = 0; i < createdStartups.length; i++) {
-        const startup = createdStartups[i];
-        const participant = createdParticipants[i % createdParticipants.length];
-        
-        // Create some initial trades to establish pricing
-        const tradeQuantity = 20 + Math.floor(Math.random() * 10);
-        const tradePrice = startup.initialPrice + (Math.random() - 0.5) * 10;
-        
-        try {
-          // Insert trade directly (simulating accepted primary market trade)
-          await supabase.from("trades").insert({
-            game_id: game.id,
-            startup_id: startup.id,
-            seller_participant_id: null, // Primary market
-            buyer_participant_id: participant.id,
-            qty: tradeQuantity,
-            price_per_share: tradePrice,
-            market_type: 'primary'
-          });
-
-          // Update participant cash
-          await supabase
-            .from("participants")
-            .update({ 
-              current_cash: participant.current_cash - (tradeQuantity * tradePrice)
-            })
-            .eq("id", participant.id);
-
-          // Create position
-          await supabase.from("positions").insert({
-            participant_id: participant.id,
-            startup_id: startup.id,
-            qty_total: tradeQuantity,
-            avg_cost: tradePrice
-          });
-
-        } catch (error) {
-          console.log("Demo trade creation error (non-critical):", error);
-        }
-      }
-
-      toast.success("🎉 Demo game created! Check it out to explore how the platform works.");
-      fetchData();
-    } catch (error: any) {
-      toast.error("Failed to create demo game: " + error.message);
-    }
+  const handleDemoClick = () => {
+    setShowInDevelopmentModal(true);
   };
 
   const getStatusColor = (status: string) => {
@@ -295,8 +148,10 @@ export default function Dashboard() {
                     </Button>
                     <Button 
                       variant="surface" 
-                      onClick={createDemoGame}
+                      onClick={handleDemoClick}
                       size="lg"
+                      disabled
+                      className="opacity-60 cursor-not-allowed"
                     >
                       <Play className="h-5 w-5 mr-2" />
                       Try Demo Game
@@ -384,7 +239,7 @@ export default function Dashboard() {
                       Experience the full platform with pre-configured startups and demo data.
                     </p>
                   </div>
-                  <Button onClick={createDemoGame} className="shrink-0 bg-[#FF6B35] hover:bg-[#E55A2B] text-white">
+                  <Button onClick={handleDemoClick} disabled className="shrink-0 bg-[#FF6B35] hover:bg-[#E55A2B] text-white opacity-60 cursor-not-allowed">
                     <Sparkles className="h-4 w-4 mr-2" />
                     Create Demo
                   </Button>
@@ -418,7 +273,7 @@ export default function Dashboard() {
                         <Plus className="h-4 w-4 mr-2" />
                         Create Game
                       </Button>
-                      <Button variant="surface" onClick={createDemoGame}>
+                      <Button variant="surface" onClick={handleDemoClick} disabled className="opacity-60 cursor-not-allowed">
                         <Sparkles className="h-4 w-4 mr-2" />
                         Try Demo
                       </Button>
@@ -561,6 +416,16 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={showInDevelopmentModal}
+        onOpenChange={setShowInDevelopmentModal}
+        title={t('common.inDevelopment')}
+        description={t('common.inDevelopmentMessage')}
+        confirmText={t('common.close')}
+        cancelText=""
+        onConfirm={() => setShowInDevelopmentModal(false)}
+      />
     </div>
   );
 }

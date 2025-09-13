@@ -14,7 +14,9 @@
     "close": "Close",
     "success": "Success",
     "error": "Error",
-    "warning": "Warning"
+    "warning": "Warning",
+    "inDevelopment": "In Development",
+    "inDevelopmentMessage": "This feature is currently under development and will be available soon."
   },
   "auth": {
     "signIn": "Sign In",
