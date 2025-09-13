@@ -247,3 +247,60 @@ body.compact-mode .space-y-8 > * + * {
     }
   }
 }
+
+/* Additional Mobile Improvements */
+@media (max-width: 768px) {
+  /* Touch-friendly targets */
+  .mobile-touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Hide scrollbars on mobile for cleaner look */
+  .mobile-no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mobile-no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Better form inputs on mobile */
+  input, textarea, select {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+
+  /* Safe area support */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  /* Prevent content from being cut off */
+  .h-screen {
+    height: 100vh;
+    height: 100dvh; /* Dynamic viewport height */
+  }
+
+  /* Better mobile viewport handling */
+  html, body {
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Ensure full height on mobile */
+  #root {
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  /* Compact mobile layout */
+  .mobile-compact {
+    padding: 0.5rem;
+    font-size: 0.875rem;
+  }
+}

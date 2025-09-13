@@ -434,11 +434,17 @@ export default function CreateGame() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className={cn("container mx-auto py-6", isMobile ? "px-4" : "px-4 py-8")}>
-        <div className={cn("mb-6 max-w-6xl mx-auto", isMobile ? "mb-4" : "mb-8")}>
-          <div className={cn("mb-4", isMobile ? "space-y-4" : "flex items-center justify-between")}>
-            <h1 className={cn("font-bold text-gray-700", isMobile ? "text-xl" : "text-2xl")}>
+    <div className={cn(
+      "bg-gray-50",
+      isMobile ? "h-full flex flex-col" : "min-h-screen"
+    )}>
+      <div className={cn(
+        "container mx-auto",
+        isMobile ? "px-2 py-3 pb-safe flex-1 flex flex-col" : "px-4 py-8"
+      )}>
+        <div className={cn("mb-6 max-w-6xl mx-auto", isMobile ? "mb-3" : "mb-8")}>
+          <div className={cn("mb-4", isMobile ? "space-y-3" : "flex items-center justify-between")}>
+            <h1 className={cn("font-bold text-gray-700", isMobile ? "text-lg" : "text-2xl")}>
               {isEditMode ? 'Editar Evento' : 'Criar Novo Evento'}
             </h1>
             
@@ -489,22 +495,32 @@ export default function CreateGame() {
           )}
         </div>
 
-        <Card className="max-w-6xl mx-auto bg-white border-gray-300 shadow-sm">
-          <CardContent className={cn(isMobile ? "p-4" : "p-8")}>
-            {getCurrentStepComponent()}
+        <Card className={cn(
+          "max-w-6xl mx-auto bg-white border-gray-300 shadow-sm",
+          isMobile ? "flex-1 flex flex-col" : ""
+        )}>
+          <CardContent className={cn(
+            isMobile ? "p-3 flex-1 flex flex-col" : "p-8"
+          )}>
+            <div className={cn(isMobile ? "flex-1" : "")}>
+              {getCurrentStepComponent()}
+            </div>
           </CardContent>
         </Card>
 
-        <div className={cn("mt-6 max-w-6xl mx-auto", isMobile ? "space-y-3" : "flex justify-between mt-8")}>
+        <div className={cn(
+          "max-w-6xl mx-auto",
+          isMobile ? "mt-3 pb-safe" : "flex justify-between mt-8"
+        )}>
           {/* Mobile: Stacked buttons */}
           {isMobile ? (
-            <div className="space-y-3">
+            <div className="space-y-3 px-2">
               <div className="flex gap-2">
                 <Button
                   variant="outline"
                   onClick={prevStep}
                   disabled={currentStep === 1}
-                  className="flex-1"
+                  className="flex-1 min-h-[44px]"
                 >
                   <ChevronLeft className="h-4 w-4 mr-2" />
                   Anterior
@@ -519,7 +535,7 @@ export default function CreateGame() {
                       setShowPreview(true);
                     }
                   }}
-                  className="border-gray-200 text-gray-700 hover:bg-gray-50"
+                  className="border-gray-200 text-gray-700 hover:bg-gray-50 min-h-[44px] min-w-[44px]"
                 >
                   <Eye className="h-4 w-4" />
                 </Button>
@@ -529,7 +545,7 @@ export default function CreateGame() {
                 <Button
                   onClick={nextStep}
                   disabled={!canProceed()}
-                  className="w-full"
+                  className="w-full min-h-[44px]"
                   size="lg"
                 >
                   Próximo
@@ -539,7 +555,7 @@ export default function CreateGame() {
                 <Button
                   onClick={handleSubmit}
                   disabled={isCreating}
-                  className="w-full bg-[#FF6B35] hover:bg-[#E55A2B] text-white"
+                  className="w-full bg-[#FF6B35] hover:bg-[#E55A2B] text-white min-h-[44px]"
                   size="lg"
                 >
                   {isCreating ? "Salvando..." : (isEditMode ? "Salvar Alterações" : "Criar Evento")}
