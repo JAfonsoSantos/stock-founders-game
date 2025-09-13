@@ -58,7 +58,7 @@ export function ImageEditor({ imageUrl, type, onSave, onCancel }: ImageEditorPro
 
   const loadImageFromUrl = async (url: string, canvas: FabricCanvas) => {
     try {
-      const img = await FabricImage.fromURL(url);
+      const img = await FabricImage.fromURL(url, { crossOrigin: 'anonymous' });
       
       // Scale image to fit canvas while maintaining aspect ratio
       const scaleX = canvasWidth / img.width!;
