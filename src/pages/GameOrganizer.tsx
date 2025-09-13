@@ -305,10 +305,12 @@ export default function GameOrganizer() {
             
             {/* Event Title - positioned to align with bottom part of logo */}
             <div className="flex-1 pb-2">
-              <h1 className="text-4xl font-bold text-gray-900 mb-1" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.1)' }}>
-                {game.name}
-              </h1>
-              <p className="text-gray-600 text-lg">Game Organizer Dashboard</p>
+              <div className="bg-white px-4 py-2 rounded-lg shadow-sm inline-block">
+                <h1 className="text-4xl font-bold text-gray-900 mb-1">
+                  {game.name}
+                </h1>
+                <p className="text-gray-600 text-lg">Game Organizer Dashboard</p>
+              </div>
             </div>
           </div>
         </div>
