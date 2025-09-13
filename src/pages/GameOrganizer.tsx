@@ -305,7 +305,7 @@ export default function GameOrganizer() {
             
             {/* Event Title - positioned to align with bottom part of logo */}
             <div className="flex-1 pb-2">
-              <h1 className="text-4xl font-bold text-gray-900 mb-1">
+              <h1 className="text-4xl font-bold text-gray-900 mb-1" style={{ WebkitTextStroke: '2px white' }}>
                 {game.name}
               </h1>
               <p className="text-gray-600 text-lg">Game Organizer Dashboard</p>
