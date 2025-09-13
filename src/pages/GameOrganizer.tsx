@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Users, Building2, Settings, Play, Pause, Mail, TrendingUp, BarChart3 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -174,6 +175,27 @@ export default function GameOrganizer() {
     }
   };
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'draft': return 'bg-gray-100 text-gray-700 border-gray-200';
+      case 'pre_market': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'open': return 'bg-green-100 text-green-800 border-green-200';
+      case 'closed': return 'bg-red-100 text-red-800 border-red-200';
+      case 'results': return 'bg-blue-100 text-blue-800 border-blue-200';
+      default: return 'bg-gray-100 text-gray-700 border-gray-200';
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'pre_market': return 'Pre-Market';
+      case 'open': return 'Market Open';
+      case 'closed': return 'Market Closed';
+      case 'results': return 'Results Available';
+      default: return status.charAt(0).toUpperCase() + status.slice(1);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -195,276 +217,335 @@ export default function GameOrganizer() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="border-b border-gray-200 bg-white shadow-sm">
-        <div className="container mx-auto px-4 py-4">
-          <Button 
-            variant="ghost" 
+      {/* Hero Section */}
+      <div className="relative">
+        {/* Background */}
+        <div className="h-64 w-full bg-gradient-to-br from-slate-600 via-slate-700 to-slate-800">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/20 to-transparent" />
+        </div>
+        
+        {/* Header Controls */}
+        <div className="absolute top-6 left-6 right-6 flex justify-between items-center">
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => navigate("/")}
-            className="mb-4 text-gray-600 hover:text-gray-900"
+            className="bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 border-white/20"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Dashboard
           </Button>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">{game.name}</h1>
-            <p className="text-gray-600">Game Organizer Dashboard</p>
+        </div>
+
+        {/* Game Logo */}
+        <div className="absolute -bottom-16 left-8 right-8">
+          <div className="flex items-end gap-6">
+            <div className="h-32 w-32 border-4 border-white shadow-xl rounded-2xl bg-white flex items-center justify-center">
+              <div className="text-center">
+                <span className="text-3xl font-bold text-gray-600">
+                  {game.name.charAt(0).toUpperCase()}
+                </span>
+                <p className="text-xs text-gray-400 mt-2">Event Logo</p>
+              </div>
+            </div>
           </div>
         </div>
-      </header>
+      </div>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid gap-6">
-          {/* Game Status */}
-          <Card className="bg-white border-gray-200 shadow-sm">
-            <CardHeader>
-              <CardTitle className="text-gray-900">Game Status & Controls</CardTitle>
-              <CardDescription className="text-gray-600">Current status: {game.status}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div>
-                  <p className="text-sm font-medium text-gray-700">Start Date</p>
-                  <p className="text-gray-600">
-                    {new Date(game.starts_at).toLocaleDateString()}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium">End Date</p>
-                  <p className="text-muted-foreground">
-                    {new Date(game.ends_at).toLocaleDateString()}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium">Currency</p>
-                  <p className="text-muted-foreground">{game.currency}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium">Language</p>
-                  <p className="text-muted-foreground">{game.locale}</p>
-                </div>
+      {/* Event Title */}
+      <div className="px-8 pt-8 pb-4 bg-gradient-to-b from-white/5 to-transparent">
+        <div className="max-w-7xl mx-auto text-center">
+          <h1 className="text-5xl font-bold text-gray-900 mb-2">
+            {game.name}
+          </h1>
+          <p className="text-gray-600 text-lg">Game Organizer Dashboard</p>
+        </div>
+      </div>
+
+      {/* Status Badges and Main Actions */}
+      <div className="px-8 pb-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex justify-between items-center mb-8">
+            <div className="flex items-center gap-3">
+              <div className={`px-4 py-2 rounded-lg font-medium border ${getStatusColor(game.status)}`}>
+                {getStatusLabel(game.status)}
               </div>
-              
-              {/* Status Controls */}
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-medium mb-3">Game Status Controls</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {game.status === 'draft' && (
-                      <Button 
-                        onClick={() => updateGameStatus('pre_market')}
-                        disabled={actionLoading === 'status-pre_market'}
-                        className="bg-[#FF6B35] hover:bg-[#E55A2B] text-foreground"
-                      >
-                        <Play className="h-4 w-4 mr-2" />
-                        Start Pre-Market
-                      </Button>
-                    )}
-                    {game.status === 'pre_market' && (
-                      <Button 
-                        onClick={() => updateGameStatus('open')}
-                        disabled={actionLoading === 'status-open'}
-                        className="bg-[#FF6B35] hover:bg-[#E55A2B] text-foreground"
-                      >
-                        <TrendingUp className="h-4 w-4 mr-2" />
-                        Open Market
-                      </Button>
-                    )}
-                    {game.status === 'open' && (
-                      <Button 
-                        variant="destructive"
-                        onClick={() => updateGameStatus('closed')}
-                        disabled={actionLoading === 'status-closed'}
-                      >
-                        <Pause className="h-4 w-4 mr-2" />
-                        Close Market
-                      </Button>
-                    )}
-                    {game.status === 'closed' && (
-                      <Button 
-                        onClick={() => updateGameStatus('results')}
-                        disabled={actionLoading === 'status-results'}
-                        className="bg-[#FF6B35] hover:bg-[#E55A2B] text-foreground"
-                      >
-                        <BarChart3 className="h-4 w-4 mr-2" />
-                        Show Results
-                      </Button>
-                    )}
+              <div className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-lg">
+                <Users className="h-4 w-4 text-gray-600" />
+                <span className="font-medium text-gray-900">{stats.participants} participants</span>
+              </div>
+              <div className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-lg">
+                <Building2 className="h-4 w-4 text-gray-600" />
+                <span className="font-medium text-gray-900">{stats.startups} startups</span>
+              </div>
+            </div>
+            
+            {/* Main Action Buttons */}
+            <div className="flex gap-3">
+              {game.status === 'draft' && (
+                <Button 
+                  onClick={() => updateGameStatus('pre_market')}
+                  disabled={actionLoading === 'status-pre_market'}
+                  className="bg-[#FF6B35] hover:bg-[#E55A2B] text-white px-6"
+                >
+                  <Play className="h-4 w-4 mr-2" />
+                  Start Pre-Market
+                </Button>
+              )}
+              {game.status === 'pre_market' && (
+                <Button 
+                  onClick={() => updateGameStatus('open')}
+                  disabled={actionLoading === 'status-open'}
+                  className="bg-[#FF6B35] hover:bg-[#E55A2B] text-white px-6"
+                >
+                  <TrendingUp className="h-4 w-4 mr-2" />
+                  Open Market
+                </Button>
+              )}
+              {game.status === 'open' && (
+                <Button 
+                  variant="destructive"
+                  onClick={() => updateGameStatus('closed')}
+                  disabled={actionLoading === 'status-closed'}
+                  className="px-6"
+                >
+                  <Pause className="h-4 w-4 mr-2" />
+                  Close Market
+                </Button>
+              )}
+              {game.status === 'closed' && (
+                <Button 
+                  onClick={() => updateGameStatus('results')}
+                  disabled={actionLoading === 'status-results'}
+                  className="bg-[#FF6B35] hover:bg-[#E55A2B] text-white px-6"
+                >
+                  <BarChart3 className="h-4 w-4 mr-2" />
+                  Show Results
+                </Button>
+              )}
+            </div>
+          </div>
+
+          {/* Main Content Grid */}
+          <div className="grid lg:grid-cols-2 gap-8">
+            {/* Left Column - Game Controls & Statistics */}
+            <div className="space-y-6">
+              {/* Game Details */}
+              <Card className="bg-white shadow-sm border-gray-100">
+                <CardHeader className="pb-6">
+                  <CardTitle className="text-xl flex items-center gap-3 text-gray-900">
+                    <div className="p-2 bg-blue-50 rounded-lg">
+                      <Settings className="h-6 w-6 text-blue-600" />
+                    </div>
+                    Game Details
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-5 pb-8">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-gray-600">Start Date</span>
+                    <span className="font-semibold text-gray-900">{new Date(game.starts_at).toLocaleDateString()}</span>
                   </div>
-                </div>
-                
-                {/* Market Controls */}
-                <div>
-                  <h4 className="font-medium mb-3">Market Controls</h4>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="h-px bg-gray-100"></div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-gray-600">End Date</span>
+                    <span className="font-semibold text-gray-900">{new Date(game.ends_at).toLocaleDateString()}</span>
+                  </div>
+                  <div className="h-px bg-gray-100"></div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-gray-600">Currency</span>
+                    <span className="font-semibold text-gray-900">{game.currency}</span>
+                  </div>
+                  <div className="h-px bg-gray-100"></div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-gray-600">Language</span>
+                    <span className="font-semibold text-gray-900">{game.locale.toUpperCase()}</span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Market Controls */}
+              <Card className="bg-white shadow-sm border-gray-100">
+                <CardHeader className="pb-6">
+                  <CardTitle className="text-xl flex items-center gap-3 text-gray-900">
+                    <div className="p-2 bg-purple-50 rounded-lg">
+                      <TrendingUp className="h-6 w-6 text-purple-600" />
+                    </div>
+                    Market Controls
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-5 pb-8">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <span className="text-sm font-medium text-gray-600">Secondary Market</span>
+                      <p className="text-xs text-gray-500">Allow peer-to-peer trading</p>
+                    </div>
                     <Button 
                       variant="outline"
+                      size="sm"
                       onClick={toggleSecondaryMarket}
                       disabled={actionLoading === 'secondary'}
+                      className={game.allow_secondary ? 'bg-green-50 text-green-700 border-green-200' : ''}
                     >
-                      {game.allow_secondary ? 'Disable' : 'Enable'} Secondary Market
+                      {game.allow_secondary ? 'Enabled' : 'Disabled'}
                     </Button>
+                  </div>
+                  <div className="h-px bg-gray-100"></div>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <span className="text-sm font-medium text-gray-600">Public Leaderboards</span>
+                      <p className="text-xs text-gray-500">Show rankings publicly</p>
+                    </div>
                     <Button 
                       variant="outline"
+                      size="sm"
                       onClick={toggleLeaderboards}
                       disabled={actionLoading === 'leaderboards'}
+                      className={game.show_public_leaderboards ? 'bg-blue-50 text-blue-700 border-blue-200' : ''}
                     >
-                      {game.show_public_leaderboards ? 'Hide' : 'Show'} Public Leaderboards
+                      {game.show_public_leaderboards ? 'Public' : 'Private'}
                     </Button>
+                  </div>
+                  <div className="h-px bg-gray-100"></div>
+                  <div className="flex justify-center pt-2">
                     <Button 
                       variant="outline"
                       onClick={() => navigate(`/games/${gameId}/leaderboard`)}
+                      className="w-full"
                     >
                       <BarChart3 className="h-4 w-4 mr-2" />
                       View Leaderboard
                     </Button>
                   </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
 
-          {/* Quick Actions */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card
-              role="button"
-              tabIndex={0}
-              onClick={() => navigate(`/games/${gameId}/participants`)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") navigate(`/games/${gameId}/participants`);
-              }}
-              className="cursor-pointer hover:bg-orange-50 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white border-gray-200 shadow-sm"
-              aria-label="Manage Participants"
-            >
-              <CardContent className="flex flex-col items-center justify-center p-6">
-                <Users className="h-8 w-8 mb-2 text-orange-600" />
-                <h3 className="font-semibold text-gray-900">Manage Participants</h3>
-                <p className="text-sm text-gray-600 text-center">
-                  Add and manage game participants
-                </p>
-              </CardContent>
-            </Card>
+              {/* Live Statistics */}
+              <Card className="bg-white shadow-sm border-gray-100">
+                <CardHeader className="pb-6">
+                  <CardTitle className="text-xl flex items-center gap-3 text-gray-900">
+                    <div className="p-2 bg-green-50 rounded-lg">
+                      <BarChart3 className="h-6 w-6 text-green-600" />
+                    </div>
+                    Live Statistics
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pb-8">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center p-4 bg-gray-50 rounded-lg">
+                      <div className="text-2xl font-bold text-gray-900">{stats.participants}</div>
+                      <div className="text-sm text-gray-600">Participants</div>
+                    </div>
+                    <div className="text-center p-4 bg-gray-50 rounded-lg">
+                      <div className="text-2xl font-bold text-gray-900">{stats.startups}</div>
+                      <div className="text-sm text-gray-600">Startups</div>
+                    </div>
+                    <div className="text-center p-4 bg-gray-50 rounded-lg">
+                      <div className="text-2xl font-bold text-gray-900">{game.currency} {stats.totalVolume.toLocaleString()}</div>
+                      <div className="text-sm text-gray-600">Total Volume</div>
+                    </div>
+                    <div className="text-center p-4 bg-gray-50 rounded-lg">
+                      <div className="text-2xl font-bold text-gray-900">{stats.activeTrades}</div>
+                      <div className="text-sm text-gray-600">Trades</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
 
-            <Card
-              role="button"
-              tabIndex={0}
-              onClick={() => navigate(`/games/${gameId}/startups`)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") navigate(`/games/${gameId}/startups`);
-              }}
-              className="cursor-pointer hover:bg-orange-50 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white border-gray-200 shadow-sm"
-              aria-label="Manage Startups"
-            >
-              <CardContent className="flex flex-col items-center justify-center p-6">
-                <Building2 className="h-8 w-8 mb-2 text-orange-600" />
-                <h3 className="font-semibold text-gray-900">Manage Startups</h3>
-                <p className="text-sm text-gray-600 text-center">
-                  Add and configure startups
-                </p>
-              </CardContent>
-            </Card>
+            {/* Right Column - Quick Actions */}
+            <div className="space-y-6">
+              <Card
+                role="button"
+                tabIndex={0}
+                onClick={() => navigate(`/games/${gameId}/participants`)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") navigate(`/games/${gameId}/participants`);
+                }}
+                className="cursor-pointer hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white border-gray-100 hover:border-orange-200 group"
+                aria-label="Manage Participants"
+              >
+                <CardContent className="flex items-center p-8">
+                  <div className="p-4 bg-orange-50 rounded-xl mr-6 group-hover:bg-orange-100 transition-colors">
+                    <Users className="h-8 w-8 text-orange-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">Manage Participants</h3>
+                    <p className="text-gray-600">
+                      Add, edit, and manage game participants and their budgets
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
 
-            <Card
-              role="button"
-              tabIndex={0}
-              onClick={() => navigate(`/games/${gameId}/settings`)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") navigate(`/games/${gameId}/settings`);
-              }}
-              className="cursor-pointer hover:bg-orange-50 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white border-gray-200 shadow-sm"
-              aria-label="Game Settings"
-            >
-              <CardContent className="flex flex-col items-center justify-center p-6">
-                <Settings className="h-8 w-8 mb-2 text-orange-600" />
-                <h3 className="font-semibold text-gray-900">Game Settings</h3>
-                <p className="text-sm text-gray-600 text-center">
-                  Configure game parameters
-                </p>
-              </CardContent>
-            </Card>
+              <Card
+                role="button"
+                tabIndex={0}
+                onClick={() => navigate(`/games/${gameId}/startups`)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") navigate(`/games/${gameId}/startups`);
+                }}
+                className="cursor-pointer hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white border-gray-100 hover:border-orange-200 group"
+                aria-label="Manage Startups"
+              >
+                <CardContent className="flex items-center p-8">
+                  <div className="p-4 bg-blue-50 rounded-xl mr-6 group-hover:bg-blue-100 transition-colors">
+                    <Building2 className="h-8 w-8 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">Manage Startups</h3>
+                    <p className="text-gray-600">
+                      Add and configure startup profiles and share distribution
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
 
-            <Card
-              role="button"
-              tabIndex={0}
-              onClick={() => navigate(`/games/${gameId}/preview`)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") navigate(`/games/${gameId}/preview`);
-              }}
-              className="cursor-pointer hover:bg-orange-50 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white border-gray-200 shadow-sm"
-              aria-label="Preview Game"
-            >
-              <CardContent className="flex flex-col items-center justify-center p-6">
-                <Play className="h-8 w-8 mb-2 text-orange-600" />
-                <h3 className="font-semibold text-gray-900">Preview Game</h3>
-                <p className="text-sm text-gray-600 text-center">
-                  Preview how the game looks
-                </p>
-              </CardContent>
-            </Card>
-          </div>
+              <Card
+                role="button"
+                tabIndex={0}
+                onClick={() => navigate(`/games/${gameId}/settings`)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") navigate(`/games/${gameId}/settings`);
+                }}
+                className="cursor-pointer hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white border-gray-100 hover:border-orange-200 group"
+                aria-label="Game Settings"
+              >
+                <CardContent className="flex items-center p-8">
+                  <div className="p-4 bg-purple-50 rounded-xl mr-6 group-hover:bg-purple-100 transition-colors">
+                    <Settings className="h-8 w-8 text-purple-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">Game Settings</h3>
+                    <p className="text-gray-600">
+                      Configure game parameters, rules, and customization
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
 
-          {/* Game Overview */}
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            <Card className="bg-white border-gray-200 shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-gray-900">Participants</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-gray-900">{stats.participants}</div>
-                <p className="text-gray-600">
-                  {stats.participants === 0 ? "No participants yet" : "Active participants"}
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white border-gray-200 shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-gray-900">Startups</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-gray-900">{stats.startups}</div>
-                <p className="text-gray-600">
-                  {stats.startups === 0 ? "No startups added" : "Available startups"}
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white border-gray-200 shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-gray-900">Total Volume</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-gray-900">{game.currency} {stats.totalVolume.toLocaleString()}</div>
-                <p className="text-gray-600">
-                  {stats.activeTrades} trades executed
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white border-gray-200 shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-gray-900">Quick Actions</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => navigate(`/games/${gameId}/participants`)}
-                  className="w-full border-gray-200 text-gray-700 hover:bg-gray-50"
-                >
-                  <Mail className="h-4 w-4 mr-2" />
-                  Send Invites
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => navigate(`/games/${gameId}/leaderboard`)}
-                  className="w-full border-gray-200 text-gray-700 hover:bg-gray-50"
-                >
-                  <BarChart3 className="h-4 w-4 mr-2" />
-                  Leaderboard
-                </Button>
-              </CardContent>
-            </Card>
+              <Card
+                role="button"
+                tabIndex={0}
+                onClick={() => navigate(`/games/${gameId}/preview`)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") navigate(`/games/${gameId}/preview`);
+                }}
+                className="cursor-pointer hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white border-gray-100 hover:border-orange-200 group"
+                aria-label="Preview Game"
+              >
+                <CardContent className="flex items-center p-8">
+                  <div className="p-4 bg-green-50 rounded-xl mr-6 group-hover:bg-green-100 transition-colors">
+                    <Play className="h-8 w-8 text-green-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">Preview Game</h3>
+                    <p className="text-gray-600">
+                      Preview how the game looks to participants before launch
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
       </div>
