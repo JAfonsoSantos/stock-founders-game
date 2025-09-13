@@ -476,7 +476,13 @@ export default function CreateGame() {
           <div className="flex gap-3">
             <Button
               variant="outline"
-              onClick={() => setShowPreview(true)}
+              onClick={() => {
+                if (isEditMode && gameId) {
+                  navigate(`/games/${gameId}/preview`);
+                } else {
+                  setShowPreview(true);
+                }
+              }}
               className="border-gray-200 text-gray-700 hover:bg-gray-50"
             >
               <Eye className="h-4 w-4 mr-2" />
