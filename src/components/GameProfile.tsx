@@ -151,11 +151,12 @@ export function GameProfile({
                 {gameData.logo_url ? (
                   <img src={gameData.logo_url} alt={gameData.name} className="w-full h-full object-cover rounded-xl" />
                 ) : (
-                  <div className="text-center">
-                    <span className="text-3xl font-bold text-gray-600">
-                      {gameData.name.charAt(0).toUpperCase()}
-                    </span>
-                    <p className="text-xs text-gray-400 mt-2">Your Logo Here</p>
+                  <div className="text-center flex flex-col justify-center h-full">
+                    <div className="text-xs text-gray-400 leading-relaxed">
+                      <div>Your</div>
+                      <div>Logo</div>
+                      <div>Here</div>
+                    </div>
                   </div>
                 )}
               </div>
