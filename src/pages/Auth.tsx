@@ -450,7 +450,7 @@ export default function Auth() {
               <form onSubmit={handleLogin}>
                 <Button 
                   type="submit" 
-                  className="w-full h-14 text-base font-semibold bg-[#FF6B35] hover:bg-[#E55A2B] text-foreground border-0 rounded-lg shadow-sm transition-all duration-200"
+                   className="w-full h-14 text-base font-semibold bg-[#FF6B35] hover:bg-[#E55A2B] text-white border-0 rounded-lg shadow-sm transition-all duration-200"
                   disabled={loading || !email || !password}
                 >
                   {loading ? "Signing in..." : "Continue"}
@@ -461,7 +461,7 @@ export default function Auth() {
               <form onSubmit={handleMagicLink}>
                 <Button 
                   type="submit" 
-                  className="w-full h-14 text-base font-semibold bg-[#FF6B35] hover:bg-[#E55A2B] text-foreground border-0 rounded-lg shadow-sm transition-all duration-200"
+                   className="w-full h-14 text-base font-semibold bg-[#FF6B35] hover:bg-[#E55A2B] text-white border-0 rounded-lg shadow-sm transition-all duration-200"
                   disabled={loading || !email}
                 >
                   {loading ? "Sending..." : "Continue"}
@@ -473,7 +473,7 @@ export default function Auth() {
               <form onSubmit={handleSignUp}>
                 <Button 
                   type="submit" 
-                  className="w-full h-14 text-base font-semibold bg-[#FF6B35] hover:bg-[#E55A2B] text-foreground border-0 rounded-lg shadow-sm transition-all duration-200" 
+                  className="w-full h-14 text-base font-semibold bg-[#FF6B35] hover:bg-[#E55A2B] text-white border-0 rounded-lg shadow-sm transition-all duration-200" 
                   disabled={loading || !email || !password || !confirmPassword}
                 >
                   {loading ? "Creating account..." : "Continue"}

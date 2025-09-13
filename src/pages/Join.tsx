@@ -361,7 +361,7 @@ export default function Join() {
 
               <Button 
                 type="submit" 
-                className="w-full h-14 text-base font-semibold bg-[#FF6B35] hover:bg-[#E55A2B] text-foreground border-0 rounded-lg shadow-sm transition-all duration-200" 
+                className="w-full h-14 text-base font-semibold bg-[#FF6B35] hover:bg-[#E55A2B] text-white border-0 rounded-lg shadow-sm transition-all duration-200" 
                 disabled={loading}
               >
                 {loading ? (
