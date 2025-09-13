@@ -273,11 +273,11 @@ export default function GameOrganizer() {
           </Button>
         </div>
 
-        {/* Game Logo */}
+        {/* Game Logo and Title */}
         <div className="absolute -bottom-16 left-8 right-8">
           <div className="flex items-end gap-6">
             <div 
-              className="h-32 w-32 border-4 border-white shadow-xl rounded-2xl bg-white flex items-center justify-center group cursor-pointer relative"
+              className="h-32 w-32 border-4 border-white shadow-xl rounded-2xl bg-white flex items-center justify-center group cursor-pointer relative flex-shrink-0"
               onClick={() => setEditingImage('logo')}
             >
               {game.logo_url ? (
@@ -302,19 +302,20 @@ export default function GameOrganizer() {
                 </div>
               )}
             </div>
+            
+            {/* Event Title - Right side of logo */}
+            <div className="flex-1 pb-4">
+              <h1 className="text-4xl font-bold text-gray-900 mb-1">
+                {game.name}
+              </h1>
+              <p className="text-gray-600 text-lg">Game Organizer Dashboard</p>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Event Title */}
-      <div className="px-8 pt-8 pb-4 bg-gradient-to-b from-white/5 to-transparent">
-        <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-5xl font-bold text-gray-900 mb-2">
-            {game.name}
-          </h1>
-          <p className="text-gray-600 text-lg">Game Organizer Dashboard</p>
-        </div>
-      </div>
+      {/* Spacer for absolute positioned content */}
+      <div className="h-20"></div>
 
       {/* Status Badges and Main Actions */}
       <div className="px-8 pb-8">
