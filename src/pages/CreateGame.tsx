@@ -111,6 +111,15 @@ export default function CreateGame() {
 
         if (rolesError) throw rolesError;
 
+        // Load team members
+        const { data: teamMembers, error: teamError } = await supabase
+          .from('game_team_members')
+          .select('*')
+          .eq('game_id', gameId)
+          .order('created_at');
+
+        if (teamError) throw teamError;
+
         // Build budgets object from roles
         const budgets: Record<string, number> = {};
         const rolesData = roles?.map(role => ({
@@ -128,32 +137,49 @@ export default function CreateGame() {
         // Update form data with loaded data
         setFormData(prev => ({
           ...prev,
+          // Step 1 - Basic Information
           name: game.name || "",
           description: game.description || "",
           currency: game.currency || "USD",
           startDate: new Date(game.starts_at),
           endDate: new Date(game.ends_at),
+          hasSpecificTimes: game.has_specific_times || false,
+          startTime: game.start_time || "09:00",
+          endTime: game.end_time || "17:00",
+          colorTheme: game.color_theme || "default",
+          notifications: game.notifications_enabled ?? true,
           language: game.locale || "en",
           logoUrl: game.logo_url || "",
           headerUrl: game.hero_image_url || "",
           // Step 2 - Organization data
-          organizerName: organizer ? `${organizer.first_name} ${organizer.last_name}`.trim() : prev.organizerName,
-          organizerCompany: prev.organizerCompany, // Keep existing value since it's not stored
-          eventWebsite: prev.eventWebsite, // Keep existing value since it's not stored
-          teamMembers: [
+          organizerName: game.organizer_name || (organizer ? `${organizer.first_name} ${organizer.last_name}`.trim() : prev.organizerName),
+          organizerCompany: game.organizer_company || prev.organizerCompany,
+          eventWebsite: game.event_website || prev.eventWebsite,
+          teamMembers: teamMembers?.map(member => ({
+            email: member.email,
+            name: member.name,
+            role: member.role
+          })) || [
             {
               email: organizer?.email || prev.teamMembers[0]?.email || "",
               name: organizer ? `${organizer.first_name} ${organizer.last_name}`.trim() : prev.teamMembers[0]?.name || "",
               role: "Organizer"
             }
           ],
+          // Step 3 - Template & Terminology
+          templateId: game.template_id || "",
+          assetSingular: game.asset_singular || "",
+          assetPlural: game.asset_plural || "",
+          roles: rolesData,
+          budgets,
           // Step 4 - Game Settings
+          enablePrimaryMarket: game.enable_primary_market ?? true,
           enableSecondaryMarket: game.allow_secondary || false,
           leaderboardMode: game.show_public_leaderboards ? 'public_live' : 'private',
+          tradingMode: game.trading_mode || 'continuous',
           circuitBreaker: game.circuit_breaker ?? true,
           maxPricePerShare: game.max_price_per_share || 10000,
-          roles: rolesData,
-          budgets
+          judgesPanel: game.judges_panel || false
         }));
 
       } catch (error: any) {
@@ -190,6 +216,24 @@ export default function CreateGame() {
         max_price_per_share: formData.maxPricePerShare,
         logo_url: formData.logoUrl,
         hero_image_url: formData.headerUrl,
+        // Step 1 additional fields
+        has_specific_times: formData.hasSpecificTimes,
+        start_time: formData.hasSpecificTimes ? formData.startTime : null,
+        end_time: formData.hasSpecificTimes ? formData.endTime : null,
+        color_theme: formData.colorTheme,
+        notifications_enabled: formData.notifications,
+        // Step 2 fields
+        organizer_name: formData.organizerName,
+        organizer_company: formData.organizerCompany,
+        event_website: formData.eventWebsite,
+        // Step 3 fields
+        template_id: formData.templateId,
+        asset_singular: formData.assetSingular,
+        asset_plural: formData.assetPlural,
+        // Step 4 fields
+        enable_primary_market: formData.enablePrimaryMarket,
+        trading_mode: formData.tradingMode,
+        judges_panel: formData.judgesPanel,
       };
 
       if (isEditMode && gameId) {
@@ -218,7 +262,30 @@ export default function CreateGame() {
             .from('game_roles')
             .insert(roleData);
 
-          if (rolesError) throw rolesError;
+        if (rolesError) throw rolesError;
+        }
+
+        // Save team members
+        if (formData.teamMembers && formData.teamMembers.length > 0) {
+          // Delete existing team members
+          await supabase
+            .from('game_team_members')
+            .delete()
+            .eq('game_id', gameId);
+
+          // Insert new team members
+          const teamMemberData = formData.teamMembers.map(member => ({
+            game_id: gameId,
+            email: member.email,
+            name: member.name,
+            role: member.role
+          }));
+
+          const { error: teamError } = await supabase
+            .from('game_team_members')
+            .insert(teamMemberData);
+
+          if (teamError) throw teamError;
         }
 
         toast({

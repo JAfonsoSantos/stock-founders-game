@@ -85,68 +85,145 @@ export type Database = {
           },
         ]
       }
+      game_team_members: {
+        Row: {
+          created_at: string | null
+          email: string
+          game_id: string
+          id: string
+          name: string
+          role: string
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          game_id: string
+          id?: string
+          name: string
+          role: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          game_id?: string
+          id?: string
+          name?: string
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_team_members_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       games: {
         Row: {
           allow_secondary: boolean
+          asset_plural: string | null
+          asset_singular: string | null
           circuit_breaker: boolean
           circuit_breaker_active: boolean | null
           circuit_breaker_until: string | null
+          color_theme: string | null
           created_at: string
           currency: string
           description: string | null
+          enable_primary_market: boolean | null
+          end_time: string | null
           ends_at: string
+          event_website: string | null
+          has_specific_times: boolean | null
           hero_image_url: string | null
           id: string
+          judges_panel: boolean | null
           locale: string
           logo_url: string | null
           max_price_per_share: number
           name: string
+          notifications_enabled: boolean | null
+          organizer_company: string | null
+          organizer_name: string | null
           owner_user_id: string
           show_public_leaderboards: boolean
+          start_time: string | null
           starts_at: string
           status: Database["public"]["Enums"]["game_status"]
+          template_id: string | null
+          trading_mode: string | null
           updated_at: string
         }
         Insert: {
           allow_secondary?: boolean
+          asset_plural?: string | null
+          asset_singular?: string | null
           circuit_breaker?: boolean
           circuit_breaker_active?: boolean | null
           circuit_breaker_until?: string | null
+          color_theme?: string | null
           created_at?: string
           currency?: string
           description?: string | null
+          enable_primary_market?: boolean | null
+          end_time?: string | null
           ends_at: string
+          event_website?: string | null
+          has_specific_times?: boolean | null
           hero_image_url?: string | null
           id?: string
+          judges_panel?: boolean | null
           locale?: string
           logo_url?: string | null
           max_price_per_share?: number
           name: string
+          notifications_enabled?: boolean | null
+          organizer_company?: string | null
+          organizer_name?: string | null
           owner_user_id: string
           show_public_leaderboards?: boolean
+          start_time?: string | null
           starts_at: string
           status?: Database["public"]["Enums"]["game_status"]
+          template_id?: string | null
+          trading_mode?: string | null
           updated_at?: string
         }
         Update: {
           allow_secondary?: boolean
+          asset_plural?: string | null
+          asset_singular?: string | null
           circuit_breaker?: boolean
           circuit_breaker_active?: boolean | null
           circuit_breaker_until?: string | null
+          color_theme?: string | null
           created_at?: string
           currency?: string
           description?: string | null
+          enable_primary_market?: boolean | null
+          end_time?: string | null
           ends_at?: string
+          event_website?: string | null
+          has_specific_times?: boolean | null
           hero_image_url?: string | null
           id?: string
+          judges_panel?: boolean | null
           locale?: string
           logo_url?: string | null
           max_price_per_share?: number
           name?: string
+          notifications_enabled?: boolean | null
+          organizer_company?: string | null
+          organizer_name?: string | null
           owner_user_id?: string
           show_public_leaderboards?: boolean
+          start_time?: string | null
           starts_at?: string
           status?: Database["public"]["Enums"]["game_status"]
+          template_id?: string | null
+          trading_mode?: string | null
           updated_at?: string
         }
         Relationships: []
