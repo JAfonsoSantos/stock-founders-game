@@ -3,11 +3,12 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Users, Building2, Settings, Play, Pause, Mail, TrendingUp, BarChart3 } from "lucide-react";
+import { ArrowLeft, Users, Building2, Settings, Play, Pause, Mail, TrendingUp, BarChart3, Edit } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { sendInviteEmail, sendMarketOpenEmail, sendLastMinutesEmail, sendResultsEmail } from "@/lib/email";
+import { GameImageUpload } from "@/components/GameImageUpload";
 
 interface Game {
   id: string;
@@ -20,6 +21,8 @@ interface Game {
   owner_user_id: string;
   allow_secondary: boolean;
   show_public_leaderboards: boolean;
+  logo_url?: string;
+  hero_image_url?: string;
 }
 
 interface GameStats {
@@ -37,6 +40,7 @@ export default function GameOrganizer() {
   const [stats, setStats] = useState<GameStats>({ participants: 0, startups: 0, totalVolume: 0, activeTrades: 0 });
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [editingImage, setEditingImage] = useState<'logo' | 'header' | null>(null);
 
   useEffect(() => {
     if (!gameId) return;
@@ -175,6 +179,18 @@ export default function GameOrganizer() {
     }
   };
 
+  const handleImageUpload = (type: 'logo' | 'header', url: string) => {
+    if (!game) return;
+    
+    const updatedGame = {
+      ...game,
+      [type === 'logo' ? 'logo_url' : 'hero_image_url']: url
+    };
+    
+    setGame(updatedGame);
+    setEditingImage(null);
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'draft': return 'bg-gray-100 text-gray-700 border-gray-200';
@@ -220,8 +236,28 @@ export default function GameOrganizer() {
       {/* Hero Section */}
       <div className="relative">
         {/* Background */}
-        <div className="h-64 w-full bg-gradient-to-br from-slate-600 via-slate-700 to-slate-800">
+        <div 
+          className="h-64 w-full bg-gradient-to-br from-slate-600 via-slate-700 to-slate-800 group cursor-pointer relative"
+          style={{
+            backgroundImage: game.hero_image_url ? `url(${game.hero_image_url})` : undefined,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
+          }}
+          onClick={() => setEditingImage('header')}
+        >
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/20 to-transparent" />
+          
+          {/* Edit Cover Image Button */}
+          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+            <Button
+              variant="secondary"
+              size="sm"
+              className="bg-white/90 text-gray-900 hover:bg-white"
+            >
+              <Edit className="h-4 w-4 mr-2" />
+              {game.hero_image_url ? 'Edit cover image' : 'Add cover image'}
+            </Button>
+          </div>
         </div>
         
         {/* Header Controls */}
@@ -240,13 +276,31 @@ export default function GameOrganizer() {
         {/* Game Logo */}
         <div className="absolute -bottom-16 left-8 right-8">
           <div className="flex items-end gap-6">
-            <div className="h-32 w-32 border-4 border-white shadow-xl rounded-2xl bg-white flex items-center justify-center">
-              <div className="text-center">
-                <span className="text-3xl font-bold text-gray-600">
-                  {game.name.charAt(0).toUpperCase()}
-                </span>
-                <p className="text-xs text-gray-400 mt-2">Event Logo</p>
-              </div>
+            <div 
+              className="h-32 w-32 border-4 border-white shadow-xl rounded-2xl bg-white flex items-center justify-center group cursor-pointer relative"
+              onClick={() => setEditingImage('logo')}
+            >
+              {game.logo_url ? (
+                <>
+                  <img src={game.logo_url} alt={game.name} className="w-full h-full object-cover rounded-xl" />
+                  <div className="absolute inset-0 rounded-xl bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="bg-white/90 text-gray-900 hover:bg-white p-2 h-10 w-10"
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <div className="text-center group-hover:opacity-75 transition-opacity">
+                  <span className="text-3xl font-bold text-gray-600">
+                    {game.name.charAt(0).toUpperCase()}
+                  </span>
+                  <p className="text-xs text-gray-400 mt-2">Click to add logo</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -549,6 +603,30 @@ export default function GameOrganizer() {
           </div>
         </div>
       </div>
+
+      {/* Image Upload Modals */}
+      {editingImage && gameId && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <h3 className="text-lg font-semibold mb-4">
+              {editingImage === 'logo' ? 'Edit Event Logo' : 'Edit Cover Image'}
+            </h3>
+            <GameImageUpload
+              type={editingImage}
+              currentUrl={editingImage === 'logo' ? game?.logo_url : game?.hero_image_url}
+              onUpload={(url) => handleImageUpload(editingImage, url)}
+              title={editingImage === 'logo' ? 'Event Logo' : 'Cover Image'}
+              description={editingImage === 'logo' ? 'PNG, JPG até 2MB' : 'PNG, JPG até 5MB'}
+              gameId={gameId}
+            />
+            <div className="flex justify-end mt-4">
+              <Button variant="outline" onClick={() => setEditingImage(null)}>
+                Close
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -95,8 +95,10 @@ export type Database = {
           currency: string
           description: string | null
           ends_at: string
+          hero_image_url: string | null
           id: string
           locale: string
+          logo_url: string | null
           max_price_per_share: number
           name: string
           owner_user_id: string
@@ -114,8 +116,10 @@ export type Database = {
           currency?: string
           description?: string | null
           ends_at: string
+          hero_image_url?: string | null
           id?: string
           locale?: string
+          logo_url?: string | null
           max_price_per_share?: number
           name: string
           owner_user_id: string
@@ -133,8 +137,10 @@ export type Database = {
           currency?: string
           description?: string | null
           ends_at?: string
+          hero_image_url?: string | null
           id?: string
           locale?: string
+          logo_url?: string | null
           max_price_per_share?: number
           name?: string
           owner_user_id?: string
