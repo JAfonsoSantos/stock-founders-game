@@ -9,6 +9,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { sendInviteEmail, sendMarketOpenEmail, sendLastMinutesEmail, sendResultsEmail } from "@/lib/email";
 import { GameImageUpload } from "@/components/GameImageUpload";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
 interface Game {
   id: string;
@@ -36,6 +38,7 @@ export default function GameOrganizer() {
   const { gameId } = useParams<{ gameId: string }>();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [game, setGame] = useState<Game | null>(null);
   const [stats, setStats] = useState<GameStats>({ participants: 0, startups: 0, totalVolume: 0, activeTrades: 0 });
   const [loading, setLoading] = useState(true);
@@ -237,7 +240,10 @@ export default function GameOrganizer() {
       <div className="relative">
         {/* Background */}
         <div 
-          className="h-48 sm:h-56 md:h-64 lg:h-72 xl:h-80 w-full bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600 group cursor-pointer relative"
+          className={cn(
+            "w-full bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600 group cursor-pointer relative",
+            isMobile ? "h-32" : "h-48 sm:h-56 md:h-64 lg:h-72 xl:h-80"
+          )}
           style={{
             backgroundImage: game.hero_image_url ? `url(${game.hero_image_url})` : undefined,
             backgroundSize: 'cover',
@@ -251,17 +257,17 @@ export default function GameOrganizer() {
           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
             <Button
               variant="secondary"
-              size="sm"
+              size={isMobile ? "sm" : "default"}
               className="bg-white/90 text-gray-900 hover:bg-white"
             >
-              <Edit className="h-4 w-4 mr-2" />
-              {game.hero_image_url ? 'Edit cover image' : 'Add cover image'}
+              <Edit className={cn("mr-2", isMobile ? "h-3 w-3" : "h-4 w-4")} />
+              {game.hero_image_url ? 'Edit cover' : 'Add cover'}
             </Button>
           </div>
         </div>
         
         {/* Header Controls */}
-        <div className="absolute top-6 left-6 right-6 flex justify-between items-center">
+        <div className={cn("absolute top-4 flex justify-between items-center", isMobile ? "left-4 right-4" : "top-6 left-6 right-6")}>
           <Button
             variant="ghost"
             size="sm"
@@ -269,15 +275,18 @@ export default function GameOrganizer() {
             className="bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 border-white/20"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Dashboard
+            {isMobile ? "Back" : "Back to Dashboard"}
           </Button>
         </div>
 
         {/* Game Logo */}
-        <div className="absolute -bottom-16 left-8 right-8">
-          <div className="flex items-end gap-6">
+        <div className={cn("absolute left-4 right-4", isMobile ? "-bottom-12" : "-bottom-16 left-8 right-8")}>
+          <div className={cn("flex gap-4", isMobile ? "flex-col items-center text-center" : "flex-row items-end gap-6")}>
             <div 
-              className="h-32 w-32 border-4 border-gray-50 rounded-2xl bg-white flex items-center justify-center group cursor-pointer relative flex-shrink-0"
+              className={cn(
+                "border-4 border-gray-50 rounded-2xl bg-white flex items-center justify-center group cursor-pointer relative flex-shrink-0",
+                isMobile ? "h-24 w-24" : "h-32 w-32"
+              )}
               onClick={() => setEditingImage('logo')}
             >
               {game.logo_url ? (
@@ -287,15 +296,15 @@ export default function GameOrganizer() {
                     <Button
                       variant="secondary"
                       size="sm"
-                      className="bg-white/90 text-gray-900 hover:bg-white p-2 h-10 w-10"
+                      className="bg-white/90 text-gray-900 hover:bg-white p-2 h-8 w-8"
                     >
-                      <Edit className="h-4 w-4" />
+                      <Edit className="h-3 w-3" />
                     </Button>
                   </div>
                 </>
               ) : (
                 <div className="text-center group-hover:opacity-75 transition-opacity flex flex-col justify-center h-full">
-                  <div className="text-sm text-gray-400 leading-relaxed">
+                  <div className={cn("text-gray-400 leading-relaxed", isMobile ? "text-xs" : "text-sm")}>
                     <div>Your</div>
                     <div>Logo</div>
                     <div>Here</div>
@@ -304,13 +313,15 @@ export default function GameOrganizer() {
               )}
             </div>
             
-            {/* Event Title - positioned to align with bottom part of logo */}
-            <div className="flex-1 pb-2" style={{ marginTop: '15px' }}>
+            {/* Event Title */}
+            <div className={cn("flex-1", isMobile ? "pb-0" : "pb-2")}>
               <div className="bg-gray-50 px-4 py-2 rounded-lg inline-block">
-                <h1 className="text-4xl font-bold text-gray-900 mb-1">
+                <h1 className={cn("font-bold text-gray-900 mb-1", isMobile ? "text-2xl" : "text-4xl")}>
                   {game.name}
                 </h1>
-                <p className="text-gray-600 text-lg">Game Organizer Dashboard</p>
+                <p className={cn("text-gray-600", isMobile ? "text-sm" : "text-lg")}>
+                  {isMobile ? "Organizer" : "Game Organizer Dashboard"}
+                </p>
               </div>
             </div>
           </div>
@@ -318,28 +329,28 @@ export default function GameOrganizer() {
       </div>
 
       {/* Spacer for absolute positioned content */}
-      <div className="h-20"></div>
+      <div className={isMobile ? "h-16" : "h-20"}></div>
 
       {/* Status Badges and Main Actions */}
-      <div className="px-8 pb-8">
+      <div className={cn("pb-8", isMobile ? "px-4" : "px-8")}>
         <div className="max-w-7xl mx-auto">
-          <div className="flex justify-between items-center mb-8">
-            <div className="flex items-center gap-3">
-              <div className={`px-4 py-2 rounded-lg font-medium border ${getStatusColor(game.status)}`}>
+          <div className={cn("mb-6", isMobile ? "space-y-4" : "flex justify-between items-center mb-8")}>
+            <div className={cn("gap-2", isMobile ? "flex flex-wrap" : "flex items-center gap-3")}>
+              <div className={`px-3 py-2 rounded-lg font-medium border ${getStatusColor(game.status)} ${isMobile ? 'text-sm' : ''}`}>
                 {getStatusLabel(game.status)}
               </div>
-              <div className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-lg">
+              <div className={cn("flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-lg", isMobile ? "text-sm" : "")}>
                 <Users className="h-4 w-4 text-gray-600" />
-                <span className="font-medium text-gray-900">{stats.participants} participants</span>
+                <span className="font-medium text-gray-900">{stats.participants} {isMobile ? "" : "participants"}</span>
               </div>
-              <div className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-lg">
+              <div className={cn("flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-lg", isMobile ? "text-sm" : "")}>
                 <Building2 className="h-4 w-4 text-gray-600" />
-                <span className="font-medium text-gray-900">{stats.startups} startups</span>
+                <span className="font-medium text-gray-900">{stats.startups} {isMobile ? "" : "startups"}</span>
               </div>
             </div>
             
             {/* Main Action Buttons */}
-            <div className="flex gap-3">
+            <div className={cn("gap-2", isMobile ? "flex flex-col space-y-2" : "flex gap-3")}>
               {/* Preview and Edit buttons */}
               <Button 
                 variant="outline"
@@ -405,7 +416,7 @@ export default function GameOrganizer() {
           </div>
 
           {/* Main Content Grid */}
-          <div className="grid lg:grid-cols-2 gap-8">
+          <div className={cn("gap-6", isMobile ? "space-y-6" : "grid lg:grid-cols-2 gap-8")}>
             {/* Left Column - Game Controls & Statistics */}
             <div className="space-y-6">
               {/* Game Details */}

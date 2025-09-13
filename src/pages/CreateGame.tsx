@@ -6,10 +6,11 @@ import { useUserProfile } from '@/hooks/useUserProfile';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { ChevronLeft, ChevronRight, Check, Eye } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Check, Eye, MoreHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from '@/hooks/use-toast';
 import { GameProfile } from '@/components/GameProfile';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { Step1BasicInformation } from '@/components/wizard/Step1BasicInformation';
 import { Step2Organization } from '@/components/wizard/Step2Organization';
 import { Step3TemplateTerminology } from '@/components/wizard/Step3TemplateTerminology';
@@ -23,6 +24,7 @@ export default function CreateGame() {
   const navigate = useNavigate();
   const { gameId } = useParams();
   const isEditMode = !!gameId;
+  const isMobile = useIsMobile();
 
   const [currentStep, setCurrentStep] = useState(1);
   const [isCreating, setIsCreating] = useState(false);
@@ -433,80 +435,167 @@ export default function CreateGame() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8 max-w-6xl mx-auto">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold text-gray-700">{isEditMode ? 'Editar Evento' : 'Criar Novo Evento'}</h1>
-            <div className="flex items-center space-x-8">
-              {steps.map((step) => (
-                <button
-                  key={step.id}
-                  onClick={() => setCurrentStep(step.id)}
-                  className={cn(
-                    "text-lg font-medium cursor-pointer transition-colors relative",
-                    currentStep === step.id ? "text-orange-500" : "text-gray-400 hover:text-gray-600"
-                  )}
-                >
-                  {step.id}
-                  {currentStep === step.id && (
-                    <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-orange-500" />
-                  )}
-                </button>
-              ))}
-            </div>
+      <div className={cn("container mx-auto py-6", isMobile ? "px-4" : "px-4 py-8")}>
+        <div className={cn("mb-6 max-w-6xl mx-auto", isMobile ? "mb-4" : "mb-8")}>
+          <div className={cn("mb-4", isMobile ? "space-y-4" : "flex items-center justify-between")}>
+            <h1 className={cn("font-bold text-gray-700", isMobile ? "text-xl" : "text-2xl")}>
+              {isEditMode ? 'Editar Evento' : 'Criar Novo Evento'}
+            </h1>
+            
+            {/* Mobile: Dots navigation */}
+            {isMobile ? (
+              <div className="flex items-center justify-center space-x-2">
+                {steps.map((step) => (
+                  <button
+                    key={step.id}
+                    onClick={() => setCurrentStep(step.id)}
+                    className={cn(
+                      "w-3 h-3 rounded-full transition-colors",
+                      currentStep === step.id ? "bg-orange-500" : "bg-gray-300"
+                    )}
+                    aria-label={`Step ${step.id}: ${step.name}`}
+                  />
+                ))}
+              </div>
+            ) : (
+              /* Desktop: Number navigation */
+              <div className="flex items-center space-x-8">
+                {steps.map((step) => (
+                  <button
+                    key={step.id}
+                    onClick={() => setCurrentStep(step.id)}
+                    className={cn(
+                      "text-lg font-medium cursor-pointer transition-colors relative",
+                      currentStep === step.id ? "text-orange-500" : "text-gray-400 hover:text-gray-600"
+                    )}
+                  >
+                    {step.id}
+                    {currentStep === step.id && (
+                      <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-orange-500" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
+          
+          {/* Mobile: Current step indicator */}
+          {isMobile && (
+            <div className="text-center">
+              <span className="text-sm text-gray-600">
+                Passo {currentStep} de {steps.length}: {steps[currentStep - 1]?.name}
+              </span>
+            </div>
+          )}
         </div>
 
         <Card className="max-w-6xl mx-auto bg-white border-gray-300 shadow-sm">
-          <CardContent className="p-8">
+          <CardContent className={cn(isMobile ? "p-4" : "p-8")}>
             {getCurrentStepComponent()}
           </CardContent>
         </Card>
 
-        <div className="flex justify-between mt-8 max-w-6xl mx-auto">
-          <Button
-            variant="outline"
-            onClick={prevStep}
-            disabled={currentStep === 1}
-          >
-            <ChevronLeft className="h-4 w-4 mr-2" />
-            Anterior
-          </Button>
-          
-          <div className="flex gap-3">
-            <Button
-              variant="outline"
-              onClick={() => {
-                if (isEditMode && gameId) {
-                  navigate(`/games/${gameId}/preview`);
-                } else {
-                  setShowPreview(true);
-                }
-              }}
-              className="border-gray-200 text-gray-700 hover:bg-gray-50"
-            >
-              <Eye className="h-4 w-4 mr-2" />
-              Preview
-            </Button>
-            
-            {currentStep < 6 ? (
+        <div className={cn("mt-6 max-w-6xl mx-auto", isMobile ? "space-y-3" : "flex justify-between mt-8")}>
+          {/* Mobile: Stacked buttons */}
+          {isMobile ? (
+            <div className="space-y-3">
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={prevStep}
+                  disabled={currentStep === 1}
+                  className="flex-1"
+                >
+                  <ChevronLeft className="h-4 w-4 mr-2" />
+                  Anterior
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    if (isEditMode && gameId) {
+                      navigate(`/games/${gameId}/preview`);
+                    } else {
+                      setShowPreview(true);
+                    }
+                  }}
+                  className="border-gray-200 text-gray-700 hover:bg-gray-50"
+                >
+                  <Eye className="h-4 w-4" />
+                </Button>
+              </div>
+              
+              {currentStep < 6 ? (
+                <Button
+                  onClick={nextStep}
+                  disabled={!canProceed()}
+                  className="w-full"
+                  size="lg"
+                >
+                  Próximo
+                  <ChevronRight className="h-4 w-4 ml-2" />
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleSubmit}
+                  disabled={isCreating}
+                  className="w-full bg-[#FF6B35] hover:bg-[#E55A2B] text-white"
+                  size="lg"
+                >
+                  {isCreating ? "Salvando..." : (isEditMode ? "Salvar Alterações" : "Criar Evento")}
+                  <Check className="h-4 w-4 ml-2" />
+                </Button>
+              )}
+            </div>
+          ) : (
+            /* Desktop: Horizontal layout */
+            <>
               <Button
-                onClick={nextStep}
-                disabled={!canProceed()}
+                variant="outline"
+                onClick={prevStep}
+                disabled={currentStep === 1}
               >
-                Próximo
-                <ChevronRight className="h-4 w-4 ml-2" />
+                <ChevronLeft className="h-4 w-4 mr-2" />
+                Anterior
               </Button>
-            ) : (
-              <Button
-                onClick={handleSubmit}
-                disabled={isCreating || !canProceed()}
-                className="bg-orange-600 hover:bg-orange-700"
-              >
-                {isCreating ? (isEditMode ? "Atualizando..." : "Criando...") : (isEditMode ? "Atualizar Evento" : "Criar Evento")}
-              </Button>
-            )}
-          </div>
+              
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    if (isEditMode && gameId) {
+                      navigate(`/games/${gameId}/preview`);
+                    } else {
+                      setShowPreview(true);
+                    }
+                  }}
+                  className="border-gray-200 text-gray-700 hover:bg-gray-50"
+                >
+                  <Eye className="h-4 w-4 mr-2" />
+                  Preview
+                </Button>
+                
+                {currentStep < 6 ? (
+                  <Button
+                    onClick={nextStep}
+                    disabled={!canProceed()}
+                  >
+                    Próximo
+                    <ChevronRight className="h-4 w-4 ml-2" />
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={handleSubmit}
+                    disabled={isCreating}
+                    className="bg-[#FF6B35] hover:bg-[#E55A2B] text-white"
+                  >
+                    {isCreating ? "Salvando..." : (isEditMode ? "Salvar Alterações" : "Criar Evento")}
+                    <Check className="h-4 w-4 ml-2" />
+                  </Button>
+                )}
+              </div>
+            </>
+          )}
         </div>
 
         {/* Preview Modal */}

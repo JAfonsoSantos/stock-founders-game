@@ -206,4 +206,44 @@ body.compact-mode .space-y-8 > * + * {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+  
+  /* Enhanced button touch areas */
+  button, [role="button"] {
+    min-height: 44px;
+    padding: 0.75rem 1rem;
+  }
+  
+  /* Better form spacing */
+  .mobile-form > * + * {
+    margin-top: 1rem;
+  }
+  
+  /* Improved focus states */
+  button:focus-visible, 
+  input:focus,
+  textarea:focus,
+  select:focus {
+    outline: 2px solid hsl(var(--primary));
+    outline-offset: 2px;
+  }
+  
+  /* Stack layout utilities */
+  .mobile-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  /* Responsive grid */
+  .mobile-responsive-grid {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: 1fr;
+  }
+  
+  @media (min-width: 480px) {
+    .mobile-responsive-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
 }
