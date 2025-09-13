@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Users, Building2, Settings, Play, Pause, Mail, TrendingUp, BarChart3, Edit } from "lucide-react";
+import { ArrowLeft, Users, Building2, Settings, Play, Pause, Mail, TrendingUp, BarChart3, Edit, Eye } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -339,6 +339,26 @@ export default function GameOrganizer() {
             
             {/* Main Action Buttons */}
             <div className="flex gap-3">
+              {/* Preview and Edit buttons */}
+              <Button 
+                variant="outline"
+                onClick={() => navigate(`/games/${game.id}/preview`)}
+                className="px-4"
+              >
+                <Eye className="h-4 w-4 mr-2" />
+                Preview Game
+              </Button>
+              
+              <Button 
+                variant="outline"
+                onClick={() => navigate(`/games/${game.id}/settings`)}
+                className="px-4"
+              >
+                <Edit className="h-4 w-4 mr-2" />
+                Edit
+              </Button>
+
+              {/* Main status control button */}
               {game.status === 'draft' && (
                 <Button 
                   onClick={() => updateGameStatus('pre_market')}
