@@ -304,7 +304,7 @@ export default function GameOrganizer() {
             </div>
             
             {/* Event Title - positioned to align with bottom part of logo */}
-            <div className="flex-1 pb-2">
+            <div className="flex-1 pb-2" style={{ marginTop: '15px' }}>
               <div className="bg-gray-50 px-4 py-2 rounded-lg inline-block">
                 <h1 className="text-4xl font-bold text-gray-900 mb-1">
                   {game.name}
