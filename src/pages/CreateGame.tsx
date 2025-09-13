@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserProfile } from '@/hooks/useUserProfile';
@@ -21,10 +21,13 @@ export default function CreateGame() {
   const { user } = useAuth();
   const { profile } = useUserProfile(user);
   const navigate = useNavigate();
+  const { gameId } = useParams();
+  const isEditMode = !!gameId;
 
   const [currentStep, setCurrentStep] = useState(1);
   const [isCreating, setIsCreating] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [loading, setLoading] = useState(isEditMode);
 
   const [formData, setFormData] = useState({
     // Step 1 - Basics
@@ -74,16 +77,88 @@ export default function CreateGame() {
     judgesPanel: false
   });
 
+  // Load existing game data when in edit mode
+  useEffect(() => {
+    if (!isEditMode || !gameId) return;
+
+    const loadGameData = async () => {
+      try {
+        setLoading(true);
+        
+        // Load game data
+        const { data: game, error: gameError } = await supabase
+          .from('games')
+          .select('*')
+          .eq('id', gameId)
+          .single();
+
+        if (gameError) throw gameError;
+
+        // Load game roles
+        const { data: roles, error: rolesError } = await supabase
+          .from('game_roles')
+          .select('*')
+          .eq('game_id', gameId);
+
+        if (rolesError) throw rolesError;
+
+        // Build budgets object from roles
+        const budgets: Record<string, number> = {};
+        const rolesData = roles?.map(role => ({
+          id: role.role,
+          label: role.role === 'founder' ? 'Founder' : role.role === 'angel' ? 'Angel' : 'VC',
+          canTrade: true,
+          voteWeight: 1,
+          isIssuer: role.role === 'founder'
+        })) || [];
+
+        roles?.forEach(role => {
+          budgets[role.role] = role.default_budget;
+        });
+
+        // Update form data with loaded data
+        setFormData(prev => ({
+          ...prev,
+          name: game.name || "",
+          description: game.description || "",
+          currency: game.currency || "USD",
+          startDate: new Date(game.starts_at),
+          endDate: new Date(game.ends_at),
+          language: game.locale || "en",
+          logoUrl: game.logo_url || "",
+          headerUrl: game.hero_image_url || "",
+          enableSecondaryMarket: game.allow_secondary || false,
+          leaderboardMode: game.show_public_leaderboards ? 'public_live' : 'private',
+          circuitBreaker: game.circuit_breaker ?? true,
+          maxPricePerShare: game.max_price_per_share || 10000,
+          roles: rolesData,
+          budgets
+        }));
+
+      } catch (error: any) {
+        console.error('Error loading game data:', error);
+        toast({
+          title: "Erro",
+          description: "Falha ao carregar dados do evento.",
+          variant: "destructive",
+        });
+        navigate('/');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadGameData();
+  }, [isEditMode, gameId, navigate]);
+
   const handleSubmit = async () => {
     if (!user) return;
 
     setIsCreating(true);
     try {
       const gameData = {
-        owner_user_id: user.id,
         name: formData.name,
         description: formData.description,
-        status: 'draft' as const,
         starts_at: formData.startDate.toISOString(),
         ends_at: formData.endDate.toISOString(),
         currency: formData.currency,
@@ -92,52 +167,98 @@ export default function CreateGame() {
         show_public_leaderboards: formData.leaderboardMode === 'public_live',
         circuit_breaker: formData.circuitBreaker,
         max_price_per_share: formData.maxPricePerShare,
+        logo_url: formData.logoUrl,
+        hero_image_url: formData.headerUrl,
       };
 
-      const { data: game, error: gameError } = await supabase
-        .from('games')
-        .insert(gameData)
-        .select()
-        .single();
+      if (isEditMode && gameId) {
+        // Update existing game
+        const { error: gameError } = await supabase
+          .from('games')
+          .update(gameData)
+          .eq('id', gameId);
 
-      if (gameError) throw gameError;
+        if (gameError) throw gameError;
 
-      const roleData = formData.roles.map(role => ({
-        game_id: game.id,
-        role: role.id as any,
-        default_budget: formData.budgets[role.id] || 0
-      }));
+        // Update game roles
+        await supabase
+          .from('game_roles')
+          .delete()
+          .eq('game_id', gameId);
 
-      const { error: rolesError } = await supabase
-        .from('game_roles')
-        .insert(roleData);
+        if (formData.roles.length > 0) {
+          const roleData = formData.roles.map(role => ({
+            game_id: gameId,
+            role: role.id as any,
+            default_budget: formData.budgets[role.id] || 0
+          }));
 
-      if (rolesError) throw rolesError;
+          const { error: rolesError } = await supabase
+            .from('game_roles')
+            .insert(roleData);
 
-      const { error: participantError } = await supabase
-        .from('participants')
-        .insert({
-          game_id: game.id,
-          user_id: user.id,
-          role: 'organizer',
-          initial_budget: 0,
-          current_cash: 0,
-          status: 'active'
+          if (rolesError) throw rolesError;
+        }
+
+        toast({
+          title: "Sucesso!",
+          description: "Evento atualizado com sucesso.",
         });
 
-      if (participantError) throw participantError;
+        navigate(`/games/${gameId}/organizer`);
+      } else {
+        // Create new game
+        const createData = {
+          ...gameData,
+          owner_user_id: user.id,
+          status: 'draft' as const,
+        };
 
-      toast({
-        title: "Sucesso!",
-        description: "Evento criado com sucesso.",
-      });
+        const { data: game, error: gameError } = await supabase
+          .from('games')
+          .insert(createData)
+          .select()
+          .single();
 
-      navigate(`/games/${game.id}/organizer`);
+        if (gameError) throw gameError;
+
+        const roleData = formData.roles.map(role => ({
+          game_id: game.id,
+          role: role.id as any,
+          default_budget: formData.budgets[role.id] || 0
+        }));
+
+        const { error: rolesError } = await supabase
+          .from('game_roles')
+          .insert(roleData);
+
+        if (rolesError) throw rolesError;
+
+        const { error: participantError } = await supabase
+          .from('participants')
+          .insert({
+            game_id: game.id,
+            user_id: user.id,
+            role: 'organizer',
+            initial_budget: 0,
+            current_cash: 0,
+            status: 'active'
+          });
+
+        if (participantError) throw participantError;
+
+        toast({
+          title: "Sucesso!",
+          description: "Evento criado com sucesso.",
+        });
+
+        navigate(`/games/${game.id}/organizer`);
+      }
     } catch (error: any) {
-      console.error('Error creating game:', error);
+      console.error('Error saving game:', error);
       toast({
         title: "Erro",
-        description: error.message || "Falha ao criar evento. Tente novamente.",
+        description: error.message || `Falha ao ${isEditMode ? 'atualizar' : 'criar'} evento. Tente novamente.`,
         variant: "destructive",
       });
     } finally {
@@ -214,12 +335,20 @@ export default function CreateGame() {
     }
   }, [currentStep, formData, setFormData]);
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8 max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold text-gray-700">Criar Novo Evento</h1>
+            <h1 className="text-2xl font-bold text-gray-700">{isEditMode ? 'Editar Evento' : 'Criar Novo Evento'}</h1>
             <div className="flex items-center space-x-8">
               {steps.map((step) => (
                 <button
@@ -280,7 +409,7 @@ export default function CreateGame() {
                 disabled={isCreating || !canProceed()}
                 className="bg-orange-600 hover:bg-orange-700"
               >
-                {isCreating ? "Criando..." : "Criar Evento"}
+                {isCreating ? (isEditMode ? "Atualizando..." : "Criando...") : (isEditMode ? "Atualizar Evento" : "Criar Evento")}
               </Button>
             )}
           </div>

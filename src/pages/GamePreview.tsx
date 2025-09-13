@@ -127,7 +127,7 @@ export default function GamePreview() {
   };
 
   const handleEdit = (type?: 'logo' | 'header') => {
-    navigate(`/games/${gameId}/settings`);
+    navigate(`/games/${gameId}/edit`);
   };
 
   const handleAdminView = () => {

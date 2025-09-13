@@ -128,6 +128,11 @@ const App = () => (
                   <CreateGame />
                 </ProtectedShellRoute>
               } />
+              <Route path="/games/:gameId/edit" element={
+                <ProtectedShellRoute>
+                  <CreateGame />
+                </ProtectedShellRoute>
+              } />
               <Route path="/games/:gameId/organizer" element={
                 <ProtectedShellRoute>
                   <GameOrganizer />
