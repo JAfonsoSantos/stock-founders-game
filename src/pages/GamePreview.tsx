@@ -95,8 +95,8 @@ export default function GamePreview() {
       setGameData({
         name: game.name,
         description: game.description,
-        logo_url: undefined, // Will be added later
-        hero_image_url: undefined, // Will be added later
+        logo_url: game.logo_url,
+        hero_image_url: game.hero_image_url,
         starts_at: game.starts_at,
         ends_at: game.ends_at,
         currency: game.currency,

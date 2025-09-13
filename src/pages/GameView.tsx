@@ -84,9 +84,9 @@ export default function GameView() {
 
       const formattedGameData = {
         name: game.name,
-        description: "", // Add description field to games table if needed
-        logo_url: "", // Add logo_url field to games table if needed
-        hero_image_url: "", // Add hero_image_url field to games table if needed
+        description: game.description || "",
+        logo_url: game.logo_url || "",
+        hero_image_url: game.hero_image_url || "",
         starts_at: game.starts_at,
         ends_at: game.ends_at,
         currency: game.currency,
