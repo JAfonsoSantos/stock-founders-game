@@ -302,22 +302,20 @@ export default function GameOrganizer() {
                 </div>
               )}
             </div>
+            
+            {/* Event Title - positioned to align with bottom part of logo */}
+            <div className="flex-1 pb-2">
+              <h1 className="text-4xl font-bold text-gray-900 mb-1">
+                {game.name}
+              </h1>
+              <p className="text-gray-600 text-lg">Game Organizer Dashboard</p>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Event Title - Below cover image */}
-      <div className="px-8 pt-20 pb-6">
-        <div className="flex items-center gap-6">
-          <div className="w-32 flex-shrink-0"></div> {/* Space for logo */}
-          <div className="flex-1">
-            <h1 className="text-4xl font-bold text-gray-900 mb-1">
-              {game.name}
-            </h1>
-            <p className="text-gray-600 text-lg">Game Organizer Dashboard</p>
-          </div>
-        </div>
-      </div>
+      {/* Spacer for absolute positioned content */}
+      <div className="h-20"></div>
 
       {/* Status Badges and Main Actions */}
       <div className="px-8 pb-8">
