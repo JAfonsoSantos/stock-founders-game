@@ -103,7 +103,7 @@ export function GameProfile({
       <div className="relative">
         {/* Background Image */}
         <div 
-          className="h-64 w-full bg-gradient-to-br from-slate-600 via-slate-700 to-slate-800 group cursor-pointer relative"
+          className="h-48 sm:h-56 md:h-64 lg:h-72 xl:h-80 w-full bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600 group cursor-pointer relative"
           style={{
             backgroundImage: gameData.hero_image_url ? `url(${gameData.hero_image_url})` : undefined,
             backgroundSize: 'cover',
@@ -155,7 +155,7 @@ export function GameProfile({
                     <span className="text-3xl font-bold text-gray-600">
                       {gameData.name.charAt(0).toUpperCase()}
                     </span>
-                    <p className="text-xs text-gray-400 mt-2">Your Event Logo</p>
+                    <p className="text-xs text-gray-400 mt-2">Your Logo Here</p>
                   </div>
                 )}
               </div>
