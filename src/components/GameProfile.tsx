@@ -18,7 +18,8 @@ import {
   Edit,
   Play,
   Crown,
-  Building
+  Building,
+  Eye
 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -56,6 +57,7 @@ interface GameProfileProps {
   onEdit?: (type?: 'logo' | 'header') => void;
   onCreateGame?: () => void;
   onJoinGame?: () => void;
+  onAdminView?: () => void;
 }
 
 const CURRENCY_SYMBOLS: Record<string, string> = {
@@ -69,7 +71,8 @@ export function GameProfile({
   onBack, 
   onEdit, 
   onCreateGame, 
-  onJoinGame 
+  onJoinGame,
+  onAdminView
 }: GameProfileProps) {
   const currencySymbol = CURRENCY_SYMBOLS[gameData.currency] || gameData.currency;
   
@@ -218,10 +221,16 @@ export function GameProfile({
             </div>
             
             <div className="flex gap-3">
+              {isPreview && onAdminView && (
+                <Button onClick={onAdminView} variant="outline" className="bg-white text-gray-700 border-gray-200 hover:bg-gray-50">
+                  <Eye className="h-4 w-4 mr-2" />
+                  Admin View
+                </Button>
+              )}
               {isPreview && onEdit && (
                 <Button onClick={() => onEdit()} variant="outline" className="bg-white text-gray-700 border-gray-200 hover:bg-gray-50">
                   <Edit className="h-4 w-4 mr-2" />
-                  Keep editing
+                  Edit
                 </Button>
               )}
               {isPreview && onCreateGame && (

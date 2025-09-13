@@ -130,6 +130,10 @@ export default function GamePreview() {
     navigate(`/games/${gameId}/settings`);
   };
 
+  const handleAdminView = () => {
+    navigate(`/games/${gameId}/organizer`);
+  };
+
   if (loading) {
     return <LoadingSpinner />;
   }
@@ -156,6 +160,7 @@ export default function GamePreview() {
       isPreview={true}
       onBack={handleBack}
       onEdit={handleEdit}
+      onAdminView={handleAdminView}
     />
   );
 }
