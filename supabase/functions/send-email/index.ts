@@ -207,7 +207,7 @@ const handler = async (req: Request): Promise<Response> => {
           gameName: emailRequest.gameName,
           gameId: emailRequest.gameId,
           locale: emailRequest.locale || 'en',
-          joinUrl: `https://stox.games/join/${emailRequest.gameId}`, // Override with secure URL
+          joinUrl: `${req.headers.get('origin') || 'https://loving-impala-66.lovable.app'}/join/${emailRequest.gameId}`,
           qrCodeBase64: qrCodeBase64,
           qrCid
         });
