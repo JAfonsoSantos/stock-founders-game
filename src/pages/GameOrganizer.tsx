@@ -71,9 +71,9 @@ export default function GameOrganizer() {
       setGame(data);
       
       // Fetch stats
-      const [participantsResult, startupsResult, tradesResult] = await Promise.all([
+      const [participantsResult, venturesResult, tradesResult] = await Promise.all([
         supabase.from("participants").select("id", { count: "exact" }).eq("game_id", gameId),
-        supabase.from("startups").select("id", { count: "exact" }).eq("game_id", gameId),
+        supabase.from("ventures").select("id", { count: "exact" }).eq("game_id", gameId),
         supabase.from("trades").select("qty, price_per_share").eq("game_id", gameId)
       ]);
 
@@ -82,7 +82,7 @@ export default function GameOrganizer() {
 
       setStats({
         participants: participantsResult.count || 0,
-        startups: startupsResult.count || 0,
+        startups: venturesResult.count || 0,
         totalVolume,
         activeTrades: tradesResult.data?.length || 0
       });

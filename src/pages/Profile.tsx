@@ -565,11 +565,11 @@ export default function Profile() {
                       </Button>
                       <Button
                         variant="destructive"
-                        onClick={() => setShowDeleteStartups(true)}
+                        onClick={() => setShowDeleteVentures(true)}
                         className="gap-2 h-20 flex-col"
                       >
                         <Trash2 className="h-6 w-6" />
-                        <span>Delete Startups</span>
+                        <span>Delete Ventures</span>
                       </Button>
                     </div>
                   </CardContent>

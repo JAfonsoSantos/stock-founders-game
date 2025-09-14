@@ -12,7 +12,7 @@ import { useI18n, SUPPORTED_LOCALES } from "@/hooks/useI18n";
 import { useSettings } from "@/hooks/useSettings";
 import { useAuth } from "@/hooks/useAuth";
 import { AdminDeleteUsers } from "@/components/AdminDeleteUsers";
-import { AdminDeleteStartups } from "@/components/AdminDeleteStartups";
+import { AdminDeleteVentures } from "@/components/AdminDeleteVentures";
 import { toast } from "sonner";
 
 export default function Settings() {
@@ -56,7 +56,7 @@ export default function Settings() {
   }
 
   if (showDeleteStartups) {
-    return <AdminDeleteStartups />;
+    return <AdminDeleteVentures />;
   }
 
   return (

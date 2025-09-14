@@ -69,9 +69,9 @@ export default function GameView() {
         .select('*', { count: 'exact', head: true })
         .eq('game_id', gameId);
 
-      // Get startups count
-      const { count: startupsCount } = await supabase
-        .from('startups')
+      // Get ventures count
+      const { count: venturesCount } = await supabase
+        .from('ventures')
         .select('*', { count: 'exact', head: true })
         .eq('game_id', gameId);
 
@@ -103,7 +103,7 @@ export default function GameView() {
           avatar: ownerProfile?.avatar_url,
         },
         participants_count: participantsCount || 0,
-        startups_count: startupsCount || 0,
+        startups_count: venturesCount || 0,
       };
 
       setGameData(formattedGameData);

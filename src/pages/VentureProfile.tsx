@@ -7,192 +7,182 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Progress } from "@/components/ui/progress";
-import { Loader2, Building, TrendingUp, ExternalLink, Globe, Linkedin, CheckCircle, XCircle, Settings, Zap } from "lucide-react";
+import { Loader2, ArrowLeft, Building, ExternalLink, DollarSign, TrendingUp, Users, Settings } from "lucide-react";
 import { toast } from "sonner";
-import InvestModal from "@/components/InvestModal";
-import { useStartupPriceUpdates, useTradeUpdates } from "@/hooks/useRealtime";
+import { InvestModal } from "@/components/InvestModal";
 
-export default function StartupProfile() {
+export default function VentureProfile() {
   const { gameId, slug } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [startup, setStartup] = useState<any>(null);
-  const [participant, setParticipant] = useState<any>(null);
-  const [orders, setOrders] = useState<any[]>([]);
-  const [trades, setTrades] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [venture, setVenture] = useState<any>(null);
+  const [participant, setParticipant] = useState<any>(null);
+  const [pendingOrders, setPendingOrders] = useState<any[]>([]);
+  const [recentTrades, setRecentTrades] = useState<any[]>([]);
   const [isFounder, setIsFounder] = useState(false);
   const [showInvestModal, setShowInvestModal] = useState(false);
-  const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const [priceUpdate, setPriceUpdate] = useState(false);
 
   useEffect(() => {
     if (!user || !gameId || !slug) return;
-    
+
     const fetchData = async () => {
-      // Get participant
-      const { data: participantData } = await supabase
-        .from("participants")
-        .select("*")
-        .eq("game_id", gameId)
-        .eq("user_id", user.id)
-        .single();
-      
-      if (!participantData) {
-        navigate(`/join/${gameId}`);
-        return;
-      }
-      
-      setParticipant(participantData);
-      
-      // Get startup
-      const { data: startupData, error } = await supabase
-        .from("startups")
-        .select("*")
-        .eq("game_id", gameId)
-        .eq("slug", slug)
-        .single();
-      
-      if (error || !startupData) {
-        toast.error("Startup not found");
-        navigate(`/games/${gameId}/discover`);
-        return;
-      }
-      
-      setStartup(startupData);
-      
-      // Check if user is a founder
-      const { data: founderData } = await supabase
-        .from("founder_members")
-        .select("*")
-        .eq("startup_id", startupData.id)
-        .eq("participant_id", participantData.id)
-        .single();
-      
-      setIsFounder(!!founderData);
-      
-      // Get pending orders if founder
-      if (founderData) {
-        const { data: ordersData } = await supabase
-          .from("orders_primary")
+      try {
+        // Get participant
+        const { data: participantData } = await supabase
+          .from("participants")
+          .select("*")
+          .eq("game_id", gameId)
+          .eq("user_id", user.id)
+          .single();
+
+        if (!participantData) {
+          navigate(`/join/${gameId}`);
+          return;
+        }
+        
+        setParticipant(participantData);
+        
+        // Get venture
+        const { data: ventureData, error } = await supabase
+          .from("ventures")
+          .select("*")
+          .eq("game_id", gameId)
+          .eq("slug", slug)
+          .single();
+
+        if (error) throw error;
+        
+        if (!ventureData) {
+          navigate('/');
+          return;
+        }
+        
+        setVenture(ventureData);
+        
+        // Check if current user is a founder of this venture
+        const { data: founderData } = await supabase
+          .from("founder_members")
+          .select("*")
+          .eq("venture_id", ventureData.id)
+          .eq("participant_id", participantData.id)
+          .single();
+
+        setIsFounder(!!founderData);
+
+        // Get pending orders for this venture (if user is founder)
+        if (participantData && founderData) {
+          const { data: ordersData } = await supabase
+            .from("orders_primary")
+            .select(`
+              *,
+              buyer_participant:participants!buyer_participant_id (
+                user:users!user_id (
+                  first_name,
+                  last_name,
+                  email
+                )
+              )
+            `)
+            .eq("venture_id", ventureData.id)
+            .eq("status", "pending")
+            .order("created_at", { ascending: false });
+
+          setPendingOrders(ordersData || []);
+        }
+
+        // Get recent trades for this venture
+        const { data: tradesData } = await supabase
+          .from("trades")
           .select(`
             *,
-            participants!orders_primary_buyer_participant_id_fkey (
-              users (
+            buyer_participant:participants!buyer_participant_id (
+              user:users!user_id (
+                first_name,
+                last_name
+              )
+            ),
+            seller_participant:participants!seller_participant_id (
+              user:users!user_id (
                 first_name,
                 last_name
               )
             )
           `)
-          .eq("startup_id", startupData.id)
-          .eq("status", "pending")
-          .order("created_at", { ascending: false });
-        
-        setOrders(ordersData || []);
+          .eq("venture_id", ventureData.id)
+          .order("created_at", { ascending: false })
+          .limit(10);
+
+        setRecentTrades(tradesData || []);
+
+      } catch (error: any) {
+        console.error('Error loading venture:', error);
+        toast.error('Failed to load venture');
+        navigate('/');
+      } finally {
+        setLoading(false);
       }
-      
-      // Get recent trades
-      const { data: tradesData } = await supabase
-        .from("trades")
-        .select("*")
-        .eq("startup_id", startupData.id)
-        .order("created_at", { ascending: false })
-        .limit(10);
-      
-      setTrades(tradesData || []);
-      setLoading(false);
     };
 
     fetchData();
   }, [user, gameId, slug, navigate]);
 
-  // Real-time price updates for this startup
-  useStartupPriceUpdates(gameId!, (updatedStartup) => {
-    if (updatedStartup.slug === slug) {
-      setStartup(prev => prev ? { ...prev, last_vwap_price: updatedStartup.last_vwap_price } : null);
-      
-      // Show price update animation
-      setPriceUpdate(true);
-      setTimeout(() => setPriceUpdate(false), 2000);
-      
-      toast.success(`Price updated to ${formatCurrency(updatedStartup.last_vwap_price)}`);
-    }
-  });
-
-  // Real-time trade updates
-  useTradeUpdates(gameId!, (newTrade) => {
-    if (newTrade.startup_id === startup?.id) {
-      // Add new trade to the list
-      setTrades(prev => [newTrade, ...prev.slice(0, 9)]);
-      
-      // Update shares remaining for primary trades
-      if (newTrade.market_type === 'primary') {
-        setStartup(prev => prev ? {
-          ...prev,
-          primary_shares_remaining: Math.max(0, prev.primary_shares_remaining - newTrade.qty)
-        } : null);
-      }
-    }
-  });
-
   const handleOrderDecision = async (orderId: string, decision: 'accepted' | 'rejected') => {
-    setActionLoading(orderId);
-    
     try {
-      const { data, error } = await supabase.rpc('decide_primary_order', {
+      const { error } = await supabase.rpc('decide_primary_order', {
         p_order_id: orderId,
         p_decision: decision
       });
 
-      if (error) {
-        toast.error(error.message || `Failed to ${decision} order`);
-      } else {
-        toast.success(`Order ${decision} successfully`);
-        // Refresh orders
-        const { data: ordersData } = await supabase
-          .from("orders_primary")
-          .select(`
-            *,
-            participants!orders_primary_buyer_participant_id_fkey (
-              users (
-                first_name,
-                last_name
-              )
+      if (error) throw error;
+
+      toast.success(`Order ${decision} successfully!`);
+      
+      // Refresh orders and venture data
+      const ordersPromise = supabase
+        .from("orders_primary")
+        .select(`
+          *,
+          buyer_participant:participants!buyer_participant_id (
+            user:users!user_id (
+              first_name,
+              last_name,
+              email
             )
-          `)
-          .eq("startup_id", startup.id)
-          .eq("status", "pending")
-          .order("created_at", { ascending: false });
-        
-        setOrders(ordersData || []);
-        
-        // Refresh startup data
-        const { data: startupData } = await supabase
-          .from("startups")
-          .select("*")
-          .eq("id", startup.id)
-          .single();
-        
-        if (startupData) {
-          setStartup(startupData);
-        }
+          )
+        `)
+        .eq("venture_id", venture.id)
+        .eq("status", "pending")
+        .order("created_at", { ascending: false });
+
+      const venturePromise = supabase
+        .from("ventures")
+        .select("*")
+        .eq("id", venture.id)
+        .single();
+
+      const [ordersResult, ventureResult] = await Promise.all([ordersPromise, venturePromise]);
+      
+      setPendingOrders(ordersResult.data || []);
+      if (ventureResult.data) {
+        setVenture(ventureResult.data);
       }
-    } catch (error) {
-      toast.error(`Failed to ${decision} order`);
-    } finally {
-      setActionLoading(null);
+
+    } catch (error: any) {
+      toast.error(`Failed to ${decision.toLowerCase()} order: ${error.message}`);
     }
   };
 
   const formatCurrency = (amount: number) => {
-    return `$${amount.toLocaleString()}`;
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(amount);
   };
 
-  const getSharesProgress = () => {
-    if (!startup) return 0;
-    const sold = startup.total_shares - startup.primary_shares_remaining;
-    return (sold / startup.total_shares) * 100;
+  const getSharesProgress = (venture: any) => {
+    const sold = venture.total_shares - venture.primary_shares_remaining;
+    return Math.round((sold / venture.total_shares) * 100);
   };
 
   if (loading) {
@@ -203,65 +193,63 @@ export default function StartupProfile() {
     );
   }
 
+  if (!venture || !participant) {
+    return <div>Venture not found</div>;
+  }
+
+  const sharesSold = venture.total_shares - venture.primary_shares_remaining;
+  const sharesProgress = getSharesProgress(venture);
+  const marketCap = venture.last_vwap_price ? venture.last_vwap_price * venture.total_shares : 0;
+
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-start justify-between">
-            <div className="flex items-center space-x-4">
-              {startup.logo_url ? (
-                <img 
-                  src={startup.logo_url} 
-                  alt={startup.name}
-                  className="w-16 h-16 rounded-lg object-cover"
-                />
-              ) : (
-                <div className="w-16 h-16 rounded-lg bg-muted flex items-center justify-center">
-                  <Building className="h-8 w-8 text-muted-foreground" />
-                </div>
-              )}
-              <div>
-                <h1 className="text-3xl font-bold flex items-center gap-3">
-                  {startup.name}
-                  {priceUpdate && (
-                    <Zap className="h-6 w-6 text-yellow-500 animate-pulse" />
-                  )}
-                </h1>
-                <div className="flex items-center space-x-4 mt-2">
-                  {startup.last_vwap_price && (
-                    <Badge variant="secondary" className={`text-lg px-3 py-1 transition-colors ${
-                      priceUpdate ? 'bg-green-100 text-green-800 border-green-300' : ''
-                    }`}>
-                      {formatCurrency(startup.last_vwap_price)} per share
-                    </Badge>
-                  )}
-                  {isFounder && (
-                    <Badge variant="outline">Founder</Badge>
-                  )}
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex space-x-2">
-              <Button onClick={() => navigate(`/games/${gameId}/discover`)}>
-                Back to Discover
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" onClick={() => navigate(`/games/${gameId}/discover`)}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Discover
+            </Button>
+          </div>
+          <div className="flex gap-2">
+            {isFounder && (
+              <Button variant="outline" onClick={() => navigate(`/games/${gameId}/venture/${slug}/admin`)}>
+                <Settings className="h-4 w-4 mr-2" />
+                Manage Venture
               </Button>
-              {isFounder && (
-                <Button 
-                  variant="outline"
-                  onClick={() => navigate(`/games/${gameId}/startup/${slug}/admin`)}
-                >
-                  <Settings className="w-4 h-4 mr-2" />
-                  Manage Startup
-                </Button>
-              )}
-              {!isFounder && startup.primary_shares_remaining > 0 && (
-                <Button onClick={() => setShowInvestModal(true)}>
-                  <TrendingUp className="w-4 h-4 mr-2" />
-                  Invest
-                </Button>
-              )}
+            )}
+            {participant.role !== 'founder' && (
+              <Button onClick={() => setShowInvestModal(true)}>
+                <DollarSign className="h-4 w-4 mr-2" />
+                Invest
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {/* Venture Header */}
+        <div className="flex items-center gap-6 mb-8">
+          {venture.logo_url ? (
+            <img 
+              src={venture.logo_url} 
+              alt={venture.name}
+              className="w-20 h-20 rounded-lg object-cover"
+            />
+          ) : (
+            <div className="w-20 h-20 rounded-lg bg-muted flex items-center justify-center">
+              <Building className="h-10 w-10 text-muted-foreground" />
+            </div>
+          )}
+          <div className="flex-1">
+            <div className="flex items-center gap-3 mb-2">
+              <h1 className="text-3xl font-bold">{venture.name}</h1>
+              {isFounder && <Badge>Founder</Badge>}
+            </div>
+            <div className="flex items-center gap-4 text-lg">
+              <span className="font-semibold">
+                Current Price: {venture.last_vwap_price ? formatCurrency(venture.last_vwap_price) : 'No trades yet'}
+              </span>
             </div>
           </div>
         </div>
@@ -269,128 +257,128 @@ export default function StartupProfile() {
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card>
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Market Cap</CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {startup.last_vwap_price 
-                  ? formatCurrency(startup.last_vwap_price * startup.total_shares)
-                  : "No trades yet"
-                }
+                {marketCap > 0 ? formatCurrency(marketCap) : '-'}
               </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Shares Sold</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {startup.total_shares - startup.primary_shares_remaining}/{startup.total_shares}
-              </div>
-              <Progress value={getSharesProgress()} className="mt-2" />
+              <div className="text-2xl font-bold">{sharesSold} / {venture.total_shares}</div>
+              <p className="text-xs text-muted-foreground">{sharesProgress}% sold</p>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Available Shares</CardTitle>
+              <Building className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{startup.primary_shares_remaining}</div>
+              <div className="text-2xl font-bold">{venture.primary_shares_remaining}</div>
             </CardContent>
           </Card>
         </div>
 
         {/* Description and Links */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle>About</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {startup.description && (
-              <p className="text-muted-foreground">{startup.description}</p>
-            )}
-            
-            <div className="flex space-x-4">
-              {startup.website && (
-                <Button variant="outline" size="sm" asChild>
-                  <a href={startup.website} target="_blank" rel="noopener noreferrer">
-                    <Globe className="w-4 h-4 mr-2" />
-                    Website
-                    <ExternalLink className="w-3 h-3 ml-1" />
-                  </a>
-                </Button>
+        {(venture.description || venture.website || venture.linkedin) && (
+          <Card className="mb-8">
+            <CardContent className="pt-6">
+              {venture.description && (
+                <p className="text-muted-foreground mb-4">{venture.description}</p>
               )}
-              {startup.linkedin && (
-                <Button variant="outline" size="sm" asChild>
-                  <a href={startup.linkedin} target="_blank" rel="noopener noreferrer">
-                    <Linkedin className="w-4 h-4 mr-2" />
-                    LinkedIn
-                    <ExternalLink className="w-3 h-3 ml-1" />
-                  </a>
-                </Button>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+              <div className="flex gap-4">
+                {venture.website && (
+                  <Button variant="outline" size="sm" asChild>
+                    <a href={venture.website} target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      Website
+                    </a>
+                  </Button>
+                )}
+                {venture.linkedin && (
+                  <Button variant="outline" size="sm" asChild>
+                    <a href={venture.linkedin} target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      LinkedIn
+                    </a>
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Tabs */}
-        <Tabs defaultValue="trades" className="space-y-6">
+        <Tabs defaultValue="trades">
           <TabsList>
             <TabsTrigger value="trades">Recent Trades</TabsTrigger>
-            {isFounder && (
-              <TabsTrigger value="orders">
-                Pending Orders ({orders.length})
-              </TabsTrigger>
-            )}
+            {isFounder && <TabsTrigger value="orders">Pending Orders ({pendingOrders.length})</TabsTrigger>}
           </TabsList>
 
           <TabsContent value="trades">
             <Card>
               <CardHeader>
-                <CardTitle>Trade History</CardTitle>
-                <CardDescription>Recent trading activity for this startup</CardDescription>
+                <CardTitle>Recent Trades</CardTitle>
+                <CardDescription>Latest trading activity for this venture</CardDescription>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Shares</TableHead>
-                      <TableHead>Price</TableHead>
-                      <TableHead>Total</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {trades.map((trade) => (
-                      <TableRow key={trade.id}>
-                        <TableCell>
-                          {new Date(trade.created_at).toLocaleDateString()}
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={trade.market_type === 'primary' ? 'default' : 'secondary'}>
-                            {trade.market_type === 'primary' ? 'Primary' : 'Secondary'}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>{trade.qty}</TableCell>
-                        <TableCell>{formatCurrency(trade.price_per_share)}</TableCell>
-                        <TableCell>{formatCurrency(trade.qty * trade.price_per_share)}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-                
-                {trades.length === 0 && (
+                {recentTrades.length === 0 ? (
                   <div className="text-center py-8">
-                    <TrendingUp className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">No trades yet</h3>
-                    <p className="text-muted-foreground">
-                      Trading activity will appear here
-                    </p>
+                    <p className="text-muted-foreground">No trades yet</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Date</TableHead>
+                          <TableHead>Type</TableHead>
+                          <TableHead>Buyer</TableHead>
+                          <TableHead>Seller</TableHead>
+                          <TableHead>Shares</TableHead>
+                          <TableHead>Price</TableHead>
+                          <TableHead>Total</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {recentTrades.map((trade) => (
+                          <TableRow key={trade.id}>
+                            <TableCell>{new Date(trade.created_at).toLocaleDateString()}</TableCell>
+                            <TableCell>
+                              <Badge variant={trade.market_type === 'primary' ? 'default' : 'secondary'}>
+                                {trade.market_type}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              {trade.buyer_participant?.user ? 
+                                `${trade.buyer_participant.user.first_name} ${trade.buyer_participant.user.last_name}` : 
+                                'Unknown'
+                              }
+                            </TableCell>
+                            <TableCell>
+                              {trade.seller_participant?.user ? 
+                                `${trade.seller_participant.user.first_name} ${trade.seller_participant.user.last_name}` : 
+                                'Primary Market'
+                              }
+                            </TableCell>
+                            <TableCell>{trade.qty}</TableCell>
+                            <TableCell>{formatCurrency(trade.price_per_share)}</TableCell>
+                            <TableCell>{formatCurrency(trade.qty * trade.price_per_share)}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
                   </div>
                 )}
               </CardContent>
@@ -401,70 +389,67 @@ export default function StartupProfile() {
             <TabsContent value="orders">
               <Card>
                 <CardHeader>
-                  <CardTitle>Pending Investment Orders</CardTitle>
-                  <CardDescription>
-                    Accept or reject investment proposals from other participants
-                  </CardDescription>
+                  <CardTitle>Pending Orders</CardTitle>
+                  <CardDescription>Investment orders awaiting your approval</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Investor</TableHead>
-                        <TableHead>Shares</TableHead>
-                        <TableHead>Price per Share</TableHead>
-                        <TableHead>Total</TableHead>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {orders.map((order) => (
-                        <TableRow key={order.id}>
-                          <TableCell>
-                            {order.participants?.users?.first_name} {order.participants?.users?.last_name}
-                          </TableCell>
-                          <TableCell>{order.qty}</TableCell>
-                          <TableCell>{formatCurrency(order.price_per_share)}</TableCell>
-                          <TableCell>{formatCurrency(order.qty * order.price_per_share)}</TableCell>
-                          <TableCell>
-                            {new Date(order.created_at).toLocaleDateString()}
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex space-x-2">
-                              <Button
-                                size="sm"
-                                onClick={() => handleOrderDecision(order.id, 'accepted')}
-                                disabled={actionLoading === order.id}
-                              >
-                                {actionLoading === order.id ? (
-                                  <Loader2 className="h-4 w-4 animate-spin" />
-                                ) : (
-                                  <CheckCircle className="h-4 w-4" />
-                                )}
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="destructive"
-                                onClick={() => handleOrderDecision(order.id, 'rejected')}
-                                disabled={actionLoading === order.id}
-                              >
-                                <XCircle className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                  
-                  {orders.length === 0 && (
+                  {pendingOrders.length === 0 ? (
                     <div className="text-center py-8">
-                      <Building className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                      <h3 className="text-lg font-semibold mb-2">No pending orders</h3>
-                      <p className="text-muted-foreground">
-                        Investment orders will appear here
-                      </p>
+                      <p className="text-muted-foreground">No pending orders</p>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Investor</TableHead>
+                            <TableHead>Shares</TableHead>
+                            <TableHead>Price per Share</TableHead>
+                            <TableHead>Total Investment</TableHead>
+                            <TableHead>Date</TableHead>
+                            <TableHead>Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {pendingOrders.map((order) => {
+                            const user = order.buyer_participant?.user;
+                            const fullName = user ? `${user.first_name} ${user.last_name}`.trim() : 'Unknown';
+                            const totalInvestment = order.qty * order.price_per_share;
+                            
+                            return (
+                              <TableRow key={order.id}>
+                                <TableCell>
+                                  <div>
+                                    <div className="font-medium">{fullName}</div>
+                                    <div className="text-sm text-muted-foreground">{user?.email}</div>
+                                  </div>
+                                </TableCell>
+                                <TableCell>{order.qty}</TableCell>
+                                <TableCell>{formatCurrency(order.price_per_share)}</TableCell>
+                                <TableCell>{formatCurrency(totalInvestment)}</TableCell>
+                                <TableCell>{new Date(order.created_at).toLocaleDateString()}</TableCell>
+                                <TableCell>
+                                  <div className="flex gap-2">
+                                    <Button
+                                      size="sm"
+                                      onClick={() => handleOrderDecision(order.id, 'accepted')}
+                                    >
+                                      Accept
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => handleOrderDecision(order.id, 'rejected')}
+                                    >
+                                      Reject
+                                    </Button>
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            );
+                          })}
+                        </TableBody>
+                      </Table>
                     </div>
                   )}
                 </CardContent>
@@ -474,9 +459,9 @@ export default function StartupProfile() {
         </Tabs>
       </div>
 
-      {showInvestModal && participant && startup && (
+      {showInvestModal && participant && venture && (
         <InvestModal
-          startup={startup}
+          venture={venture}
           participant={participant}
           gameId={gameId!}
           onClose={() => setShowInvestModal(false)}

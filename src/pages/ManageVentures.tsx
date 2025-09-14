@@ -13,7 +13,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { LogoUpload } from "@/components/LogoUpload";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 
-interface Startup {
+interface Venture {
   id: string;
   slug: string;
   name: string;
@@ -27,73 +27,68 @@ interface Startup {
   created_at: string;
 }
 
-export default function ManageStartups() {
+export default function ManageVentures() {
   const { gameId } = useParams<{ gameId: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { toast } = useToast();
-  const [startups, setStartups] = useState<Startup[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [isCreating, setIsCreating] = useState(false);
-  const [isScrapingLinkedIn, setIsScrapingLinkedIn] = useState(false);
-  const [editingStartup, setEditingStartup] = useState<string | null>(null);
-  const [editData, setEditData] = useState<Partial<Startup>>({});
-  const [startupToDelete, setStartupToDelete] = useState<Startup | null>(null);
-  const [newStartup, setNewStartup] = useState({
-    slug: "",
+  
+  const [ventures, setVentures] = useState<Venture[]>([]);
+  const [newVenture, setNewVenture] = useState({
     name: "",
-    logo_url: "",
+    slug: "",
     description: "",
     website: "",
     linkedin: "",
     total_shares: 100
   });
+  const [editingVenture, setEditingVenture] = useState<string | null>(null);
+  const [editData, setEditData] = useState<any>({});
+  const [isCreating, setIsCreating] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
   useEffect(() => {
     if (gameId) {
-      fetchStartups();
+      fetchVentures();
     }
   }, [gameId]);
 
-  const fetchStartups = async () => {
+  const fetchVentures = async () => {
     try {
       const { data, error } = await supabase
-        .from("startups")
+        .from("ventures")
         .select("*")
         .eq("game_id", gameId)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setStartups(data || []);
+      setVentures(data || []);
     } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Error",
         description: error.message,
       });
-    } finally {
-      setLoading(false);
     }
   };
 
   const generateSlug = (name: string) => {
     return name
       .toLowerCase()
-      .trim()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/[\s_-]+/g, '-')
-      .replace(/^-+|-+$/g, '');
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)+/g, '');
   };
 
   const handleNameChange = (name: string) => {
-    setNewStartup(prev => ({
+    setNewVenture(prev => ({
       ...prev,
       name,
       slug: generateSlug(name)
     }));
   };
 
-  const createStartup = async () => {
-    if (!newStartup.name.trim() || !newStartup.slug.trim()) {
+  const createVenture = async () => {
+    if (!newVenture.name.trim() || !newVenture.slug.trim()) {
       toast({
         variant: "destructive",
         title: "Error",
@@ -106,39 +101,35 @@ export default function ManageStartups() {
       setIsCreating(true);
 
       const { error } = await supabase
-        .from("startups")
+        .from("ventures")
         .insert({
           game_id: gameId,
-          slug: newStartup.slug,
-          name: newStartup.name,
-          logo_url: newStartup.logo_url || null,
-          description: newStartup.description || null,
-          website: newStartup.website || null,
-          linkedin: newStartup.linkedin || null,
-          total_shares: newStartup.total_shares,
-          primary_shares_remaining: newStartup.total_shares
+          slug: newVenture.slug,
+          name: newVenture.name,
+          description: newVenture.description || null,
+          website: newVenture.website || null,
+          linkedin: newVenture.linkedin || null,
+          total_shares: newVenture.total_shares,
+          primary_shares_remaining: newVenture.total_shares
         });
 
       if (error) throw error;
 
       toast({
         title: "Success",
-        description: "Startup created successfully",
+        description: "Venture created successfully!",
       });
 
-      // Reset form
-      setNewStartup({
-        slug: "",
+      setNewVenture({
         name: "",
-        logo_url: "",
+        slug: "",
         description: "",
         website: "",
         linkedin: "",
         total_shares: 100
       });
 
-      // Refresh list
-      fetchStartups();
+      fetchVentures();
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -150,150 +141,21 @@ export default function ManageStartups() {
     }
   };
 
-  const handleAutoFillFromLinkedIn = async () => {
-    if (!newStartup.linkedin.trim()) {
-      toast({
-        variant: "destructive",
-        title: "No LinkedIn URL",
-        description: "Please enter a LinkedIn URL first",
-      });
-      return;
-    }
-
-    console.log('Starting LinkedIn auto-fill with URL:', newStartup.linkedin);
-    setIsScrapingLinkedIn(true);
-    
-    try {
-      // Extract vanity name from LinkedIn URL
-      let vanityName = newStartup.linkedin;
-      if (newStartup.linkedin.includes('linkedin.com/company/')) {
-        const match = newStartup.linkedin.match(/linkedin\.com\/company\/([^/?]+)/);
-        if (match) {
-          vanityName = match[1];
-        }
-      }
-
-      console.log('Using LinkedIn Organization Lookup API with vanity name:', vanityName);
-      
-      // Call our new LinkedIn Organization Lookup edge function
-      const { data, error } = await supabase.functions.invoke('linkedin-organization-lookup', {
-        body: {
-          vanityName: vanityName
-        }
-      });
-
-      console.log('LinkedIn Organization API response:', { data, error });
-
-      if (error) {
-        console.error('LinkedIn Organization API error:', error);
-        throw new Error(error.message);
-      }
-
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to lookup organization');
-      }
-
-      const orgData = data.data;
-      console.log('Organization data received:', orgData);
-
-      // Convert logoV2 URN to actual URL if needed
-      let logoUrl = orgData.logoUrl;
-      if (logoUrl && logoUrl.startsWith('urn:li:digitalmediaAsset:')) {
-        // LinkedIn media URNs need special handling
-        // For now, we'll skip these and try the fallback method
-        logoUrl = null;
-        console.log('LinkedIn media URN detected, using fallback method for logo');
-      }
-
-      if (orgData.name || orgData.description || logoUrl || orgData.website) {
-        console.log('Final extracted data from LinkedIn API:', {
-          name: orgData.name,
-          logoUrl: logoUrl,
-          website: orgData.website,
-          description: orgData.description?.substring(0, 100) + '...'
-        });
-        
-        setNewStartup(prev => ({
-          ...prev,
-          name: orgData.name || prev.name,
-          slug: orgData.name ? generateSlug(orgData.name) : prev.slug,
-          description: orgData.description || prev.description,
-          website: orgData.website || prev.website,
-          logo_url: logoUrl || prev.logo_url
-        }));
-        
-        const extractedItems = [];
-        if (orgData.name) extractedItems.push('nome');
-        if (orgData.description) extractedItems.push('descrição');
-        if (orgData.website) extractedItems.push('website');
-        if (logoUrl) extractedItems.push('logo');
-        
-        toast({
-          title: "Sucesso",
-          description: `Informações extraídas do LinkedIn: ${extractedItems.join(', ')}`,
-        });
-      } else {
-        console.log('No data extracted from LinkedIn API');
-        toast({
-          variant: "destructive",
-          title: "Nenhum dado encontrado",
-          description: "Não foi possível extrair informações da startup do LinkedIn. Verifique se o perfil da empresa existe e é público.",
-        });
-      }
-    } catch (error: any) {
-      console.error('Error in LinkedIn auto-fill:', error);
-      console.error('Error details:', {
-        message: error.message,
-        stack: error.stack,
-        name: error.name
-      });
-      
-      // If API fails, show a more helpful message
-      if (error.message.includes('LinkedIn access token')) {
-        toast({
-          variant: "destructive",
-          title: "Configuração necessária",
-          description: "O token de acesso do LinkedIn não está configurado. Entre em contacto com o administrador.",
-        });
-      } else if (error.message.includes('Organization not found')) {
-        toast({
-          variant: "destructive",
-          title: "Empresa não encontrada",
-          description: "Não foi possível encontrar esta empresa no LinkedIn. Verifique o URL e tente novamente.",
-        });
-      } else if (error.message.includes('Failed to fetch LinkedIn page')) {
-        toast({
-          variant: "destructive",
-          title: "Erro de acesso",
-          description: "Não foi possível aceder à página do LinkedIn. Tente novamente mais tarde.",
-        });
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Erro",
-          description: "Falha ao buscar dados do LinkedIn: " + error.message,
-        });
-      }
-    } finally {
-      setIsScrapingLinkedIn(false);
-    }
-  };
-
-  const deleteStartup = async (startupId: string) => {
+  const deleteVenture = async (ventureId: string) => {
     try {
       const { error } = await supabase
-        .from("startups")
+        .from("ventures")
         .delete()
-        .eq("id", startupId);
+        .eq("id", ventureId);
 
       if (error) throw error;
 
       toast({
         title: "Success",
-        description: "Startup deleted successfully",
+        description: "Venture deleted successfully!",
       });
 
-      fetchStartups();
+      fetchVentures();
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -303,47 +165,40 @@ export default function ManageStartups() {
     }
   };
 
-  const confirmDeleteStartup = () => {
-    if (startupToDelete) {
-      deleteStartup(startupToDelete.id);
-      setStartupToDelete(null);
-    }
-  };
-
-  const startEditing = (startup: Startup) => {
-    setEditingStartup(startup.id);
+  const startEditing = (venture: Venture) => {
+    setEditingVenture(venture.id);
     setEditData({
-      name: startup.name,
-      slug: startup.slug,
-      description: startup.description,
-      website: startup.website,
-      linkedin: startup.linkedin,
-      total_shares: startup.total_shares
+      name: venture.name,
+      slug: venture.slug,
+      description: venture.description,
+      website: venture.website,
+      linkedin: venture.linkedin,
+      total_shares: venture.total_shares
     });
   };
 
   const cancelEditing = () => {
-    setEditingStartup(null);
+    setEditingVenture(null);
     setEditData({});
   };
 
-  const saveEdit = async (startupId: string) => {
+  const saveEdit = async (ventureId: string) => {
     try {
       const { error } = await supabase
-        .from("startups")
+        .from("ventures")
         .update(editData)
-        .eq("id", startupId);
+        .eq("id", ventureId);
 
       if (error) throw error;
 
       toast({
         title: "Success",
-        description: "Startup updated successfully",
+        description: "Venture updated successfully!",
       });
 
-      setEditingStartup(null);
+      setEditingVenture(null);
       setEditData({});
-      fetchStartups();
+      fetchVentures();
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -353,167 +208,148 @@ export default function ManageStartups() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(amount);
+  };
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b">
-        <div className="container mx-auto px-4 py-4">
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate(`/games/${gameId}/organizer`)}
-            className="mb-4"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Game Dashboard
-          </Button>
-          <div>
-            <h1 className="text-2xl font-bold">Manage Startups</h1>
-            <p className="text-muted-foreground">Add and configure startups for the game</p>
+    <div className="min-h-screen bg-background p-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" onClick={() => navigate(`/games/${gameId}/organizer`)}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Organizer
+            </Button>
+            <h1 className="text-3xl font-bold">Manage Ventures</h1>
           </div>
         </div>
-      </header>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid gap-6">
-          {/* Add New Startup */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Plus className="h-5 w-5" />
-                Add New Startup
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-                  <div className="grid gap-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="name">Startup Name</Label>
-                    <Input
-                      id="name"
-                      value={newStartup.name}
-                      onChange={(e) => handleNameChange(e.target.value)}
-                      placeholder="Awesome Startup"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="slug">Slug (URL-friendly)</Label>
-                    <Input
-                      id="slug"
-                      value={newStartup.slug}
-                      onChange={(e) => setNewStartup(prev => ({ ...prev, slug: e.target.value }))}
-                      placeholder="awesome-startup"
-                    />
-                  </div>
-                  <div>
-                    <LogoUpload
-                      startupSlug={newStartup.slug}
-                      currentLogoUrl={newStartup.logo_url}
-                      onLogoUploaded={(url) => setNewStartup({ ...newStartup, logo_url: url })}
-                    />
-                  </div>
-                </div>
-                
-                <div>
-                  <Label htmlFor="description">Description</Label>
-                  <Textarea
-                    id="description"
-                    value={newStartup.description}
-                    onChange={(e) => setNewStartup(prev => ({ ...prev, description: e.target.value }))}
-                    placeholder="Brief description of the startup..."
-                    rows={3}
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <Label htmlFor="website">Website</Label>
-                    <Input
-                      id="website"
-                      value={newStartup.website}
-                      onChange={(e) => setNewStartup(prev => ({ ...prev, website: e.target.value }))}
-                      placeholder="https://startup.com"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="linkedin">LinkedIn</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        id="linkedin"
-                        value={newStartup.linkedin}
-                        onChange={(e) => setNewStartup(prev => ({ ...prev, linkedin: e.target.value }))}
-                        placeholder="https://linkedin.com/company/startup"
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={handleAutoFillFromLinkedIn}
-                        disabled={isScrapingLinkedIn || !newStartup.linkedin.trim()}
-                      >
-                        {isScrapingLinkedIn ? "Fetching..." : "Auto-fill"}
-                      </Button>
-                    </div>
-                  </div>
-                  <div>
-                    <Label htmlFor="shares">Total Shares</Label>
-                    <Input
-                      id="shares"
-                      type="number"
-                      min="1"
-                      value={newStartup.total_shares}
-                      onChange={(e) => setNewStartup(prev => ({ ...prev, total_shares: Number(e.target.value) }))}
-                    />
-                  </div>
-                </div>
+        {/* Create New Venture */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Plus className="h-5 w-5" />
+              Create New Venture
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Name *</Label>
+                <Input
+                  id="name"
+                  value={newVenture.name}
+                  onChange={(e) => handleNameChange(e.target.value)}
+                  placeholder="Venture name"
+                />
               </div>
               
-              <div className="mt-6">
-                <Button onClick={createStartup} disabled={isCreating}>
-                  {isCreating ? "Creating..." : "Create Startup"}
-                </Button>
+              <div className="space-y-2">
+                <Label htmlFor="slug">URL Slug *</Label>
+                <Input
+                  id="slug"
+                  value={newVenture.slug}
+                  onChange={(e) => setNewVenture(prev => ({ ...prev, slug: e.target.value }))}
+                  placeholder="venture-url-slug"
+                />
               </div>
-            </CardContent>
-          </Card>
+            </div>
 
-          {/* Startups List */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Building2 className="h-5 w-5" />
-                Startups ({startups.length})
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {startups.length > 0 ? (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Logo</TableHead>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Slug</TableHead>
-                        <TableHead>Description</TableHead>
-                        <TableHead>Website</TableHead>
-                        <TableHead>LinkedIn</TableHead>
-                        <TableHead>Total Shares</TableHead>
-                        <TableHead>Available</TableHead>
-                        <TableHead>VWAP Price</TableHead>
-                        <TableHead>Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {startups.map((startup) => (
-                        <TableRow key={startup.id}>
-                          <TableCell>
-                            {startup.logo_url ? (
+            <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={newVenture.description}
+                onChange={(e) => setNewVenture(prev => ({ ...prev, description: e.target.value }))}
+                placeholder="Brief description of the venture"
+                rows={3}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="website">Website</Label>
+                <Input
+                  id="website"
+                  value={newVenture.website}
+                  onChange={(e) => setNewVenture(prev => ({ ...prev, website: e.target.value }))}
+                  placeholder="https://example.com"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="linkedin">LinkedIn</Label>
+                <Input
+                  id="linkedin"
+                  value={newVenture.linkedin}  
+                  onChange={(e) => setNewVenture(prev => ({ ...prev, linkedin: e.target.value }))}
+                  placeholder="https://linkedin.com/company/..."
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="total_shares">Total Shares</Label>
+                <Input
+                  id="total_shares"
+                  type="number"
+                  value={newVenture.total_shares}
+                  onChange={(e) => setNewVenture(prev => ({ ...prev, total_shares: parseInt(e.target.value) || 100 }))}
+                  min="1"
+                />
+              </div>
+            </div>
+
+            <Button 
+              onClick={createVenture} 
+              disabled={isCreating || !newVenture.name.trim()}
+              className="w-full md:w-auto"
+            >
+              {isCreating ? "Creating..." : "Create Venture"}
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Ventures List */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Building2 className="h-5 w-5" />
+              Ventures ({ventures.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {ventures.length === 0 ? (
+              <div className="text-center py-8">
+                <Building2 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-semibold mb-2">No ventures yet</h3>
+                <p className="text-muted-foreground">Create your first venture to get started.</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Slug</TableHead>
+                      <TableHead>Shares</TableHead>
+                      <TableHead>Current Price</TableHead>
+                      <TableHead>Market Cap</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {ventures.map((venture) => (
+                      <TableRow key={venture.id}>
+                        <TableCell>
+                          <div className="flex items-center gap-3">
+                            {venture.logo_url ? (
                               <img 
-                                src={startup.logo_url} 
-                                alt={`${startup.name} logo`} 
+                                src={venture.logo_url} 
+                                alt={venture.name}
                                 className="w-8 h-8 rounded object-cover"
                               />
                             ) : (
@@ -521,169 +357,104 @@ export default function ManageStartups() {
                                 <Building2 className="h-4 w-4 text-muted-foreground" />
                               </div>
                             )}
-                          </TableCell>
-                          <TableCell className="font-medium">
-                            {editingStartup === startup.id ? (
+                            {editingVenture === venture.id ? (
                               <Input
-                                value={editData.name || ''}
+                                value={editData.name || ""}
                                 onChange={(e) => setEditData(prev => ({ ...prev, name: e.target.value }))}
-                                placeholder="Startup name"
+                                className="w-32"
                               />
                             ) : (
-                              startup.name
+                              <span className="font-medium">{venture.name}</span>
                             )}
-                          </TableCell>
-                          <TableCell className="text-muted-foreground">
-                            {editingStartup === startup.id ? (
-                              <Input
-                                value={editData.slug || ''}
-                                onChange={(e) => setEditData(prev => ({ ...prev, slug: e.target.value }))}
-                                placeholder="startup-slug"
-                              />
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          {editingVenture === venture.id ? (
+                            <Input
+                              value={editData.slug || ""}
+                              onChange={(e) => setEditData(prev => ({ ...prev, slug: e.target.value }))}
+                              className="w-32"
+                            />
+                          ) : (
+                            <code className="text-sm bg-muted px-2 py-1 rounded">{venture.slug}</code>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <span className="text-sm text-muted-foreground">
+                            {venture.total_shares - venture.primary_shares_remaining} / {venture.total_shares}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          {venture.last_vwap_price ? (
+                            formatCurrency(venture.last_vwap_price)
+                          ) : (
+                            <span className="text-muted-foreground">No trades yet</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {venture.last_vwap_price ? (
+                            formatCurrency(venture.last_vwap_price * venture.total_shares)
+                          ) : (
+                            <span className="text-muted-foreground">-</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            {editingVenture === venture.id ? (
+                              <>
+                                <Button size="sm" onClick={() => saveEdit(venture.id)}>
+                                  Save
+                                </Button>
+                                <Button size="sm" variant="outline" onClick={cancelEditing}>
+                                  Cancel
+                                </Button>
+                              </>
                             ) : (
-                              startup.slug
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            {editingStartup === startup.id ? (
-                              <Textarea
-                                value={editData.description || ''}
-                                onChange={(e) => setEditData(prev => ({ ...prev, description: e.target.value }))}
-                                placeholder="Description..."
-                                rows={2}
-                                className="min-w-[200px]"
-                              />
-                            ) : (
-                              <div className="max-w-[200px] truncate" title={startup.description || ''}>
-                                {startup.description || '-'}
-                              </div>
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            {editingStartup === startup.id ? (
-                              <Input
-                                value={editData.website || ''}
-                                onChange={(e) => setEditData(prev => ({ ...prev, website: e.target.value }))}
-                                placeholder="https://website.com"
-                              />
-                            ) : (
-                              startup.website ? (
-                                <a 
-                                  href={startup.website} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  className="text-primary hover:underline truncate block max-w-[150px]"
-                                  title={startup.website}
+                              <>
+                                <Button size="sm" variant="outline" onClick={() => startEditing(venture)}>
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                                <Button 
+                                  size="sm" 
+                                  variant="outline" 
+                                  onClick={() => navigate(`/games/${gameId}/venture/${venture.slug}`)}
                                 >
-                                  {startup.website.replace(/^https?:\/\//, '')}
-                                </a>
-                              ) : '-'
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            {editingStartup === startup.id ? (
-                              <Input
-                                value={editData.linkedin || ''}
-                                onChange={(e) => setEditData(prev => ({ ...prev, linkedin: e.target.value }))}
-                                placeholder="https://linkedin.com/company/..."
-                              />
-                            ) : (
-                              startup.linkedin ? (
-                                <a 
-                                  href={startup.linkedin} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  className="text-primary hover:underline truncate block max-w-[150px]"
-                                  title={startup.linkedin}
+                                  <ExternalLink className="h-4 w-4" />
+                                </Button>
+                                <Button 
+                                  size="sm" 
+                                  variant="destructive" 
+                                  onClick={() => setDeleteConfirm(venture.id)}
                                 >
-                                  LinkedIn
-                                </a>
-                              ) : '-'
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </>
                             )}
-                          </TableCell>
-                          <TableCell>
-                            {editingStartup === startup.id ? (
-                              <Input
-                                type="number"
-                                min="1"
-                                value={editData.total_shares || ''}
-                                onChange={(e) => setEditData(prev => ({ ...prev, total_shares: Number(e.target.value) }))}
-                              />
-                            ) : (
-                              startup.total_shares
-                            )}
-                          </TableCell>
-                          <TableCell>{startup.primary_shares_remaining}</TableCell>
-                          <TableCell>
-                            {startup.last_vwap_price ? `$${startup.last_vwap_price.toFixed(2)}` : '-'}
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex gap-2">
-                              {editingStartup === startup.id ? (
-                                <>
-                                  <Button 
-                                    variant="ghost" 
-                                    size="sm"
-                                    onClick={() => saveEdit(startup.id)}
-                                  >
-                                    Save
-                                  </Button>
-                                  <Button 
-                                    variant="ghost" 
-                                    size="sm"
-                                    onClick={cancelEditing}
-                                  >
-                                    Cancel
-                                  </Button>
-                                </>
-                              ) : (
-                                <>
-                                  <Button 
-                                    variant="ghost" 
-                                    size="sm"
-                                    onClick={() => startEditing(startup)}
-                                  >
-                                    <Edit className="h-4 w-4" />
-                                  </Button>
-                                  <Button 
-                                    variant="ghost" 
-                                    size="sm"
-                                    onClick={() => setStartupToDelete(startup)}
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </Button>
-                                </>
-                              )}
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-              ) : (
-                <div className="text-center py-8 text-muted-foreground">
-                  No startups yet. Add the first startup above.
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
-      <ConfirmDialog
-        open={!!startupToDelete}
-        onOpenChange={(open) => !open && setStartupToDelete(null)}
-        onConfirm={confirmDeleteStartup}
-        title="Delete Startup"
-        description={
-          startupToDelete
-            ? `Are you sure you want to delete "${startupToDelete.name}"? This action cannot be undone.`
-            : ""
-        }
-        confirmText="Delete"
-        cancelText="Cancel"
-        variant="destructive"
-      />
+        {/* Delete Confirmation Dialog */}
+        <ConfirmDialog
+          open={!!deleteConfirm}
+          onOpenChange={(open) => !open && setDeleteConfirm(null)}
+          onConfirm={() => {
+            if (deleteConfirm) {
+              deleteVenture(deleteConfirm);
+              setDeleteConfirm(null);
+            }
+          }}
+          title="Delete Venture"
+          description="Are you sure you want to delete this venture? This action cannot be undone."
+        />
+      </div>
     </div>
   );
 }

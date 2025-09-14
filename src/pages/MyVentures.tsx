@@ -155,8 +155,10 @@ export default function MyVentures() {
         <EmptyState
           title="No ventures yet"
           description="You haven't created or joined any ventures. Join a game to get started!"
-          actionLabel="Browse Games"
-          actionOnClick={() => navigate('/dashboard')}
+          action={{
+            label: "Browse Games",
+            onClick: () => navigate('/dashboard')
+          }}
         />
       ) : (
         <Tabs value={selectedType} onValueChange={setSelectedType}>

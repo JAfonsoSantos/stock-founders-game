@@ -75,9 +75,9 @@ export default function GamePreview() {
         .select("*", { count: "exact", head: true })
         .eq("game_id", gameId);
 
-      // Fetch startup count
-      const { count: startupCount } = await supabase
-        .from("startups")
+      // Fetch venture count
+      const { count: ventureCount } = await supabase
+        .from("ventures")
         .select("*", { count: "exact", head: true })
         .eq("game_id", gameId);
 
@@ -111,7 +111,7 @@ export default function GamePreview() {
           avatar: organizer.avatar_url
         } : undefined,
         participants_count: participantCount || 0,
-        startups_count: startupCount || 0,
+        startups_count: ventureCount || 0,
       });
     } catch (error: any) {
       console.error("Error loading game data:", error);

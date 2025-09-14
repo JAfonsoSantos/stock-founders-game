@@ -62,12 +62,12 @@ export default function FounderOnboarding() {
         return;
       }
       
-      // Check if founder already has a startup
+      // Check if founder already has a venture
       const { data: founderData } = await supabase
         .from("founder_members")
         .select(`
           *,
-          startups (
+          ventures (
             slug,
             name
           )
@@ -75,9 +75,9 @@ export default function FounderOnboarding() {
         .eq("participant_id", participantData.id)
         .maybeSingle();
       
-      if (founderData && founderData.startups) {
-        // Founder already has a startup, redirect to startup admin
-        navigate(`/games/${gameId}/startup/${founderData.startups.slug}/admin`);
+      if (founderData && founderData.ventures) {
+        // Founder already has a venture, redirect to venture admin
+        navigate(`/games/${gameId}/venture/${founderData.ventures.slug}/admin`);
         return;
       }
       

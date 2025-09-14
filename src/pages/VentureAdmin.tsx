@@ -1,36 +1,36 @@
-import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { supabase } from "@/integrations/supabase/client";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import { Loader2, CheckCircle, XCircle, Users, Settings, TrendingUp, ArrowLeft } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Loader2, ArrowLeft, DollarSign, TrendingUp, Users, Building } from "lucide-react";
+import { toast } from "sonner";
 import { LogoUpload } from "@/components/LogoUpload";
 
 interface PendingOrder {
   id: string;
   qty: number;
   price_per_share: number;
-  auto_accept_min_price?: number;
   created_at: string;
   buyer_participant: {
-    user_id: string;
-    users: {
+    id: string;
+    user: {
+      id: string;
       first_name: string;
       last_name: string;
+      email: string;
     };
   };
 }
 
-interface StartupData {
+interface VentureData {
   id: string;
   slug: string;
   name: string;
@@ -46,121 +46,130 @@ interface StartupData {
 
 interface TeamMember {
   id: string;
-  role: string;
+  role: 'owner' | 'member';
   can_manage: boolean;
   participant: {
-    user_id: string;
-    users: {
+    user: {
       first_name: string;
       last_name: string;
+      email: string;
     };
   };
 }
 
-export default function StartupAdmin() {
+export default function VentureAdmin() {
   const { gameId, slug } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { toast } = useToast();
-  
-  const [startup, setStartup] = useState<StartupData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [venture, setVenture] = useState<VentureData | null>(null);
   const [pendingOrders, setPendingOrders] = useState<PendingOrder[]>([]);
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [isFounder, setIsFounder] = useState(false);
   const [processingOrder, setProcessingOrder] = useState<string | null>(null);
-  const [autoAcceptPrice, setAutoAcceptPrice] = useState<number>(0);
 
   useEffect(() => {
-    if (user && gameId && slug) {
-      fetchData();
-    }
-  }, [user, gameId, slug]);
+    if (!user || !gameId || !slug) return;
 
-  const fetchData = async () => {
-    try {
-      // Get startup data
-      const { data: startupData, error: startupError } = await supabase
-        .from('startups')
-        .select('*')
-        .eq('game_id', gameId)
-        .eq('slug', slug)
-        .single();
+    const fetchData = async () => {
+      try {
+        // Get venture data
+        const { data: ventureData, error: ventureError } = await supabase
+          .from('ventures')
+          .select('*')
+          .eq('game_id', gameId)
+          .eq('slug', slug)
+          .single();
 
-      if (startupError) throw startupError;
+        if (ventureError) throw ventureError;
 
-      // Check if user is a founder of this startup
-      const { data: founderData, error: founderError } = await supabase
-        .from('founder_members')
-        .select(`
-          *,
-          participant:participants!inner(
-            user_id,
-            users(first_name, last_name)
-          )
-        `)
-        .eq('startup_id', startupData.id)
-        .eq('participant.user_id', user.id);
+        if (!ventureData) {
+          navigate('/');
+          return;
+        }
 
-      if (founderError) throw founderError;
+        setVenture(ventureData);
 
-      if (!founderData || founderData.length === 0) {
-        toast({
-          title: "Acesso Negado",
-          description: "Você não tem permissão para gerenciar esta startup",
-          variant: "destructive"
-        });
-        navigate(`/games/${gameId}/startup/${slug}`);
-        return;
+        // Check if user is a founder
+        const { data: participantData } = await supabase
+          .from('participants')
+          .select('id')
+          .eq('game_id', gameId)
+          .eq('user_id', user.id)
+          .single();
+
+        if (!participantData) {
+          navigate(`/games/${gameId}/discover`);
+          return;
+        }
+
+        const { data: founderData } = await supabase
+          .from('founder_members')
+          .select('*')
+          .eq('venture_id', ventureData.id)
+          .eq('participant_id', participantData.id)
+          .single();
+
+        if (!founderData) {
+          navigate(`/games/${gameId}/venture/${slug}`);
+          return;
+        }
+
+        setIsFounder(true);
+
+        // Fetch pending orders
+        const { data: ordersData } = await supabase
+          .from('orders_primary')
+          .select(`
+            *,
+            buyer_participant:participants!buyer_participant_id (
+              id,
+              user:users!user_id (
+                id,
+                first_name,
+                last_name,
+                email
+              )
+            )
+          `)
+          .eq('venture_id', ventureData.id)
+          .eq('status', 'pending')
+          .order('created_at', { ascending: false });
+
+        setPendingOrders(ordersData || []);
+
+        // Fetch team members
+        const { data: teamData } = await supabase
+          .from('founder_members')
+          .select(`
+            *,
+            participant:participants!participant_id (
+              user:users!user_id (
+                first_name,
+                last_name,
+                email
+              )
+            )
+          `)
+          .eq('venture_id', ventureData.id);
+
+        setTeamMembers(teamData || []);
+
+      } catch (error: any) {
+        console.error('Error loading venture data:', error);
+        toast.error('Failed to load venture data');
+        navigate('/');
+      } finally {
+        setLoading(false);
       }
+    };
 
-      setStartup(startupData);
-
-      // Get pending orders
-      const { data: ordersData, error: ordersError } = await supabase
-        .from('orders_primary')
-        .select(`
-          *,
-          buyer_participant:participants!buyer_participant_id(
-            user_id,
-            users(first_name, last_name)
-          )
-        `)
-        .eq('startup_id', startupData.id)
-        .eq('status', 'pending')
-        .order('created_at', { ascending: false });
-
-      if (ordersError) throw ordersError;
-      setPendingOrders(ordersData || []);
-
-      // Get team members
-      const { data: teamData, error: teamError } = await supabase
-        .from('founder_members')
-        .select(`
-          *,
-          participant:participants!inner(
-            user_id,
-            users(first_name, last_name)
-          )
-        `)
-        .eq('startup_id', startupData.id);
-
-      if (teamError) throw teamError;
-      setTeamMembers(teamData || []);
-
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      toast({
-        title: "Erro",
-        description: "Erro ao carregar dados da startup",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+    fetchData();
+  }, [user, gameId, slug, navigate]);
 
   const handleOrderDecision = async (orderId: string, decision: 'accepted' | 'rejected') => {
     setProcessingOrder(orderId);
+    
     try {
       const { data, error } = await supabase.rpc('decide_primary_order', {
         p_order_id: orderId,
@@ -169,321 +178,384 @@ export default function StartupAdmin() {
 
       if (error) throw error;
 
-      toast({
-        title: "Sucesso",
-        description: `Pedido ${decision === 'accepted' ? 'aceito' : 'rejeitado'} com sucesso`,
-      });
+      toast.success(`Order ${decision} successfully!`);
+      
+      // Refresh pending orders and venture data
+      const { data: ordersData } = await supabase
+        .from('orders_primary')
+        .select(`
+          *,
+          buyer_participant:participants!buyer_participant_id (
+            id,
+            user:users!user_id (
+              id,
+              first_name,
+              last_name,
+              email
+            )
+          )
+        `)
+        .eq('venture_id', venture?.id)
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false });
 
-      fetchData(); // Refresh data
-    } catch (error) {
-      console.error('Error processing order:', error);
-      toast({
-        title: "Erro",
-        description: "Erro ao processar pedido",
-        variant: "destructive"
-      });
+      setPendingOrders(ordersData || []);
+
+      // Refresh venture data to get updated shares remaining
+      const { data: ventureData } = await supabase
+        .from('ventures')
+        .select('*')
+        .eq('id', venture?.id)
+        .single();
+
+      if (ventureData) {
+        setVenture(ventureData);
+      }
+
+    } catch (error: any) {
+      toast.error(`Failed to ${decision.toLowerCase()} order: ${error.message}`);
     } finally {
       setProcessingOrder(null);
     }
   };
 
-  const updateStartupProfile = async (updates: Partial<StartupData>) => {
+  const updateVentureProfile = async (updates: Partial<VentureData>) => {
+    if (!venture) return;
+
     try {
       const { error } = await supabase
-        .from('startups')
+        .from('ventures')
         .update(updates)
-        .eq('id', startup?.id);
+        .eq('id', venture.id);
 
       if (error) throw error;
 
-      toast({
-        title: "Sucesso",
-        description: "Perfil da startup atualizado",
-      });
-
-      setStartup(prev => prev ? { ...prev, ...updates } : null);
-    } catch (error) {
-      console.error('Error updating startup:', error);
-      toast({
-        title: "Erro",
-        description: "Erro ao atualizar perfil",
-        variant: "destructive"
-      });
+      setVenture({ ...venture, ...updates });
+      toast.success('Venture profile updated successfully!');
+    } catch (error: any) {
+      toast.error(`Failed to update venture profile: ${error.message}`);
     }
+  };
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(amount);
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     );
   }
 
-  if (!startup) {
+  if (!venture || !isFounder) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <Card>
-          <CardContent className="pt-6">
-            <p>Startup não encontrada</p>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-2">Venture not found</h2>
+          <p className="text-muted-foreground mb-4">The venture you're looking for doesn't exist or you don't have access to it.</p>
+          <Button onClick={() => navigate(`/games/${gameId}/discover`)}>
+            Back to Game
+          </Button>
+        </div>
       </div>
     );
   }
 
-  const marketCap = startup.last_vwap_price ? startup.last_vwap_price * startup.total_shares : 0;
-  const sharesSold = startup.total_shares - startup.primary_shares_remaining;
+  const sharesSold = venture.total_shares - venture.primary_shares_remaining;
+  const marketCap = venture.last_vwap_price ? venture.last_vwap_price * venture.total_shares : 0;
 
   return (
-    <div className="container mx-auto px-4 py-6">
-      <div className="flex items-center gap-4 mb-6">
-        <Button 
-          variant="ghost" 
-          size="sm"
-          onClick={() => navigate(`/games/${gameId}/startup/${slug}`)}
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Voltar ao Perfil
-        </Button>
-        <div>
-          <h1 className="text-2xl font-bold">{startup.name} - Admin</h1>
-          <p className="text-muted-foreground">Gerencie sua startup</p>
+    <div className="min-h-screen bg-background p-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" onClick={() => navigate(`/games/${gameId}/venture/${slug}`)}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Venture
+            </Button>
+          </div>
         </div>
-      </div>
 
-      {/* KPIs */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-primary" />
-              <div>
-                <p className="text-sm font-medium">Preço Atual</p>
-                <p className="text-2xl font-bold">
-                  {startup.last_vwap_price ? `$${startup.last_vwap_price.toFixed(2)}` : 'N/A'}
-                </p>
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center gap-4 mb-4">
+            {venture.logo_url ? (
+              <img 
+                src={venture.logo_url} 
+                alt={venture.name}
+                className="w-16 h-16 rounded-lg object-cover"
+              />
+            ) : (
+              <div className="w-16 h-16 rounded-lg bg-muted flex items-center justify-center">
+                <Building className="h-8 w-8 text-muted-foreground" />
               </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
+            )}
             <div>
-              <p className="text-sm font-medium">Market Cap</p>
-              <p className="text-2xl font-bold">${marketCap.toLocaleString()}</p>
+              <h1 className="text-3xl font-bold">{venture.name}</h1>
+              <p className="text-muted-foreground">Venture Administration</p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card>
-          <CardContent className="pt-6">
-            <div>
-              <p className="text-sm font-medium">Ações Vendidas</p>
-              <p className="text-2xl font-bold">{sharesSold}/{startup.total_shares}</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div>
-              <p className="text-sm font-medium">Pedidos Pendentes</p>
-              <p className="text-2xl font-bold">{pendingOrders.length}</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Tabs defaultValue="orders" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="orders">Pedidos Pendentes</TabsTrigger>
-          <TabsTrigger value="profile">Perfil da Startup</TabsTrigger>
-          <TabsTrigger value="team">Equipe</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="orders" className="space-y-4">
+        {/* KPIs */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card>
-            <CardHeader>
-              <CardTitle>Pedidos de Investimento</CardTitle>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Current Price</CardTitle>
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              {pendingOrders.length === 0 ? (
-                <p className="text-center text-muted-foreground py-8">
-                  Nenhum pedido pendente
-                </p>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Investidor</TableHead>
-                      <TableHead>Quantidade</TableHead>
-                      <TableHead>Preço/Ação</TableHead>
-                      <TableHead>Total</TableHead>
-                      <TableHead>Data</TableHead>
-                      <TableHead>Ações</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {pendingOrders.map((order) => (
-                      <TableRow key={order.id}>
-                        <TableCell>
-                          {order.buyer_participant.users.first_name} {order.buyer_participant.users.last_name}
-                        </TableCell>
-                        <TableCell>{order.qty}</TableCell>
-                        <TableCell>${order.price_per_share.toFixed(2)}</TableCell>
-                        <TableCell>${(order.qty * order.price_per_share).toLocaleString()}</TableCell>
-                        <TableCell>
-                          {new Date(order.created_at).toLocaleDateString()}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex gap-2">
-                            <Button
-                              size="sm"
-                              variant="default"
-                              onClick={() => handleOrderDecision(order.id, 'accepted')}
-                              disabled={processingOrder === order.id}
-                            >
-                              {processingOrder === order.id ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                              ) : (
-                                <CheckCircle className="h-4 w-4" />
-                              )}
-                              Aceitar
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => handleOrderDecision(order.id, 'rejected')}
-                              disabled={processingOrder === order.id}
-                            >
-                              <XCircle className="h-4 w-4" />
-                              Rejeitar
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
+              <div className="text-2xl font-bold">
+                {venture.last_vwap_price ? formatCurrency(venture.last_vwap_price) : 'No trades yet'}
+              </div>
             </CardContent>
           </Card>
-        </TabsContent>
 
-        <TabsContent value="profile" className="space-y-4">
           <Card>
-            <CardHeader>
-              <CardTitle>Editar Perfil da Startup</CardTitle>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Market Cap</CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Nome</Label>
-                <Input
-                  id="name"
-                  value={startup.name}
-                  onChange={(e) => setStartup(prev => prev ? { ...prev, name: e.target.value } : null)}
-                  onBlur={() => updateStartupProfile({ name: startup.name })}
-                />
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {marketCap > 0 ? formatCurrency(marketCap) : '-'}
               </div>
+            </CardContent>
+          </Card>
 
-              <div className="space-y-2">
-                <Label htmlFor="description">Descrição</Label>
-                <Textarea
-                  id="description"
-                  value={startup.description || ''}
-                  onChange={(e) => setStartup(prev => prev ? { ...prev, description: e.target.value } : null)}
-                  onBlur={() => updateStartupProfile({ description: startup.description })}
-                  rows={4}
-                />
-              </div>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Shares Sold</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{sharesSold} / {venture.total_shares}</div>
+              <p className="text-xs text-muted-foreground">
+                {Math.round((sharesSold / venture.total_shares) * 100)}% sold
+              </p>
+            </CardContent>
+          </Card>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Pending Orders</CardTitle>
+              <Building className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{pendingOrders.length}</div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Tabs */}
+        <Tabs defaultValue="orders">
+          <TabsList>
+            <TabsTrigger value="orders">Pending Orders</TabsTrigger>
+            <TabsTrigger value="profile">Venture Profile</TabsTrigger>
+            <TabsTrigger value="team">Team</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="orders" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Pending Investment Orders</CardTitle>
+                <CardDescription>
+                  Review and approve or reject investment orders from participants
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {pendingOrders.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground">No pending orders</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Investor</TableHead>
+                          <TableHead>Shares</TableHead>
+                          <TableHead>Price per Share</TableHead>
+                          <TableHead>Total Investment</TableHead>
+                          <TableHead>Date</TableHead>
+                          <TableHead>Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {pendingOrders.map((order) => {
+                          const user = order.buyer_participant?.user;
+                          const fullName = user ? `${user.first_name} ${user.last_name}`.trim() : 'Unknown';
+                          const totalInvestment = order.qty * order.price_per_share;
+                          
+                          return (
+                            <TableRow key={order.id}>
+                              <TableCell>
+                                <div>
+                                  <div className="font-medium">{fullName}</div>
+                                  <div className="text-sm text-muted-foreground">{user?.email}</div>
+                                </div>
+                              </TableCell>
+                              <TableCell>{order.qty}</TableCell>
+                              <TableCell>{formatCurrency(order.price_per_share)}</TableCell>
+                              <TableCell>{formatCurrency(totalInvestment)}</TableCell>
+                              <TableCell>
+                                {new Date(order.created_at).toLocaleDateString()}
+                              </TableCell>
+                              <TableCell>
+                                <div className="flex gap-2">
+                                  <Button
+                                    size="sm"
+                                    onClick={() => handleOrderDecision(order.id, 'accepted')}
+                                    disabled={processingOrder === order.id}
+                                  >
+                                    {processingOrder === order.id ? (
+                                      <Loader2 className="h-4 w-4 animate-spin" />
+                                    ) : (
+                                      'Accept'
+                                    )}
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => handleOrderDecision(order.id, 'rejected')}
+                                    disabled={processingOrder === order.id}
+                                  >
+                                    Reject
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="profile" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Venture Profile</CardTitle>
+                <CardDescription>
+                  Update your venture's public information
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="website">Website</Label>
+                  <Label htmlFor="name">Venture Name</Label>
                   <Input
-                    id="website"
-                    value={startup.website || ''}
-                    onChange={(e) => setStartup(prev => prev ? { ...prev, website: e.target.value } : null)}
-                    onBlur={() => updateStartupProfile({ website: startup.website })}
-                    placeholder="https://..."
+                    id="name"
+                    value={venture.name}
+                    onChange={(e) => updateVentureProfile({ name: e.target.value })}
+                    placeholder="Enter venture name"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="linkedin">LinkedIn</Label>
-                  <Input
-                    id="linkedin"
-                    value={startup.linkedin || ''}
-                    onChange={(e) => setStartup(prev => prev ? { ...prev, linkedin: e.target.value } : null)}
-                    onBlur={() => updateStartupProfile({ linkedin: startup.linkedin })}
-                    placeholder="https://linkedin.com/company/..."
+                  <Label htmlFor="description">Description</Label>
+                  <Textarea
+                    id="description"
+                    value={venture.description || ''}
+                    onChange={(e) => updateVentureProfile({ description: e.target.value })}
+                    placeholder="Describe your venture..."
+                    rows={4}
                   />
                 </div>
-              </div>
 
-              <div className="space-y-2">
-                <Label>Logo da Startup</Label>
-                <LogoUpload
-                  startupSlug={startup.slug}
-                  currentLogoUrl={startup.logo_url}
-                  onLogoUploaded={(url) => updateStartupProfile({ logo_url: url })}
-                />
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="website">Website</Label>
+                    <Input
+                      id="website"
+                      value={venture.website || ''}
+                      onChange={(e) => updateVentureProfile({ website: e.target.value })}
+                      placeholder="https://example.com"
+                    />
+                  </div>
 
-        <TabsContent value="team" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                Equipe da Startup
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {teamMembers.length === 0 ? (
-                <p className="text-center text-muted-foreground py-8">
-                  Nenhum membro da equipe encontrado
-                </p>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Nome</TableHead>
-                      <TableHead>Papel</TableHead>
-                      <TableHead>Pode Gerenciar</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {teamMembers.map((member) => (
-                      <TableRow key={member.id}>
-                        <TableCell>
-                          {member.participant.users.first_name} {member.participant.users.last_name}
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={member.role === 'owner' ? 'default' : 'secondary'}>
-                            {member.role === 'owner' ? 'Fundador' : 'Membro'}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          {member.can_manage ? (
-                            <Badge variant="default">Sim</Badge>
-                          ) : (
-                            <Badge variant="secondary">Não</Badge>
-                          )}
-                        </TableCell>
+                  <div className="space-y-2">
+                    <Label htmlFor="linkedin">LinkedIn</Label>
+                    <Input
+                      id="linkedin"
+                      value={venture.linkedin || ''}
+                      onChange={(e) => updateVentureProfile({ linkedin: e.target.value })}
+                      placeholder="https://linkedin.com/company/..."
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Logo</Label>
+                  <LogoUpload
+                    currentLogoUrl={venture.logo_url}
+                    startupSlug={venture.slug}
+                    onLogoUploaded={(url) => updateVentureProfile({ logo_url: url })}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="team" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Team Members</CardTitle>
+                <CardDescription>
+                  Manage your venture's team members and their permissions
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Member</TableHead>
+                        <TableHead>Role</TableHead>
+                        <TableHead>Can Manage</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+                    </TableHeader>
+                    <TableBody>
+                      {teamMembers.map((member) => {
+                        const user = member.participant?.user;
+                        const fullName = user ? `${user.first_name} ${user.last_name}`.trim() : 'Unknown';
+                        
+                        return (
+                          <TableRow key={member.id}>
+                            <TableCell>
+                              <div>
+                                <div className="font-medium">{fullName}</div>
+                                <div className="text-sm text-muted-foreground">{user?.email}</div>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant={member.role === 'owner' ? 'default' : 'secondary'}>
+                                {member.role}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant={member.can_manage ? 'default' : 'secondary'}>
+                                {member.can_manage ? 'Yes' : 'No'}
+                              </Badge>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 }
