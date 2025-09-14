@@ -363,7 +363,7 @@ export default function GameOrganizer() {
               
               <Button 
                 variant="outline"
-                onClick={() => navigate(`/games/${game.id}/settings`)}
+                onClick={() => navigate(`/games/${game.id}/edit`)}
                 className="px-4"
               >
                 <Edit className="h-4 w-4 mr-2" />
