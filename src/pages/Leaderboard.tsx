@@ -51,11 +51,21 @@ export default function Leaderboard() {
         return;
       }
       
-      // Fetch venture leaderboard
+      // Fetch venture leaderboard with slug for navigation
       const { data: startupsData } = await supabase
-        .rpc("get_venture_leaderboard", { p_game_id: gameId });
+        .from("ventures")
+        .select("id, name, logo_url, last_vwap_price, total_shares, primary_shares_remaining, slug, type")
+        .eq("game_id", gameId)
+        .order("last_vwap_price", { ascending: false, nullsFirst: false });
       
-      setStartupLeaderboard(startupsData || []);
+      // Calculate market cap and shares sold for each venture
+      const processedStartups = (startupsData || []).map(startup => ({
+        ...startup,
+        market_cap: startup.last_vwap_price ? startup.last_vwap_price * startup.total_shares : 0,
+        shares_sold: startup.total_shares - startup.primary_shares_remaining
+      })).sort((a, b) => b.market_cap - a.market_cap);
+      
+      setStartupLeaderboard(processedStartups);
       
       // Fetch angel leaderboard
       const { data: angelsData } = await supabase
@@ -160,7 +170,10 @@ export default function Leaderboard() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center space-x-3">
+                          <div 
+                            className="flex items-center space-x-3 cursor-pointer hover:opacity-75 transition-opacity"
+                            onClick={() => navigate(`/games/${gameId}/venture/${startup.slug}`)}
+                          >
                             {startup.logo_url ? (
                               <img 
                                 src={startup.logo_url} 
@@ -172,7 +185,7 @@ export default function Leaderboard() {
                                 <Building className="h-4 w-4 text-muted-foreground" />
                               </div>
                             )}
-                            <span className="font-medium">{startup.name}</span>
+                            <span className="font-medium text-primary hover:underline">{startup.name}</span>
                           </div>
                         </TableCell>
                         <TableCell>
