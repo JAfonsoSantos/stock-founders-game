@@ -11,6 +11,7 @@ import { sendInviteEmail, sendMarketOpenEmail, sendLastMinutesEmail, sendResults
 import { GameImageUpload } from "@/components/GameImageUpload";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
+import { OrganizerNotifications } from "@/components/OrganizerNotifications";
 
 interface Game {
   id: string;
@@ -543,6 +544,9 @@ export default function GameOrganizer() {
 
             {/* Right Column - Quick Actions */}
             <div className="space-y-6">
+              {/* Organizer Notifications */}
+              {gameId && <OrganizerNotifications gameId={gameId} />}
+              
               <Card
                 role="button"
                 tabIndex={0}

@@ -677,6 +677,10 @@ export type Database = {
         Args: { venture_ids: string[] }
         Returns: Json
       }
+      approve_reject_participant: {
+        Args: { p_action: string; p_notification_id: string }
+        Returns: Json
+      }
       calculate_vwap3_for_venture: {
         Args: { venture_uuid: string }
         Returns: number
