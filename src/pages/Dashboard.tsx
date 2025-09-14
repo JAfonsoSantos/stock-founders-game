@@ -22,6 +22,7 @@ interface Game {
   created_at: string;
   logo_url?: string;
   hero_image_url?: string;
+  owner_user_id: string;
 }
 
 interface Participation {
@@ -231,7 +232,7 @@ export default function Dashboard() {
                       <Button 
                         variant="outline" 
                         size="sm"
-                        onClick={() => navigate(`/games/${game.id}`)}
+                        onClick={() => navigate(`/games/${game.id}/preview`)}
                         className="flex-1 text-xs"
                       >
                         View Profile
@@ -303,7 +304,11 @@ export default function Dashboard() {
                       <Button 
                         variant="outline" 
                         size="sm"
-                        onClick={() => navigate(`/games/${participation.games.id}`)}
+                        onClick={() => navigate(
+                          participation.games.owner_user_id === user?.id 
+                            ? `/games/${participation.games.id}/preview` 
+                            : `/games/${participation.games.id}`
+                        )}
                         className="flex-1 text-xs"
                       >
                         View Profile
