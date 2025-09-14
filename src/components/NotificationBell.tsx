@@ -24,7 +24,7 @@ interface Notification {
 const getNotificationIcon = (type: string) => {
   if (type.includes('trade')) {
     return <TrendingUp className="h-4 w-4 text-green-500" />;
-  } else if (type.includes('game')) {
+  } else if (type.includes('game') || type === 'game_invitation') {
     return <Calendar className="h-4 w-4 text-blue-500" />;
   } else if (type.includes('winner')) {
     return <CheckCircle className="h-4 w-4 text-yellow-500" />;
@@ -37,7 +37,7 @@ const getNotificationIcon = (type: string) => {
 const getNotificationColor = (type: string) => {
   if (type.includes('trade')) {
     return 'border-l-green-500 bg-green-50/50';
-  } else if (type.includes('game')) {
+  } else if (type.includes('game') || type === 'game_invitation') {
     return 'border-l-blue-500 bg-blue-50/50';
   } else if (type.includes('winner')) {
     return 'border-l-yellow-500 bg-yellow-50/50';
@@ -50,7 +50,12 @@ const getNotificationColor = (type: string) => {
 const getNotificationContent = (notification: Notification) => {
   const { type, payload } = notification;
   
-  if (type === 'trade_request') {
+  if (type === 'game_invitation') {
+    return {
+      title: 'Game Invitation',
+      message: `You've been invited to join "${payload?.game_name || 'a game'}" by ${payload?.inviter_name || 'someone'}`
+    };
+  } else if (type === 'trade_request') {
     return {
       title: 'Trade Request',
       message: `${payload?.from_name || 'Someone'} wants to buy ${payload?.qty || 0} shares of ${payload?.startup_name || 'a startup'} for ${payload?.price_per_share || 0} per share`
@@ -207,6 +212,84 @@ export function NotificationBell() {
     }
   };
 
+  const acceptGameInvitation = async (notification: Notification) => {
+    try {
+      const gameId = notification.payload?.game_id;
+      if (!gameId || !user) return;
+
+      // Check if user is already a participant in this game
+      const { data: existingParticipant } = await supabase
+        .from('participants')
+        .select('id')
+        .eq('game_id', gameId)
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (!existingParticipant) {
+        // Add user as a participant to the game
+        const { error: participantError } = await supabase
+          .from('participants')
+          .insert({
+            game_id: gameId,
+            user_id: user.id,
+            role: 'angel', // Default role
+            initial_budget: 100000, // Default budget
+            current_cash: 100000,
+            status: 'active'
+          });
+
+        if (participantError) throw participantError;
+      } else {
+        // Update existing participant to active status
+        const { error: updateError } = await supabase
+          .from('participants')
+          .update({ status: 'active' })
+          .eq('id', existingParticipant.id);
+
+        if (updateError) throw updateError;
+      }
+
+      // Mark notification as read and accepted
+      await supabase
+        .from('notifications')
+        .update({ status: 'accepted' })
+        .eq('id', notification.id);
+
+      // Remove from local state
+      setNotifications(prev => prev.filter(n => n.id !== notification.id));
+      setUnreadCount(prev => Math.max(0, prev - 1));
+
+      toast.success('Game invitation accepted!', {
+        description: `You've joined "${notification.payload?.game_name}"`
+      });
+
+      // Refresh the page to update active games
+      window.location.reload();
+    } catch (error) {
+      console.error('Error accepting game invitation:', error);
+      toast.error('Failed to accept invitation');
+    }
+  };
+
+  const refuseGameInvitation = async (notification: Notification) => {
+    try {
+      // Mark notification as refused
+      await supabase
+        .from('notifications')
+        .update({ status: 'refused' })
+        .eq('id', notification.id);
+
+      // Remove from local state
+      setNotifications(prev => prev.filter(n => n.id !== notification.id));
+      setUnreadCount(prev => Math.max(0, prev - 1));
+
+      toast.success('Game invitation declined');
+    } catch (error) {
+      console.error('Error refusing game invitation:', error);
+      toast.error('Failed to decline invitation');
+    }
+  };
+
   const deleteNotification = async (notificationId: string) => {
     try {
       const { error } = await supabase
@@ -310,6 +393,33 @@ export function NotificationBell() {
                         <p className="text-xs text-gray-400 mt-2">
                           {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
                         </p>
+
+                        {/* Game invitation actions */}
+                        {notification.type === 'game_invitation' && notification.status === 'unread' && (
+                          <div className="flex gap-2 mt-3">
+                            <Button
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                acceptGameInvitation(notification);
+                              }}
+                              className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 h-7 text-xs"
+                            >
+                              Accept
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                refuseGameInvitation(notification);
+                              }}
+                              className="border-red-200 text-red-600 hover:bg-red-50 px-3 py-1 h-7 text-xs"
+                            >
+                              Refuse
+                            </Button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </CardContent>
