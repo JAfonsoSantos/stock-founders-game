@@ -66,31 +66,19 @@ export function GameProvider({ children }: { children: ReactNode }) {
     try {
       setLoading(true);
       
-      // First get participant IDs for this user
-      const { data: userParticipants } = await supabase
-        .from('participants')
-        .select('id')
-        .eq('user_id', user.id);
-      
-      const participantIds = userParticipants?.map(p => p.id) || [];
-      
-      // Get games where user is owner, participant, or has pending invitations
-      const [ownedGamesRes, participationsRes, invitationsRes] = await Promise.all([
+      // Get games where user is owner or participant
+      const [ownedGamesRes, participationsRes] = await Promise.all([
+        // Games owned by user
         supabase
           .from('games')
           .select('*')
           .eq('owner_user_id', user.id)
           .in('status', ['draft', 'pre_market', 'open', 'closed']),
+        // Games where user is participant
         supabase
           .from('participants')
           .select('games(*)')
-          .eq('user_id', user.id),
-        participantIds.length > 0 ? supabase
-          .from('notifications')
-          .select('game_id, games(*)')
-          .eq('type', 'game_invitation')
-          .eq('status', 'unread')
-          .in('to_participant_id', participantIds) : Promise.resolve({ data: [] })
+          .eq('user_id', user.id)
       ]);
 
       const ownedGames = ownedGamesRes.data || [];
@@ -99,19 +87,14 @@ export function GameProvider({ children }: { children: ReactNode }) {
         .filter((game): game is any => 
           game !== null && ['draft', 'pre_market', 'open', 'closed'].includes(game.status)
         );
-      
-      const invitedGames = (invitationsRes.data || [])
-        .map(i => i.games)
-        .filter((game): game is any => 
-          game !== null && ['draft', 'pre_market', 'open', 'closed'].includes(game.status)
-        );
 
       // Combine and deduplicate
-      const allGames = [...ownedGames, ...participatedGames, ...invitedGames];
+      const allGames = [...ownedGames, ...participatedGames];
       const uniqueGames = allGames.filter((game, index, self) => 
         index === self.findIndex(g => g.id === game.id)
       );
 
+      console.log('Active games found:', uniqueGames.map(g => ({id: g.id, name: g.name, status: g.status})));
       setActiveGames(uniqueGames);
 
       // Validate currentGameId is still active
