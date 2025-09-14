@@ -548,6 +548,48 @@ export type Database = {
         }
         Relationships: []
       }
+      venture_ideas: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          linkedin: string | null
+          logo_url: string | null
+          name: string
+          slug: string
+          type: string
+          updated_at: string
+          user_id: string
+          website: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          linkedin?: string | null
+          logo_url?: string | null
+          name: string
+          slug: string
+          type: string
+          updated_at?: string
+          user_id: string
+          website?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          linkedin?: string | null
+          logo_url?: string | null
+          name?: string
+          slug?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
       ventures: {
         Row: {
           created_at: string

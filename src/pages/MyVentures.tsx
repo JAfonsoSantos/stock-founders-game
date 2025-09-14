@@ -60,48 +60,28 @@ export default function MyVentures() {
     if (!user) return;
 
     try {
-      // Get all ventures where the user is a founder member
+      // Get all venture ideas created by the user
       const { data, error } = await supabase
-        .from('founder_members')
-        .select(`
-          venture_id,
-          ventures!inner (
-            id,
-            name,
-            slug,
-            logo_url,
-            description,
-            type,
-            game_id,
-            total_shares,
-            primary_shares_remaining,
-            last_vwap_price,
-            created_at,
-            games!inner (
-              name
-            )
-          ),
-          participants!inner (
-            user_id
-          )
-        `)
-        .eq('participants.user_id', user.id);
+        .from('venture_ideas')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
 
       const venturesData = data?.map((item: any) => ({
-        id: item.ventures.id,
-        name: item.ventures.name,
-        slug: item.ventures.slug,
-        logo_url: item.ventures.logo_url,
-        description: item.ventures.description,
-        type: item.ventures.type,
-        game_id: item.ventures.game_id,
-        game_name: item.ventures.games.name,
-        total_shares: item.ventures.total_shares,
-        primary_shares_remaining: item.ventures.primary_shares_remaining,
-        last_vwap_price: item.ventures.last_vwap_price,
-        created_at: item.ventures.created_at,
+        id: item.id,
+        name: item.name,
+        slug: item.slug,
+        logo_url: item.logo_url,
+        description: item.description,
+        type: item.type,
+        game_id: null, // Venture ideas don't belong to games yet
+        game_name: 'Independent Venture',
+        total_shares: 100, // Default for display
+        primary_shares_remaining: 100, // Default for display
+        last_vwap_price: null,
+        created_at: item.created_at,
       })) || [];
 
       setVentures(venturesData);
@@ -181,7 +161,13 @@ export default function MyVentures() {
                   <Card 
                     key={venture.id} 
                     className="hover:shadow-lg transition-shadow cursor-pointer"
-                    onClick={() => navigate(`/games/${venture.game_id}/venture/${venture.slug}`)}
+                    onClick={() => {
+                      if (venture.game_id) {
+                        navigate(`/games/${venture.game_id}/venture/${venture.slug}`);
+                      } else {
+                        navigate(`/ventures/${venture.id}/edit`);
+                      }
+                    }}
                   >
                     <CardHeader>
                       <div className="flex items-start justify-between">

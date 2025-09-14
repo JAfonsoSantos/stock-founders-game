@@ -55,9 +55,9 @@ export default function CreateVenture() {
     try {
       const slug = generateSlug(formData.name);
       
-      // Create the venture record directly in ventures table
+      // Create the venture idea record
       const { data: venture, error: ventureError } = await supabase
-        .from('ventures')
+        .from('venture_ideas')
         .insert({
           name: formData.name,
           slug: slug,
@@ -66,9 +66,7 @@ export default function CreateVenture() {
           website: formData.website,
           linkedin: formData.linkedin,
           logo_url: formData.logo_url,
-          created_by: user.id,
-          total_shares: 100, // Default
-          primary_shares_remaining: 100
+          user_id: user.id
         })
         .select()
         .single();
@@ -165,10 +163,36 @@ export default function CreateVenture() {
 
             <div className="space-y-2">
               <Label>Logo</Label>
-              <LogoUpload
-                currentLogoUrl={formData.logo_url}
-                onLogoChange={handleLogoUpload}
-              />
+              <div className="space-y-4">
+                {formData.logo_url && (
+                  <div className="w-24 h-24 rounded border overflow-hidden bg-muted">
+                    <img 
+                      src={formData.logo_url} 
+                      alt="Current logo" 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      // Simple file upload - for demo purposes
+                      // In production, you'd upload to storage and get URL
+                      const reader = new FileReader();
+                      reader.onload = (e) => {
+                        handleLogoUpload(e.target?.result as string);
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                />
+                <p className="text-xs text-muted-foreground">
+                  PNG, JPG, WebP ou SVG. Max 5MB.
+                </p>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
