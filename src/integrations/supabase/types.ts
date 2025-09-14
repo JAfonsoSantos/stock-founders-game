@@ -21,7 +21,7 @@ export type Database = {
           id: string
           participant_id: string
           role: Database["public"]["Enums"]["founder_member_role"]
-          startup_id: string
+          venture_id: string
         }
         Insert: {
           can_manage?: boolean
@@ -29,7 +29,7 @@ export type Database = {
           id?: string
           participant_id: string
           role?: Database["public"]["Enums"]["founder_member_role"]
-          startup_id: string
+          venture_id: string
         }
         Update: {
           can_manage?: boolean
@@ -37,7 +37,7 @@ export type Database = {
           id?: string
           participant_id?: string
           role?: Database["public"]["Enums"]["founder_member_role"]
-          startup_id?: string
+          venture_id?: string
         }
         Relationships: [
           {
@@ -49,9 +49,9 @@ export type Database = {
           },
           {
             foreignKeyName: "founder_members_startup_id_fkey"
-            columns: ["startup_id"]
+            columns: ["venture_id"]
             isOneToOne: false
-            referencedRelation: "startups"
+            referencedRelation: "ventures"
             referencedColumns: ["id"]
           },
         ]
@@ -293,9 +293,9 @@ export type Database = {
           id: string
           price_per_share: number
           qty: number
-          startup_id: string
           status: Database["public"]["Enums"]["order_status"]
           updated_at: string
+          venture_id: string
         }
         Insert: {
           auto_accept_min_price?: number | null
@@ -306,9 +306,9 @@ export type Database = {
           id?: string
           price_per_share: number
           qty: number
-          startup_id: string
           status?: Database["public"]["Enums"]["order_status"]
           updated_at?: string
+          venture_id: string
         }
         Update: {
           auto_accept_min_price?: number | null
@@ -319,9 +319,9 @@ export type Database = {
           id?: string
           price_per_share?: number
           qty?: number
-          startup_id?: string
           status?: Database["public"]["Enums"]["order_status"]
           updated_at?: string
+          venture_id?: string
         }
         Relationships: [
           {
@@ -347,9 +347,9 @@ export type Database = {
           },
           {
             foreignKeyName: "orders_primary_startup_id_fkey"
-            columns: ["startup_id"]
+            columns: ["venture_id"]
             isOneToOne: false
-            referencedRelation: "startups"
+            referencedRelation: "ventures"
             referencedColumns: ["id"]
           },
         ]
@@ -414,24 +414,24 @@ export type Database = {
           id: string
           participant_id: string
           qty_total: number
-          startup_id: string
           updated_at: string
+          venture_id: string
         }
         Insert: {
           avg_cost?: number
           id?: string
           participant_id: string
           qty_total?: number
-          startup_id: string
           updated_at?: string
+          venture_id: string
         }
         Update: {
           avg_cost?: number
           id?: string
           participant_id?: string
           qty_total?: number
-          startup_id?: string
           updated_at?: string
+          venture_id?: string
         }
         Relationships: [
           {
@@ -443,65 +443,9 @@ export type Database = {
           },
           {
             foreignKeyName: "positions_startup_id_fkey"
-            columns: ["startup_id"]
+            columns: ["venture_id"]
             isOneToOne: false
-            referencedRelation: "startups"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      startups: {
-        Row: {
-          created_at: string
-          description: string | null
-          game_id: string
-          id: string
-          last_vwap_price: number | null
-          linkedin: string | null
-          logo_url: string | null
-          name: string
-          primary_shares_remaining: number
-          slug: string
-          total_shares: number
-          updated_at: string
-          website: string | null
-        }
-        Insert: {
-          created_at?: string
-          description?: string | null
-          game_id: string
-          id?: string
-          last_vwap_price?: number | null
-          linkedin?: string | null
-          logo_url?: string | null
-          name: string
-          primary_shares_remaining?: number
-          slug: string
-          total_shares?: number
-          updated_at?: string
-          website?: string | null
-        }
-        Update: {
-          created_at?: string
-          description?: string | null
-          game_id?: string
-          id?: string
-          last_vwap_price?: number | null
-          linkedin?: string | null
-          logo_url?: string | null
-          name?: string
-          primary_shares_remaining?: number
-          slug?: string
-          total_shares?: number
-          updated_at?: string
-          website?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "startups_game_id_fkey"
-            columns: ["game_id"]
-            isOneToOne: false
-            referencedRelation: "games"
+            referencedRelation: "ventures"
             referencedColumns: ["id"]
           },
         ]
@@ -516,7 +460,7 @@ export type Database = {
           price_per_share: number
           qty: number
           seller_participant_id: string | null
-          startup_id: string
+          venture_id: string
         }
         Insert: {
           buyer_participant_id: string
@@ -527,7 +471,7 @@ export type Database = {
           price_per_share: number
           qty: number
           seller_participant_id?: string | null
-          startup_id: string
+          venture_id: string
         }
         Update: {
           buyer_participant_id?: string
@@ -538,7 +482,7 @@ export type Database = {
           price_per_share?: number
           qty?: number
           seller_participant_id?: string | null
-          startup_id?: string
+          venture_id?: string
         }
         Relationships: [
           {
@@ -564,9 +508,9 @@ export type Database = {
           },
           {
             foreignKeyName: "trades_startup_id_fkey"
-            columns: ["startup_id"]
+            columns: ["venture_id"]
             isOneToOne: false
-            referencedRelation: "startups"
+            referencedRelation: "ventures"
             referencedColumns: ["id"]
           },
         ]
@@ -604,15 +548,70 @@ export type Database = {
         }
         Relationships: []
       }
+      ventures: {
+        Row: {
+          created_at: string
+          description: string | null
+          game_id: string
+          id: string
+          last_vwap_price: number | null
+          linkedin: string | null
+          logo_url: string | null
+          name: string
+          primary_shares_remaining: number
+          slug: string
+          total_shares: number
+          type: string
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          game_id: string
+          id?: string
+          last_vwap_price?: number | null
+          linkedin?: string | null
+          logo_url?: string | null
+          name: string
+          primary_shares_remaining?: number
+          slug: string
+          total_shares?: number
+          type?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          game_id?: string
+          id?: string
+          last_vwap_price?: number | null
+          linkedin?: string | null
+          logo_url?: string | null
+          name?: string
+          primary_shares_remaining?: number
+          slug?: string
+          total_shares?: number
+          type?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "startups_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      accept_secondary_trade: {
-        Args: { p_notification_id: string }
-        Returns: Json
-      }
       add_demo_participant: {
         Args: {
           p_budget: number
@@ -624,56 +623,9 @@ export type Database = {
         }
         Returns: Json
       }
-      admin_delete_startups: {
-        Args: { startup_ids: string[] }
-        Returns: Json
-      }
       admin_delete_users: {
         Args: { user_ids: string[] }
         Returns: Json
-      }
-      calculate_vwap3_for_startup: {
-        Args: { startup_uuid: string }
-        Returns: number
-      }
-      create_primary_order: {
-        Args: {
-          p_auto_accept_min_price?: number
-          p_game_id: string
-          p_price_per_share: number
-          p_qty: number
-          p_startup_id: string
-        }
-        Returns: Json
-      }
-      create_secondary_trade_request: {
-        Args: {
-          p_buyer_email: string
-          p_game_id: string
-          p_price_per_share: number
-          p_qty: number
-          p_startup_id: string
-        }
-        Returns: Json
-      }
-      decide_primary_order: {
-        Args: {
-          p_decided_by_participant_id?: string
-          p_decision: string
-          p_order_id: string
-        }
-        Returns: Json
-      }
-      get_all_startups_admin: {
-        Args: Record<PropertyKey, never>
-        Returns: {
-          created_at: string
-          game_id: string
-          id: string
-          logo_url: string
-          name: string
-          slug: string
-        }[]
       }
       get_all_users_admin: {
         Args: Record<PropertyKey, never>
@@ -711,19 +663,6 @@ export type Database = {
           role: Database["public"]["Enums"]["participant_role"]
           total_value: number
           user_id: string
-        }[]
-      }
-      get_startup_leaderboard: {
-        Args: { p_game_id?: string }
-        Returns: {
-          game_id: string
-          id: string
-          last_vwap_price: number
-          logo_url: string
-          market_cap: number
-          name: string
-          shares_sold: number
-          total_shares: number
         }[]
       }
       get_vc_leaderboard: {
