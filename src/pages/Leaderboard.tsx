@@ -51,9 +51,9 @@ export default function Leaderboard() {
         return;
       }
       
-      // Fetch startup leaderboard
+      // Fetch venture leaderboard
       const { data: startupsData } = await supabase
-        .rpc("get_startup_leaderboard", { p_game_id: gameId });
+        .rpc("get_venture_leaderboard", { p_game_id: gameId });
       
       setStartupLeaderboard(startupsData || []);
       
@@ -127,7 +127,7 @@ export default function Leaderboard() {
 
         <Tabs defaultValue="startups" className="space-y-6">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="startups">Top Startups</TabsTrigger>
+            <TabsTrigger value="startups">Top Ventures</TabsTrigger>
             <TabsTrigger value="angels">Top Angels</TabsTrigger>
             <TabsTrigger value="vcs">Top VCs</TabsTrigger>
           </TabsList>
@@ -137,7 +137,7 @@ export default function Leaderboard() {
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Building className="h-5 w-5 mr-2" />
-                  Startups by Market Cap
+                  Ventures by Market Cap
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -145,7 +145,7 @@ export default function Leaderboard() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Rank</TableHead>
-                      <TableHead>Startup</TableHead>
+                      <TableHead>Venture</TableHead>
                       <TableHead>Current Price</TableHead>
                       <TableHead>Market Cap</TableHead>
                       <TableHead>Shares Sold</TableHead>
@@ -198,9 +198,9 @@ export default function Leaderboard() {
                 {startupLeaderboard.length === 0 && (
                   <div className="text-center py-8">
                     <Building className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">No startups yet</h3>
+                    <h3 className="text-lg font-semibold mb-2">No ventures yet</h3>
                     <p className="text-muted-foreground">
-                      Startups will appear here once they're added
+                      Ventures will appear here once they're added
                     </p>
                   </div>
                 )}

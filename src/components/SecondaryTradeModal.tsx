@@ -52,7 +52,7 @@ export function SecondaryTradeModal({
     try {
       const { data, error } = await supabase.rpc('create_secondary_trade_request', {
         p_game_id: gameId,
-        p_startup_id: startupId,
+        p_venture_id: startupId,
         p_buyer_email: buyerEmail,
         p_qty: quantity,
         p_price_per_share: pricePerShare

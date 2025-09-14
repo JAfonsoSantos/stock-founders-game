@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useI18n } from "@/hooks/useI18n";
 import { AdminDeleteUsers } from "@/components/AdminDeleteUsers";
-import { AdminDeleteStartups } from "@/components/AdminDeleteStartups";
+import { AdminDeleteVentures } from "@/components/AdminDeleteVentures";
 
 export default function Profile() {
   const { user, signOut } = useAuth();
@@ -34,7 +34,7 @@ export default function Profile() {
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [showDeleteUsers, setShowDeleteUsers] = useState(false);
-  const [showDeleteStartups, setShowDeleteStartups] = useState(false);
+  const [showDeleteVentures, setShowDeleteVentures] = useState(false);
 
   // Check if user is admin
   const isAdmin = user?.email === "joseafonsosantos@gmail.com";
@@ -231,8 +231,8 @@ export default function Profile() {
     return <AdminDeleteUsers />;
   }
 
-  if (showDeleteStartups) {
-    return <AdminDeleteStartups />;
+  if (showDeleteVentures) {
+    return <AdminDeleteVentures />;
   }
 
   const unlinkProvider = async (provider: string) => {

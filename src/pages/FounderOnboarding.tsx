@@ -21,7 +21,7 @@ export default function FounderOnboarding() {
   const [gameInfo, setGameInfo] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
-  const [newStartup, setNewStartup] = useState({
+  const [newVenture, setNewVenture] = useState({
     name: "",
     slug: "",
     description: "",
@@ -81,7 +81,7 @@ export default function FounderOnboarding() {
         return;
       }
       
-      // Only show onboarding for founders without startups
+      // Only show onboarding for founders without ventures
       if (participantData.role !== 'founder') {
         navigate(`/games/${gameId}/discover`);
         return;
@@ -94,14 +94,14 @@ export default function FounderOnboarding() {
     fetchData();
   }, [user, gameId, navigate]);
 
-  const searchStartups = async (query: string) => {
+  const searchVentures = async (query: string) => {
     if (!query.trim()) {
       setSearchResults([]);
       return;
     }
 
     const { data } = await supabase
-      .from("startups")
+      .from("ventures")
       .select(`
         *,
         founder_members!inner(
@@ -120,7 +120,7 @@ export default function FounderOnboarding() {
 
   useEffect(() => {
     const debounced = setTimeout(() => {
-      searchStartups(searchTerm);
+      searchVentures(searchTerm);
     }, 300);
 
     return () => clearTimeout(debounced);
@@ -134,15 +134,15 @@ export default function FounderOnboarding() {
   };
 
   const handleNameChange = (name: string) => {
-    setNewStartup(prev => ({
+    setNewVenture(prev => ({
       ...prev,
       name,
       slug: generateSlug(name)
     }));
   };
 
-  const createStartup = async () => {
-    if (!newStartup.name.trim() || !newStartup.slug.trim()) {
+  const createVenture = async () => {
+    if (!newVenture.name.trim() || !newVenture.slug.trim()) {
       toast.error("Name and slug are required");
       return;
     }
@@ -151,40 +151,41 @@ export default function FounderOnboarding() {
     
     try {
       // Check if slug is unique
-      const { data: existingStartup } = await supabase
-        .from("startups")
+      const { data: existingVenture } = await supabase
+        .from("ventures")
         .select("id")
         .eq("game_id", gameId)
-        .eq("slug", newStartup.slug)
+        .eq("slug", newVenture.slug)
         .single();
 
-      if (existingStartup) {
-        toast.error("This startup name is already taken");
+      if (existingVenture) {
+        toast.error("This venture name is already taken");
         return;
       }
 
-      // Create startup
-      const { data: startupData, error: startupError } = await supabase
-        .from("startups")
+      // Create venture
+      const { data: ventureData, error: ventureError } = await supabase
+        .from("ventures")
         .insert({
           game_id: gameId,
-          name: newStartup.name,
-          slug: newStartup.slug,
-          description: newStartup.description || null,
-          website: newStartup.website || null,
-          linkedin: newStartup.linkedin || null,
-          logo_url: newStartup.logo_url || null
+          name: newVenture.name,
+          slug: newVenture.slug,
+          description: newVenture.description || null,
+          website: newVenture.website || null,
+          linkedin: newVenture.linkedin || null,
+          logo_url: newVenture.logo_url || null,
+          type: 'startup'
         })
         .select()
         .single();
 
-      if (startupError) throw startupError;
+      if (ventureError) throw ventureError;
 
       // Add founder as owner
       const { error: founderError } = await supabase
         .from("founder_members")
         .insert({
-          startup_id: startupData.id,
+          venture_id: ventureData.id,
           participant_id: participant.id,
           role: 'owner',
           can_manage: true
@@ -192,24 +193,24 @@ export default function FounderOnboarding() {
 
       if (founderError) throw founderError;
 
-      toast.success("Startup created successfully!");
+      toast.success("Venture created successfully!");
       navigate(`/games/${gameId}/discover`);
       
     } catch (error: any) {
-      toast.error(error.message || "Failed to create startup");
+      toast.error(error.message || "Failed to create venture");
     } finally {
       setIsCreating(false);
     }
   };
 
-  const joinStartup = async (startupId: string) => {
+  const joinVenture = async (ventureId: string) => {
     setIsJoining(true);
     
     try {
       const { error } = await supabase
         .from("founder_members")
         .insert({
-          startup_id: startupId,
+          venture_id: ventureId,
           participant_id: participant.id,
           role: 'member',
           can_manage: false
@@ -217,11 +218,11 @@ export default function FounderOnboarding() {
 
       if (error) throw error;
 
-      toast.success("Join request sent! The startup owner will need to approve.");
+      toast.success("Join request sent! The venture owner will need to approve.");
       navigate(`/games/${gameId}/discover`);
       
     } catch (error: any) {
-      toast.error(error.message || "Failed to join startup");
+      toast.error(error.message || "Failed to join venture");
     } finally {
       setIsJoining(false);
     }
@@ -251,8 +252,8 @@ export default function FounderOnboarding() {
 
         <Tabs defaultValue="create" className="space-y-6">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="create">Create Startup</TabsTrigger>
-            <TabsTrigger value="join">Join Startup</TabsTrigger>
+            <TabsTrigger value="create">Create Venture</TabsTrigger>
+            <TabsTrigger value="join">Join Venture</TabsTrigger>
             <TabsTrigger value="skip">Skip for Now</TabsTrigger>
           </TabsList>
 
@@ -261,20 +262,20 @@ export default function FounderOnboarding() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Plus className="h-5 w-5" />
-                  Create Your Startup
+                  Create Your Venture
                 </CardTitle>
                 <CardDescription>
-                  Build your own startup and attract investors
+                  Build your own venture and attract investors
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Startup Name *</Label>
+                  <Label htmlFor="name">Venture Name *</Label>
                   <Input
                     id="name"
-                    value={newStartup.name}
+                    value={newVenture.name}
                     onChange={(e) => handleNameChange(e.target.value)}
-                    placeholder="Enter your startup name"
+                    placeholder="Enter your venture name"
                   />
                 </div>
 
@@ -282,12 +283,12 @@ export default function FounderOnboarding() {
                   <Label htmlFor="slug">URL Slug *</Label>
                   <Input
                     id="slug"
-                    value={newStartup.slug}
-                    onChange={(e) => setNewStartup(prev => ({ ...prev, slug: e.target.value }))}
-                    placeholder="startup-url-slug"
+                    value={newVenture.slug}
+                    onChange={(e) => setNewVenture(prev => ({ ...prev, slug: e.target.value }))}
+                    placeholder="venture-url-slug"
                   />
                   <p className="text-xs text-muted-foreground">
-                    This will be used in your startup's URL
+                    This will be used in your venture's URL
                   </p>
                 </div>
 
@@ -295,9 +296,9 @@ export default function FounderOnboarding() {
                   <Label htmlFor="description">Description</Label>
                   <Textarea
                     id="description"
-                    value={newStartup.description}
-                    onChange={(e) => setNewStartup(prev => ({ ...prev, description: e.target.value }))}
-                    placeholder="Describe what your startup does..."
+                    value={newVenture.description}
+                    onChange={(e) => setNewVenture(prev => ({ ...prev, description: e.target.value }))}
+                    placeholder="Describe what your venture does..."
                     rows={3}
                   />
                 </div>
@@ -307,8 +308,8 @@ export default function FounderOnboarding() {
                     <Label htmlFor="website">Website</Label>
                     <Input
                       id="website"
-                      value={newStartup.website}
-                      onChange={(e) => setNewStartup(prev => ({ ...prev, website: e.target.value }))}
+                      value={newVenture.website}
+                      onChange={(e) => setNewVenture(prev => ({ ...prev, website: e.target.value }))}
                       placeholder="https://example.com"
                     />
                   </div>
@@ -317,8 +318,8 @@ export default function FounderOnboarding() {
                     <Label htmlFor="linkedin">LinkedIn</Label>
                     <Input
                       id="linkedin"
-                      value={newStartup.linkedin}
-                      onChange={(e) => setNewStartup(prev => ({ ...prev, linkedin: e.target.value }))}
+                      value={newVenture.linkedin}
+                      onChange={(e) => setNewVenture(prev => ({ ...prev, linkedin: e.target.value }))}
                       placeholder="https://linkedin.com/company/..."
                     />
                   </div>
@@ -327,16 +328,16 @@ export default function FounderOnboarding() {
                 <div className="space-y-2">
                   <Label>Logo</Label>
                   <LogoUpload
-                    currentLogoUrl={newStartup.logo_url}
-                    startupSlug={newStartup.slug || 'new-startup'}
-                    onLogoUploaded={(url) => setNewStartup(prev => ({ ...prev, logo_url: url }))}
+                    currentLogoUrl={newVenture.logo_url}
+                    startupSlug={newVenture.slug || 'new-venture'}
+                    onLogoUploaded={(url) => setNewVenture(prev => ({ ...prev, logo_url: url }))}
                   />
                 </div>
 
                 <Button 
                   className="w-full" 
-                  onClick={createStartup}
-                  disabled={isCreating || !newStartup.name.trim()}
+                  onClick={createVenture}
+                  disabled={isCreating || !newVenture.name.trim()}
                 >
                   {isCreating ? (
                     <>
@@ -346,7 +347,7 @@ export default function FounderOnboarding() {
                   ) : (
                     <>
                       <Building className="mr-2 h-4 w-4" />
-                      Create Startup
+                      Create Venture
                     </>
                   )}
                 </Button>
@@ -359,32 +360,32 @@ export default function FounderOnboarding() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Search className="h-5 w-5" />
-                  Join Existing Startup
+                  Join Existing Venture
                 </CardTitle>
                 <CardDescription>
-                  Search for and join an existing startup as a co-founder
+                  Search for and join an existing venture as a co-founder
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="search">Search Startups</Label>
+                  <Label htmlFor="search">Search Ventures</Label>
                   <Input
                     id="search"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Search by startup name..."
+                    placeholder="Search by venture name..."
                   />
                 </div>
 
                 {searchResults.length > 0 && (
                   <div className="space-y-3">
-                    {searchResults.map((startup) => (
-                      <div key={startup.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    {searchResults.map((venture) => (
+                      <div key={venture.id} className="flex items-center justify-between p-4 border rounded-lg">
                         <div className="flex items-center gap-3">
-                          {startup.logo_url ? (
+                          {venture.logo_url ? (
                             <img 
-                              src={startup.logo_url} 
-                              alt={startup.name}
+                              src={venture.logo_url} 
+                              alt={venture.name}
                               className="w-10 h-10 rounded-lg object-cover"
                             />
                           ) : (
@@ -393,15 +394,15 @@ export default function FounderOnboarding() {
                             </div>
                           )}
                           <div>
-                            <h3 className="font-medium">{startup.name}</h3>
+                            <h3 className="font-medium">{venture.name}</h3>
                             <p className="text-sm text-muted-foreground">
-                              {startup.description || "No description"}
+                              {venture.description || "No description"}
                             </p>
                           </div>
                         </div>
                         <Button
                           size="sm"
-                          onClick={() => joinStartup(startup.id)}
+                          onClick={() => joinVenture(venture.id)}
                           disabled={isJoining}
                         >
                           {isJoining ? (
@@ -418,7 +419,7 @@ export default function FounderOnboarding() {
                 {searchTerm && searchResults.length === 0 && (
                   <div className="text-center py-8">
                     <Search className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">No startups found</h3>
+                    <h3 className="text-lg font-semibold mb-2">No ventures found</h3>
                     <p className="text-muted-foreground">
                       Try searching with different keywords
                     </p>
@@ -436,18 +437,18 @@ export default function FounderOnboarding() {
                   Skip for Now
                 </CardTitle>
                 <CardDescription>
-                  Continue without creating or joining a startup
+                  Continue without creating or joining a venture
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-muted-foreground">
-                  You can always create or join a startup later. For now, you can:
+                  You can always create or join a venture later. For now, you can:
                 </p>
                 <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground">
-                  <li>Browse and invest in other startups</li>
+                  <li>Browse and invest in other ventures</li>
                   <li>View the leaderboard and market activity</li>
                   <li>Access your portfolio dashboard</li>
-                  <li>Create or join a startup at any time</li>
+                  <li>Create or join a venture at any time</li>
                 </ul>
 
                 <Button 

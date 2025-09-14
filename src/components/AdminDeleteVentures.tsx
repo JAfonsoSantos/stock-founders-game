@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ArrowLeft, Trash2, Building, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { ArrowLeft, Trash2, Building2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 
 interface Venture {
   id: string;
@@ -24,7 +24,7 @@ export function AdminDeleteVentures() {
   const [selectedVentures, setSelectedVentures] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
   useEffect(() => {
     fetchVentures();
@@ -32,15 +32,21 @@ export function AdminDeleteVentures() {
 
   const fetchVentures = async () => {
     try {
-      // Use admin function to get ALL ventures
+      setLoading(true);
+      
       const { data, error } = await supabase
         .rpc('get_all_ventures_admin');
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching ventures:", error);
+        toast.error("Erro ao buscar ventures");
+        return;
+      }
+
       setVentures(data || []);
     } catch (error) {
-      console.error('Error fetching ventures:', error);
-      toast.error('Erro ao carregar ventures');
+      console.error("Error:", error);
+      toast.error("Erro ao buscar ventures");
     } finally {
       setLoading(false);
     }
@@ -67,144 +73,170 @@ export function AdminDeleteVentures() {
   const handleDelete = async () => {
     if (selectedVentures.size === 0) return;
 
-    setDeleting(true);
     try {
-      // Use admin function to delete ventures
-      const { data, error } = await supabase
-        .rpc('admin_delete_ventures', { 
-          venture_ids: Array.from(selectedVentures) 
-        });
-
-      if (error) throw error;
+      setDeleting(true);
       
-      const result = data as { error?: string; success?: boolean };
-      if (result?.error) {
-        throw new Error(result.error);
+      const ventureIds = Array.from(selectedVentures);
+      const { data, error } = await supabase
+        .rpc('admin_delete_ventures', { venture_ids: ventureIds });
+
+      if (error) {
+        console.error("Delete error:", error);
+        toast.error("Erro ao eliminar ventures");
+        return;
       }
 
-      toast.success(`${selectedVentures.size} ventures eliminadas com sucesso`);
+      const result = data as { success?: boolean; deleted_count?: number; error?: string };
+      
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+
+      toast.success(`${result.deleted_count || selectedVentures.size} ventures eliminadas com sucesso`);
       setSelectedVentures(new Set());
-      fetchVentures();
+      await fetchVentures();
+      
     } catch (error) {
-      console.error('Error deleting ventures:', error);
-      toast.error('Erro ao eliminar ventures');
+      console.error("Error:", error);
+      toast.error("Erro ao eliminar ventures");
     } finally {
       setDeleting(false);
-      setShowConfirm(false);
+      setShowConfirmDialog(false);
     }
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-gray-600" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={() => navigate(-1)}
-          className="gap-2"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Voltar
-        </Button>
-        <div>
-          <h2 className="text-2xl font-bold">Eliminar Ventures</h2>
-          <p className="text-muted-foreground">Selecione as ventures que deseja eliminar</p>
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center gap-4 mb-8">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Voltar
+          </Button>
+          <h1 className="text-3xl font-bold text-gray-900">Administrar Ventures</h1>
         </div>
-      </div>
 
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Lista de Ventures</CardTitle>
-              <CardDescription>
-                {ventures.length} ventures encontradas
-              </CardDescription>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                onClick={toggleAll}
-                disabled={ventures.length === 0}
-                size="sm"
-              >
-                {selectedVentures.size === ventures.length ? 'Desseleccionar todas' : 'Seleccionar todas'}
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={() => setShowConfirm(true)}
-                disabled={selectedVentures.size === 0}
-                className="gap-2"
-              >
-                <Trash2 className="h-4 w-4" />
-                Eliminar ({selectedVentures.size})
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            {ventures.map((venture) => (
-              <div key={venture.id} className="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50">
-                <Checkbox
-                  checked={selectedVentures.has(venture.id)}
-                  onCheckedChange={() => toggleVenture(venture.id)}
-                />
-                <div className="flex items-center gap-3 flex-1 min-w-0">
-                  {venture.logo_url ? (
-                    <img 
-                      src={venture.logo_url} 
-                      alt={venture.name} 
-                      className="w-10 h-10 rounded-full object-cover"
+        <Card className="bg-white border-gray-200 shadow-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-gray-900">
+              <Building className="h-5 w-5" />
+              Ventures do Sistema ({ventures.length})
+            </CardTitle>
+            <CardDescription className="text-gray-600">
+              Gerir todas as ventures criadas no sistema. Use com cuidado - esta ação não pode ser desfeita.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {ventures.length === 0 ? (
+              <div className="text-center py-12">
+                <Building className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Nenhuma venture encontrada</h3>
+                <p className="text-gray-600">Não existem ventures no sistema no momento.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      id="select-all"
+                      checked={selectedVentures.size === ventures.length && ventures.length > 0}
+                      onCheckedChange={toggleAll}
                     />
-                  ) : (
-                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-                      <Building2 className="h-5 w-5 text-gray-500" />
-                    </div>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="font-medium">{venture.name}</p>
-                      <p className="text-sm text-muted-foreground">({venture.slug})</p>
-                      <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
-                        {venture.type}
-                      </span>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      Criada em: {new Date(venture.created_at).toLocaleDateString('pt-PT')}
-                    </p>
+                    <label htmlFor="select-all" className="text-sm font-medium text-gray-700">
+                      Selecionar todas ({selectedVentures.size} de {ventures.length})
+                    </label>
+                  </div>
+                  
+                  <Button
+                    variant="destructive"
+                    onClick={() => setShowConfirmDialog(true)}
+                    disabled={selectedVentures.size === 0 || deleting}
+                    className="bg-red-600 hover:bg-red-700 text-white"
+                  >
+                    {deleting ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        A eliminar...
+                      </>
+                    ) : (
+                      <>
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Eliminar Selecionadas ({selectedVentures.size})
+                      </>
+                    )}
+                  </Button>
+                </div>
+
+                <div className="border border-gray-200 rounded-lg">
+                  <div className="max-h-96 overflow-y-auto">
+                    {ventures.map((venture) => (
+                      <div
+                        key={venture.id}
+                        className="flex items-center gap-4 p-4 border-b border-gray-100 last:border-b-0 hover:bg-gray-50"
+                      >
+                        <Checkbox
+                          id={`venture-${venture.id}`}
+                          checked={selectedVentures.has(venture.id)}
+                          onCheckedChange={() => toggleVenture(venture.id)}
+                        />
+                        
+                        {venture.logo_url ? (
+                          <img 
+                            src={venture.logo_url} 
+                            alt={venture.name}
+                            className="w-10 h-10 rounded-lg object-cover border border-gray-200"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center border border-gray-200">
+                            <Building className="h-5 w-5 text-gray-400" />
+                          </div>
+                        )}
+                        
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-medium text-gray-900 truncate">{venture.name}</h3>
+                          <div className="flex items-center gap-4 text-sm text-gray-600">
+                            <span>Slug: {venture.slug}</span>
+                            <span>Tipo: {venture.type}</span>
+                            <span>Criado: {new Date(venture.created_at).toLocaleDateString('pt-PT')}</span>
+                          </div>
+                        </div>
+                        
+                        <div className="text-xs text-gray-400 font-mono">
+                          {venture.id.slice(0, 8)}...
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
-            ))}
-
-            {ventures.length === 0 && (
-              <div className="text-center py-8 text-muted-foreground">
-                Nenhuma venture encontrada
-              </div>
             )}
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
-      <ConfirmDialog
-        open={showConfirm}
-        onOpenChange={setShowConfirm}
-        title="Confirmar Eliminação"
-        description={`Tem a certeza que deseja apagar ${selectedVentures.size} ventures? Esta acção não pode ser desfeita.`}
-        confirmText={deleting ? "A eliminar..." : "Sim, eliminar"}
-        cancelText="Cancelar"
-        onConfirm={handleDelete}
-        variant="destructive"
-      />
+        <ConfirmDialog
+          open={showConfirmDialog}
+          onOpenChange={setShowConfirmDialog}
+          title="Confirmar Eliminação"
+          description={`Tem a certeza que deseja eliminar ${selectedVentures.size} ventures? Esta ação não pode ser desfeita e eliminará também todas as trades, posições e ordens relacionadas.`}
+          onConfirm={handleDelete}
+          confirmText="Eliminar"
+          cancelText="Cancelar"
+        />
+      </div>
     </div>
   );
 }
