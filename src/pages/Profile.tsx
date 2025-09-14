@@ -8,10 +8,12 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
-import { ArrowLeft, Camera, User, Lock, Globe, Upload, Link2, Unlink } from "lucide-react";
+import { ArrowLeft, Camera, User, Lock, Globe, Upload, Link2, Unlink, Shield, Users, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useI18n } from "@/hooks/useI18n";
+import { AdminDeleteUsers } from "@/components/AdminDeleteUsers";
+import { AdminDeleteStartups } from "@/components/AdminDeleteStartups";
 
 export default function Profile() {
   const { user, signOut } = useAuth();
@@ -31,6 +33,11 @@ export default function Profile() {
   });
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
+  const [showDeleteUsers, setShowDeleteUsers] = useState(false);
+  const [showDeleteStartups, setShowDeleteStartups] = useState(false);
+
+  // Check if user is admin
+  const isAdmin = user?.email === "joseafonsosantos@gmail.com";
 
   useEffect(() => {
     if (user) {
@@ -220,6 +227,14 @@ export default function Profile() {
   const isLinkedInUser = user?.app_metadata?.provider === 'linkedin_oidc';
   const isOAuthUser = isGoogleUser || isLinkedInUser;
 
+  if (showDeleteUsers) {
+    return <AdminDeleteUsers />;
+  }
+
+  if (showDeleteStartups) {
+    return <AdminDeleteStartups />;
+  }
+
   const unlinkProvider = async (provider: string) => {
     if (!confirm(`Desligar a conexão com ${provider === 'google' ? 'Google' : 'LinkedIn'}?`)) return;
     
@@ -248,7 +263,7 @@ export default function Profile() {
 
         <div className="max-w-4xl mx-auto">
           <Tabs defaultValue="profile" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4 bg-white border border-gray-200">
+            <TabsList className={`grid w-full ${isAdmin ? 'grid-cols-5' : 'grid-cols-4'} bg-white border border-gray-200`}>
               <TabsTrigger value="profile" className="flex items-center gap-2 text-gray-600 data-[state=active]:text-orange-600 data-[state=active]:bg-orange-50">
                 <User className="h-4 w-4" />
                 Perfil
@@ -265,6 +280,12 @@ export default function Profile() {
                 <Globe className="h-4 w-4" />
                 Preferências
               </TabsTrigger>
+              {isAdmin && (
+                <TabsTrigger value="admin" className="flex items-center gap-2 text-gray-600 data-[state=active]:text-orange-600 data-[state=active]:bg-orange-50">
+                  <Shield className="h-4 w-4" />
+                  Admin
+                </TabsTrigger>
+              )}
             </TabsList>
 
             <TabsContent value="profile">
@@ -519,6 +540,42 @@ export default function Profile() {
                 </CardContent>
               </Card>
             </TabsContent>
+
+            {isAdmin && (
+              <TabsContent value="admin">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Shield className="h-5 w-5 text-primary" />
+                      Administração
+                    </CardTitle>
+                    <CardDescription>
+                      Ferramentas de administração do sistema
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Button
+                        variant="destructive"
+                        onClick={() => setShowDeleteUsers(true)}
+                        className="gap-2 h-20 flex-col"
+                      >
+                        <Users className="h-6 w-6" />
+                        <span>Delete Users</span>
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        onClick={() => setShowDeleteStartups(true)}
+                        className="gap-2 h-20 flex-col"
+                      >
+                        <Trash2 className="h-6 w-6" />
+                        <span>Delete Startups</span>
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            )}
           </Tabs>
         </div>
       </div>
