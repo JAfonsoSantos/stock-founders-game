@@ -20,17 +20,23 @@ export function AppSidebar() {
   const [showGameModal, setShowGameModal] = useState(false);
 
   const handleGameNavigation = () => {
+    console.log('Games button clicked!', { currentGameId, activeGamesCount: activeGames.length, activeGames: activeGames.map(g => ({id: g.id, name: g.name})) });
+    
     if (!currentGameId && activeGames.length === 0) {
+      console.log('No active games, showing toast');
       toast.info(t('sidebar.noActiveGames'));
       navigate('/');
       return;
     }
 
     if (currentGameId) {
+      console.log('Has current game, navigating to:', currentGameId);
       navigate(`/games/${currentGameId}/discover`);
     } else if (activeGames.length === 1) {
+      console.log('Has exactly 1 game, navigating to:', activeGames[0].id);
       navigate(`/games/${activeGames[0].id}/discover`);
     } else {
+      console.log('Multiple games, showing modal');
       setShowGameModal(true);
     }
   };
