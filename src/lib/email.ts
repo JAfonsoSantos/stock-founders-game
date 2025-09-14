@@ -22,51 +22,59 @@ export async function sendEmail(request: EmailRequest) {
     }
     
     console.log('User ID:', session.user.id);
+    console.log('Supabase URL being used:', 'https://ccwlxhhsfgnmcqbnjmys.supabase.co');
+    console.log('Function URL will be:', 'https://ccwlxhhsfgnmcqbnjmys.supabase.co/functions/v1/send-email');
     
-    // Try to invoke the function with timeout and retry logic
-    let lastError;
-    for (let attempt = 1; attempt <= 3; attempt++) {
-      try {
-        console.log(`Attempt ${attempt}: Invoking send-email function...`);
-        
-        const result = await Promise.race([
-          supabase.functions.invoke('send-email', {
-            body: request,
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${session.access_token}`
-            }
-          }),
-          new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Request timeout after 30 seconds')), 30000)
-          )
-        ]) as { data: any; error: any };
-
-        const { data, error } = result;
-
-        console.log('Function invoke result:', { data, error });
-
-        if (error) {
-          console.error('Supabase function error:', error);
-          throw new Error(`Email function error: ${error.message || 'Unknown error'}`);
-        }
-
-        console.log('Email sent successfully:', data);
+    // Try direct fetch instead of supabase client to test connectivity
+    try {
+      console.log('Testing direct fetch to function...');
+      const directResponse = await fetch('https://ccwlxhhsfgnmcqbnjmys.supabase.co/functions/v1/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjd2x4aGhzZmdubWNxYm5qbXlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcyMzQ2NDQsImV4cCI6MjA3MjgxMDY0NH0.K6kbRHdjZoXvPLXNVHyJeg6-6xcjfyl5uNk0vHnfy3w'
+        },
+        body: JSON.stringify(request)
+      });
+      
+      console.log('Direct fetch response status:', directResponse.status);
+      const responseText = await directResponse.text();
+      console.log('Direct fetch response body:', responseText);
+      
+      if (directResponse.ok) {
+        const data = JSON.parse(responseText);
+        console.log('Email sent successfully via direct fetch:', data);
         return data;
-      } catch (attemptError) {
-        lastError = attemptError;
-        console.error(`Attempt ${attempt} failed:`, attemptError);
-        
-        if (attempt < 3) {
-          console.log(`Waiting 2 seconds before retry...`);
-          await new Promise(resolve => setTimeout(resolve, 2000));
-        }
+      } else {
+        throw new Error(`Direct fetch failed with status ${directResponse.status}: ${responseText}`);
       }
+    } catch (directError) {
+      console.error('Direct fetch failed:', directError);
+      
+      // Fallback to supabase client
+      console.log('Falling back to Supabase client...');
+      
+      const { data, error } = await supabase.functions.invoke('send-email', {
+        body: request,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        }
+      });
+
+      console.log('Supabase client result:', { data, error });
+
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw new Error(`Email function error: ${error.message || 'Unknown error'}`);
+      }
+
+      console.log('Email sent successfully via Supabase client:', data);
+      return data;
     }
-    
-    throw lastError;
   } catch (error) {
-    console.error('Failed to send email after all attempts:', error);
+    console.error('Failed to send email:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     throw new Error(`Email sending failed: ${errorMessage}`);
   }
