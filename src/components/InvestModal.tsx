@@ -26,6 +26,7 @@ interface InvestModalProps {
 }
 
 export default function InvestModal({ venture, participant, gameId, onClose, onSuccess }: InvestModalProps) {
+  // Investment modal for venture shares
   const [quantity, setQuantity] = useState("");
   const [pricePerShare, setPricePerShare] = useState("");
   const [loading, setLoading] = useState(false);
