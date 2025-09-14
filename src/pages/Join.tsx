@@ -135,15 +135,71 @@ export default function Join() {
       const { error } = await signUp(email, password);
       if (error) {
         toast.error(error.message);
-      } else {
-        // Update profile with name after signup
-        await supabase.from("users").upsert({
-          id: user?.id,
-          first_name: firstName,
-          last_name: lastName,
-        });
-        toast.success("Account created! Check your email to confirm.");
+        return;
       }
+
+      // Update profile with name after signup
+      await supabase.from("users").upsert({
+        id: user?.id,
+        first_name: firstName,
+        last_name: lastName,
+        email: email
+      });
+
+      // If we have a gameId, check and setup participant after signup
+      if (gameId) {
+        try {
+          // Wait a moment for the user to be available
+          setTimeout(async () => {
+            const { data: { user: newUser } } = await supabase.auth.getUser();
+            
+            if (newUser) {
+              // Check if user is already a participant (might have been pre-added by organizer)
+              const { data: existingParticipant } = await supabase
+                .from("participants")
+                .select("id, status")
+                .eq("game_id", gameId)
+                .eq("user_id", newUser.id)
+                .maybeSingle();
+
+              if (existingParticipant) {
+                // If participant exists but is pending, activate them
+                if (existingParticipant.status === 'pending') {
+                  await supabase
+                    .from("participants")
+                    .update({ status: 'active' })
+                    .eq("id", existingParticipant.id);
+                }
+              } else {
+                // If no participant record exists, create one with default founder role
+                const { data: gameRoles } = await supabase
+                  .from("game_roles")
+                  .select("role, default_budget")
+                  .eq("game_id", gameId)
+                  .eq("role", "founder")
+                  .maybeSingle();
+
+                const defaultBudget = gameRoles?.default_budget || 10000;
+
+                await supabase
+                  .from("participants")
+                  .insert({
+                    game_id: gameId,
+                    user_id: newUser.id,
+                    role: "founder",
+                    initial_budget: defaultBudget,
+                    current_cash: defaultBudget,
+                    status: 'active'
+                  });
+              }
+            }
+          }, 1000);
+        } catch (participantError) {
+          console.error("Error setting up participant:", participantError);
+        }
+      }
+
+      toast.success("Account created! Check your email to confirm.");
     } catch (error) {
       toast.error("An error occurred");
     } finally {
