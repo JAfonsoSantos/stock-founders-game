@@ -9,9 +9,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { sendInviteEmail, sendMarketOpenEmail, sendLastMinutesEmail, sendResultsEmail } from "@/lib/email";
 import { GameImageUpload } from "@/components/GameImageUpload";
+import { OrganizerNotifications } from "@/components/OrganizerNotifications";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
-import { OrganizerNotifications } from "@/components/OrganizerNotifications";
 
 interface Game {
   id: string;
@@ -420,6 +420,9 @@ export default function GameOrganizer() {
           <div className={cn("gap-6", isMobile ? "space-y-6" : "grid lg:grid-cols-2 gap-8")}>
             {/* Left Column - Game Controls & Statistics */}
             <div className="space-y-6">
+              {/* Organizer Notifications */}
+              <OrganizerNotifications gameId={gameId!} />
+
               {/* Game Details */}
               <Card className="bg-white shadow-sm border-gray-100">
                 <CardHeader className="pb-6">
