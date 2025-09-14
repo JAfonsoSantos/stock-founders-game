@@ -117,7 +117,7 @@ export function AppSidebar() {
                     </SidebarMenuButton>
                   </TooltipTrigger>
                   <TooltipContent side="right" className="ml-2">
-                    Your Startup
+                    My Venture
                   </TooltipContent>
                 </Tooltip>
               </SidebarMenuItem>

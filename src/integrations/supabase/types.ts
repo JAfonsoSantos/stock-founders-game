@@ -627,6 +627,32 @@ export type Database = {
         Args: { user_ids: string[] }
         Returns: Json
       }
+      admin_delete_ventures: {
+        Args: { venture_ids: string[] }
+        Returns: Json
+      }
+      calculate_vwap3_for_venture: {
+        Args: { venture_uuid: string }
+        Returns: number
+      }
+      create_primary_order: {
+        Args: {
+          p_auto_accept_min_price?: number
+          p_game_id: string
+          p_price_per_share: number
+          p_qty: number
+          p_venture_id: string
+        }
+        Returns: Json
+      }
+      decide_primary_order: {
+        Args: {
+          p_decided_by_participant_id?: string
+          p_decision: string
+          p_order_id: string
+        }
+        Returns: Json
+      }
       get_all_users_admin: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -635,6 +661,18 @@ export type Database = {
           first_name: string
           id: string
           last_name: string
+        }[]
+      }
+      get_all_ventures_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          created_at: string
+          game_id: string
+          id: string
+          logo_url: string
+          name: string
+          slug: string
+          type: string
         }[]
       }
       get_angel_leaderboard: {
@@ -677,6 +715,20 @@ export type Database = {
           role: Database["public"]["Enums"]["participant_role"]
           total_value: number
           user_id: string
+        }[]
+      }
+      get_venture_leaderboard: {
+        Args: { p_game_id?: string }
+        Returns: {
+          game_id: string
+          id: string
+          last_vwap_price: number
+          logo_url: string
+          market_cap: number
+          name: string
+          shares_sold: number
+          total_shares: number
+          type: string
         }[]
       }
       is_game_owner: {

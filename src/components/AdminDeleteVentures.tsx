@@ -8,70 +8,71 @@ import { toast } from "sonner";
 import { ArrowLeft, Trash2, Building2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-interface Startup {
+interface Venture {
   id: string;
   name: string;
   slug: string;
   logo_url: string | null;
   created_at: string;
   game_id: string;
+  type: string;
 }
 
-export function AdminDeleteStartups() {
+export function AdminDeleteVentures() {
   const navigate = useNavigate();
-  const [startups, setStartups] = useState<Startup[]>([]);
-  const [selectedStartups, setSelectedStartups] = useState<Set<string>>(new Set());
+  const [ventures, setVentures] = useState<Venture[]>([]);
+  const [selectedVentures, setSelectedVentures] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
   useEffect(() => {
-    fetchStartups();
+    fetchVentures();
   }, []);
 
-  const fetchStartups = async () => {
+  const fetchVentures = async () => {
     try {
-      // Use admin function to get ALL startups
+      // Use admin function to get ALL ventures
       const { data, error } = await supabase
-        .rpc('get_all_startups_admin');
+        .rpc('get_all_ventures_admin');
 
       if (error) throw error;
-      setStartups(data || []);
+      setVentures(data || []);
     } catch (error) {
-      console.error('Error fetching startups:', error);
-      toast.error('Erro ao carregar startups');
+      console.error('Error fetching ventures:', error);
+      toast.error('Erro ao carregar ventures');
     } finally {
       setLoading(false);
     }
   };
 
-  const toggleStartup = (startupId: string) => {
-    const newSelected = new Set(selectedStartups);
-    if (newSelected.has(startupId)) {
-      newSelected.delete(startupId);
+  const toggleVenture = (ventureId: string) => {
+    const newSelected = new Set(selectedVentures);
+    if (newSelected.has(ventureId)) {
+      newSelected.delete(ventureId);
     } else {
-      newSelected.add(startupId);
+      newSelected.add(ventureId);
     }
-    setSelectedStartups(newSelected);
+    setSelectedVentures(newSelected);
   };
 
   const toggleAll = () => {
-    if (selectedStartups.size === startups.length) {
-      setSelectedStartups(new Set());
+    if (selectedVentures.size === ventures.length) {
+      setSelectedVentures(new Set());
     } else {
-      setSelectedStartups(new Set(startups.map(startup => startup.id)));
+      setSelectedVentures(new Set(ventures.map(venture => venture.id)));
     }
   };
 
   const handleDelete = async () => {
-    if (selectedStartups.size === 0) return;
+    if (selectedVentures.size === 0) return;
 
     setDeleting(true);
     try {
-      // Use admin function to delete startups
+      // Use admin function to delete ventures
       const { data, error } = await supabase
-        .rpc('admin_delete_startups', { 
-          startup_ids: Array.from(selectedStartups) 
+        .rpc('admin_delete_ventures', { 
+          venture_ids: Array.from(selectedVentures) 
         });
 
       if (error) throw error;
@@ -81,12 +82,12 @@ export function AdminDeleteStartups() {
         throw new Error(result.error);
       }
 
-      toast.success(`${selectedStartups.size} startups eliminadas com sucesso`);
-      setSelectedStartups(new Set());
-      fetchStartups();
+      toast.success(`${selectedVentures.size} ventures eliminadas com sucesso`);
+      setSelectedVentures(new Set());
+      fetchVentures();
     } catch (error) {
-      console.error('Error deleting startups:', error);
-      toast.error('Erro ao eliminar startups');
+      console.error('Error deleting ventures:', error);
+      toast.error('Erro ao eliminar ventures');
     } finally {
       setDeleting(false);
       setShowConfirm(false);
@@ -114,8 +115,8 @@ export function AdminDeleteStartups() {
           Voltar
         </Button>
         <div>
-          <h2 className="text-2xl font-bold">Eliminar Startups</h2>
-          <p className="text-muted-foreground">Selecione as startups que deseja eliminar</p>
+          <h2 className="text-2xl font-bold">Eliminar Ventures</h2>
+          <p className="text-muted-foreground">Selecione as ventures que deseja eliminar</p>
         </div>
       </div>
 
@@ -123,45 +124,45 @@ export function AdminDeleteStartups() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Lista de Startups</CardTitle>
+              <CardTitle>Lista de Ventures</CardTitle>
               <CardDescription>
-                {startups.length} startups encontradas
+                {ventures.length} ventures encontradas
               </CardDescription>
             </div>
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
                 onClick={toggleAll}
-                disabled={startups.length === 0}
+                disabled={ventures.length === 0}
                 size="sm"
               >
-                {selectedStartups.size === startups.length ? 'Desseleccionar todas' : 'Seleccionar todas'}
+                {selectedVentures.size === ventures.length ? 'Desseleccionar todas' : 'Seleccionar todas'}
               </Button>
               <Button
                 variant="destructive"
                 onClick={() => setShowConfirm(true)}
-                disabled={selectedStartups.size === 0}
+                disabled={selectedVentures.size === 0}
                 className="gap-2"
               >
                 <Trash2 className="h-4 w-4" />
-                Eliminar ({selectedStartups.size})
+                Eliminar ({selectedVentures.size})
               </Button>
             </div>
           </div>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            {startups.map((startup) => (
-              <div key={startup.id} className="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50">
+            {ventures.map((venture) => (
+              <div key={venture.id} className="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50">
                 <Checkbox
-                  checked={selectedStartups.has(startup.id)}
-                  onCheckedChange={() => toggleStartup(startup.id)}
+                  checked={selectedVentures.has(venture.id)}
+                  onCheckedChange={() => toggleVenture(venture.id)}
                 />
                 <div className="flex items-center gap-3 flex-1 min-w-0">
-                  {startup.logo_url ? (
+                  {venture.logo_url ? (
                     <img 
-                      src={startup.logo_url} 
-                      alt={startup.name} 
+                      src={venture.logo_url} 
+                      alt={venture.name} 
                       className="w-10 h-10 rounded-full object-cover"
                     />
                   ) : (
@@ -171,20 +172,23 @@ export function AdminDeleteStartups() {
                   )}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className="font-medium">{startup.name}</p>
-                      <p className="text-sm text-muted-foreground">({startup.slug})</p>
+                      <p className="font-medium">{venture.name}</p>
+                      <p className="text-sm text-muted-foreground">({venture.slug})</p>
+                      <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
+                        {venture.type}
+                      </span>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      Criada em: {new Date(startup.created_at).toLocaleDateString('pt-PT')}
+                      Criada em: {new Date(venture.created_at).toLocaleDateString('pt-PT')}
                     </p>
                   </div>
                 </div>
               </div>
             ))}
 
-            {startups.length === 0 && (
+            {ventures.length === 0 && (
               <div className="text-center py-8 text-muted-foreground">
-                Nenhuma startup encontrada
+                Nenhuma venture encontrada
               </div>
             )}
           </div>
@@ -195,7 +199,7 @@ export function AdminDeleteStartups() {
         open={showConfirm}
         onOpenChange={setShowConfirm}
         title="Confirmar Eliminação"
-        description={`Tem a certeza que deseja apagar ${selectedStartups.size} startups? Esta acção não pode ser desfeita.`}
+        description={`Tem a certeza que deseja apagar ${selectedVentures.size} ventures? Esta acção não pode ser desfeita.`}
         confirmText={deleting ? "A eliminar..." : "Sim, eliminar"}
         cancelText="Cancelar"
         onConfirm={handleDelete}

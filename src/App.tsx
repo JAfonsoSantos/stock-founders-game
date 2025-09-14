@@ -13,16 +13,17 @@ import Dashboard from "./pages/Dashboard";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
+import MyVentures from "./pages/MyVentures";
 import CreateGame from "./pages/CreateGame";
 import GameOrganizer from "./pages/GameOrganizer";
 import ManageParticipants from "./pages/ManageParticipants";
-import ManageStartups from "./pages/ManageStartups";
+import ManageVentures from "./pages/ManageVentures";
 import GameSettings from "./pages/GameSettings";
 import Join from "./pages/Join";
 import Discover from "./pages/Discover";
 import PlayerDashboard from "./pages/PlayerDashboard";
-import StartupProfile from "./pages/StartupProfile";
-import StartupAdmin from "./pages/StartupAdmin";
+import VentureProfile from "./pages/VentureProfile";
+import VentureAdmin from "./pages/VentureAdmin";
 import Leaderboard from "./pages/Leaderboard";
 import FounderOnboarding from "./pages/FounderOnboarding";
 import ResetPassword from "./pages/ResetPassword";
@@ -123,6 +124,11 @@ const App = () => (
                   <Settings />
                 </ProtectedShellRoute>
               } />
+              <Route path="/my-ventures" element={
+                <ProtectedShellRoute>
+                  <MyVentures />
+                </ProtectedShellRoute>
+              } />
               <Route path="/games/new" element={
                 <ProtectedShellRoute>
                   <CreateGame />
@@ -143,9 +149,9 @@ const App = () => (
                   <ManageParticipants />
                 </ProtectedShellRoute>
               } />
-              <Route path="/games/:gameId/startups" element={
+              <Route path="/games/:gameId/ventures" element={
                 <ProtectedShellRoute>
-                  <ManageStartups />
+                  <ManageVentures />
                 </ProtectedShellRoute>
               } />
               <Route path="/games/:gameId/settings" element={
@@ -165,14 +171,14 @@ const App = () => (
                   <PlayerDashboard />
                 </ProtectedShellRoute>
               } />
-              <Route path="/games/:gameId/startup/:slug" element={
+              <Route path="/games/:gameId/venture/:slug" element={
                 <ProtectedShellRoute>
-                  <StartupProfile />
+                  <VentureProfile />
                 </ProtectedShellRoute>
               } />
-              <Route path="/games/:gameId/startup/:slug/admin" element={
+              <Route path="/games/:gameId/venture/:slug/admin" element={
                 <ProtectedShellRoute>
-                  <StartupAdmin />
+                  <VentureAdmin />
                 </ProtectedShellRoute>
               } />
               <Route path="/games/:gameId/leaderboard" element={

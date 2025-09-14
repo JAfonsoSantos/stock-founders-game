@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 interface InvestModalProps {
-  startup: {
+  venture: {
     id: string;
     name: string;
     primary_shares_remaining: number;
@@ -25,14 +25,14 @@ interface InvestModalProps {
   onSuccess: () => void;
 }
 
-export default function InvestModal({ startup, participant, gameId, onClose, onSuccess }: InvestModalProps) {
+export default function InvestModal({ venture, participant, gameId, onClose, onSuccess }: InvestModalProps) {
   const [quantity, setQuantity] = useState("");
   const [pricePerShare, setPricePerShare] = useState("");
   const [loading, setLoading] = useState(false);
 
   const totalCost = Number(quantity) * Number(pricePerShare) || 0;
   const canAfford = totalCost <= participant.current_cash;
-  const validQuantity = Number(quantity) > 0 && Number(quantity) <= startup.primary_shares_remaining;
+  const validQuantity = Number(quantity) > 0 && Number(quantity) <= venture.primary_shares_remaining;
   const validPrice = Number(pricePerShare) > 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -44,7 +44,7 @@ export default function InvestModal({ startup, participant, gameId, onClose, onS
     try {
       const { data, error } = await supabase.rpc('create_primary_order', {
         p_game_id: gameId,
-        p_startup_id: startup.id,
+        p_venture_id: venture.id,
         p_qty: Number(quantity),
         p_price_per_share: Number(pricePerShare),
         p_auto_accept_min_price: null
@@ -71,7 +71,7 @@ export default function InvestModal({ startup, participant, gameId, onClose, onS
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
             <TrendingUp className="h-5 w-5" />
-            <span>Invest in {startup.name}</span>
+            <span>Invest in {venture.name}</span>
           </DialogTitle>
         </DialogHeader>
 
@@ -85,12 +85,12 @@ export default function InvestModal({ startup, participant, gameId, onClose, onS
                 </div>
                 <div>
                   <span className="text-gray-700">Shares Available</span>
-                  <p className="font-semibold">{startup.primary_shares_remaining}</p>
+                  <p className="font-semibold">{venture.primary_shares_remaining}</p>
                 </div>
                 <div>
                   <span className="text-gray-700">Last Price</span>
                   <p className="font-semibold">
-                    {startup.last_vwap_price ? `$${startup.last_vwap_price.toFixed(2)}` : "No trades yet"}
+                    {venture.last_vwap_price ? `$${venture.last_vwap_price.toFixed(2)}` : "No trades yet"}
                   </p>
                 </div>
               </div>
@@ -104,7 +104,7 @@ export default function InvestModal({ startup, participant, gameId, onClose, onS
                 id="quantity"
                 type="number"
                 min="1"
-                max={startup.primary_shares_remaining}
+                max={venture.primary_shares_remaining}
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
                 placeholder="Number of shares"
