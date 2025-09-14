@@ -624,6 +624,14 @@ export type Database = {
         }
         Returns: Json
       }
+      admin_delete_startups: {
+        Args: { startup_ids: string[] }
+        Returns: Json
+      }
+      admin_delete_users: {
+        Args: { user_ids: string[] }
+        Returns: Json
+      }
       calculate_vwap3_for_startup: {
         Args: { startup_uuid: string }
         Returns: number
@@ -655,6 +663,27 @@ export type Database = {
           p_order_id: string
         }
         Returns: Json
+      }
+      get_all_startups_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          created_at: string
+          game_id: string
+          id: string
+          logo_url: string
+          name: string
+          slug: string
+        }[]
+      }
+      get_all_users_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          created_at: string
+          email: string
+          first_name: string
+          id: string
+          last_name: string
+        }[]
       }
       get_angel_leaderboard: {
         Args: { p_game_id?: string }
@@ -725,6 +754,10 @@ export type Database = {
       }
       is_participant_of_user: {
         Args: { participant_uuid: string }
+        Returns: boolean
+      }
+      is_super_admin: {
+        Args: Record<PropertyKey, never>
         Returns: boolean
       }
       is_user_participant_in_game: {

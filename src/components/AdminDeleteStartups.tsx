@@ -31,10 +31,9 @@ export function AdminDeleteStartups() {
 
   const fetchStartups = async () => {
     try {
+      // Use admin function to get ALL startups
       const { data, error } = await supabase
-        .from('startups')
-        .select('id, name, slug, logo_url, created_at, game_id')
-        .order('created_at', { ascending: false });
+        .rpc('get_all_startups_admin');
 
       if (error) throw error;
       setStartups(data || []);
@@ -69,56 +68,18 @@ export function AdminDeleteStartups() {
 
     setDeleting(true);
     try {
-      // Delete related records first (to avoid foreign key constraints)
-      const startupIds = Array.from(selectedStartups);
+      // Use admin function to delete startups
+      const { data, error } = await supabase
+        .rpc('admin_delete_startups', { 
+          startup_ids: Array.from(selectedStartups) 
+        });
+
+      if (error) throw error;
       
-      // Delete founder members
-      const { error: foundersError } = await supabase
-        .from('founder_members')
-        .delete()
-        .in('startup_id', startupIds);
-
-      if (foundersError) {
-        console.error('Error deleting founder members:', foundersError);
+      const result = data as { error?: string; success?: boolean };
+      if (result?.error) {
+        throw new Error(result.error);
       }
-
-      // Delete positions
-      const { error: positionsError } = await supabase
-        .from('positions')
-        .delete()
-        .in('startup_id', startupIds);
-
-      if (positionsError) {
-        console.error('Error deleting positions:', positionsError);
-      }
-
-      // Delete trades
-      const { error: tradesError } = await supabase
-        .from('trades')
-        .delete()
-        .in('startup_id', startupIds);
-
-      if (tradesError) {
-        console.error('Error deleting trades:', tradesError);
-      }
-
-      // Delete orders
-      const { error: ordersError } = await supabase
-        .from('orders_primary')
-        .delete()
-        .in('startup_id', startupIds);
-
-      if (ordersError) {
-        console.error('Error deleting orders:', ordersError);
-      }
-
-      // Finally delete startups
-      const { error: startupsError } = await supabase
-        .from('startups')
-        .delete()
-        .in('id', startupIds);
-
-      if (startupsError) throw startupsError;
 
       toast.success(`${selectedStartups.size} startups eliminadas com sucesso`);
       setSelectedStartups(new Set());

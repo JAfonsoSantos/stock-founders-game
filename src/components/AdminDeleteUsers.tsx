@@ -30,10 +30,9 @@ export function AdminDeleteUsers() {
 
   const fetchUsers = async () => {
     try {
+      // Use admin function to get ALL users
       const { data, error } = await supabase
-        .from('users')
-        .select('id, first_name, last_name, email, created_at')
-        .order('created_at', { ascending: false });
+        .rpc('get_all_users_admin');
 
       if (error) throw error;
       setUsers(data || []);
@@ -68,23 +67,18 @@ export function AdminDeleteUsers() {
 
     setDeleting(true);
     try {
-      // Delete participants first (to avoid foreign key constraints)
-      const { error: participantsError } = await supabase
-        .from('participants')
-        .delete()
-        .in('user_id', Array.from(selectedUsers));
+      // Use admin function to delete users
+      const { data, error } = await supabase
+        .rpc('admin_delete_users', { 
+          user_ids: Array.from(selectedUsers) 
+        });
 
-      if (participantsError) {
-        console.error('Error deleting participants:', participantsError);
+      if (error) throw error;
+      
+      const result = data as { error?: string; success?: boolean };
+      if (result?.error) {
+        throw new Error(result.error);
       }
-
-      // Then delete users
-      const { error: usersError } = await supabase
-        .from('users')
-        .delete()
-        .in('id', Array.from(selectedUsers));
-
-      if (usersError) throw usersError;
 
       toast.success(`${selectedUsers.size} utilizadores eliminados com sucesso`);
       setSelectedUsers(new Set());
