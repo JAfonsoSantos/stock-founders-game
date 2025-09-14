@@ -13,9 +13,19 @@ export async function sendEmail(request: EmailRequest) {
   try {
     console.log('Sending email request:', { type: request.type, to: request.to, gameId: request.gameId });
     
+    // Get the current session to ensure we're authenticated
+    const { data: { session } } = await supabase.auth.getSession();
+    console.log('Auth session exists:', !!session);
+    console.log('User ID:', session?.user?.id);
+    
     const { data, error } = await supabase.functions.invoke('send-email', {
-      body: request
+      body: request,
+      headers: {
+        'Content-Type': 'application/json',
+      }
     });
+
+    console.log('Function invoke result:', { data, error });
 
     if (error) {
       console.error('Supabase function error:', error);
