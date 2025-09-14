@@ -109,7 +109,7 @@ export function AppSidebar() {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <SidebarMenuButton
-                      onClick={() => navigate('/discover')}
+                      onClick={() => navigate('/my-ventures')}
                       className="h-8 w-8 justify-center p-0 hover:bg-gray-200 rounded-lg text-gray-600 hover:text-gray-800"
                       size="sm"
                     >
