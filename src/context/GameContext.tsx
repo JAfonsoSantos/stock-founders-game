@@ -66,7 +66,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     try {
       setLoading(true);
       
-      // Get games where user is owner or participant
+      // Get games where user is owner or active participant
       const [ownedGamesRes, participationsRes] = await Promise.all([
         // Games owned by user
         supabase
@@ -74,11 +74,12 @@ export function GameProvider({ children }: { children: ReactNode }) {
           .select('*')
           .eq('owner_user_id', user.id)
           .in('status', ['draft', 'pre_market', 'open', 'closed']),
-        // Games where user is participant
+        // Games where user is ACTIVE participant (not pending)
         supabase
           .from('participants')
           .select('games(*)')
           .eq('user_id', user.id)
+          .eq('status', 'active')
       ]);
 
       const ownedGames = ownedGamesRes.data || [];

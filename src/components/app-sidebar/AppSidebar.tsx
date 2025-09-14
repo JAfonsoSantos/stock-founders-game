@@ -8,8 +8,6 @@ import { useI18n } from "@/hooks/useI18n";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { toast } from "sonner";
-import { SelectActiveGameModal } from "@/components/modals/SelectActiveGameModal";
-import { useState } from "react";
 
 export function AppSidebar() {
   const { currentGameId, activeGames } = useGameContext();
@@ -17,28 +15,10 @@ export function AppSidebar() {
   const { t } = useI18n();
   const { user, signOut } = useAuth();
   const { profile, displayName, initials } = useUserProfile(user);
-  const [showGameModal, setShowGameModal] = useState(false);
 
   const handleGameNavigation = () => {
-    console.log('Games button clicked!', { currentGameId, activeGamesCount: activeGames.length, activeGames: activeGames.map(g => ({id: g.id, name: g.name})) });
-    
-    if (!currentGameId && activeGames.length === 0) {
-      console.log('No active games, showing toast');
-      toast.info(t('sidebar.noActiveGames'));
-      navigate('/');
-      return;
-    }
-
-    if (currentGameId) {
-      console.log('Has current game, navigating to:', currentGameId);
-      navigate(`/games/${currentGameId}/discover`);
-    } else if (activeGames.length === 1) {
-      console.log('Has exactly 1 game, navigating to:', activeGames[0].id);
-      navigate(`/games/${activeGames[0].id}/discover`);
-    } else {
-      console.log('Multiple games, showing modal');
-      setShowGameModal(true);
-    }
+    // Always navigate to games list page
+    navigate('/games');
   };
 
   const handleTransactionsNavigation = () => {
@@ -53,7 +33,8 @@ export function AppSidebar() {
     } else if (activeGames.length === 1) {
       navigate(`/games/${activeGames[0].id}/me`);
     } else {
-      setShowGameModal(true);
+      // If multiple games, navigate to games page to select one
+      navigate('/games');
     }
   };
 
@@ -199,12 +180,6 @@ export function AppSidebar() {
         </SidebarContent>
 
       </Sidebar>
-
-      {/* Game Selection Modal */}
-      <SelectActiveGameModal 
-        open={showGameModal}
-        onOpenChange={setShowGameModal}
-      />
     </TooltipProvider>
   );
 }

@@ -13,6 +13,7 @@ import Dashboard from "./pages/Dashboard";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
+import Games from "./pages/Games";
 import MyVentures from "./pages/MyVentures";
 import CreateGame from "./pages/CreateGame";
 import GameOrganizer from "./pages/GameOrganizer";
@@ -122,6 +123,11 @@ const App = () => (
               <Route path="/settings" element={
                 <ProtectedShellRoute>
                   <Settings />
+                </ProtectedShellRoute>
+              } />
+              <Route path="/games" element={
+                <ProtectedShellRoute>
+                  <Games />
                 </ProtectedShellRoute>
               } />
               <Route path="/my-ventures" element={
