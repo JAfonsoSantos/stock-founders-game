@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAuth } from "@/hooks/useAuth";
+import { useGameContext } from "@/context/GameContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
@@ -93,6 +94,7 @@ export function NotificationBell() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [open, setOpen] = useState(false);
   const { user } = useAuth();
+  const { refreshActiveGames } = useGameContext();
 
   useEffect(() => {
     if (!user) return;
@@ -100,24 +102,33 @@ export function NotificationBell() {
     // Load existing notifications
     loadNotifications();
 
-    // Set up real-time subscription for new notifications
-    const channel = supabase
-      .channel(`notifications_${user.id}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'notifications'
-        },
-        (payload) => {
-          const newNotification = payload.new as Notification;
-          if (newNotification.to_participant_id === user.id) {
-            setNotifications(prev => [newNotification, ...prev]);
-            setUnreadCount(prev => prev + 1);
+      // Set up real-time subscription for new notifications
+      const channel = supabase
+        .channel(`notifications_${user.id}`)
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'notifications'
+          },
+          async (payload) => {
+            const newNotification = payload.new as Notification;
             
-            const content = getNotificationContent(newNotification);
-            // Show toast for new notification
+            // Get user's participant IDs to check if notification is for them
+            const { data: participants } = await supabase
+              .from('participants')
+              .select('id')
+              .eq('user_id', user.id);
+            
+            const participantIds = participants?.map(p => p.id) || [];
+            
+            if (participantIds.includes(newNotification.to_participant_id)) {
+              setNotifications(prev => [newNotification, ...prev]);
+              setUnreadCount(prev => prev + 1);
+              
+              const content = getNotificationContent(newNotification);
+              // Show toast for new notification
             toast(content.title, {
               description: content.message,
               action: {
@@ -263,8 +274,8 @@ export function NotificationBell() {
         description: `You've joined "${notification.payload?.game_name}"`
       });
 
-      // Refresh the page to update active games
-      window.location.reload();
+      // Refresh active games
+      await refreshActiveGames();
     } catch (error) {
       console.error('Error accepting game invitation:', error);
       toast.error('Failed to accept invitation');
@@ -284,6 +295,9 @@ export function NotificationBell() {
       setUnreadCount(prev => Math.max(0, prev - 1));
 
       toast.success('Game invitation declined');
+      
+      // Refresh active games
+      await refreshActiveGames();
     } catch (error) {
       console.error('Error refusing game invitation:', error);
       toast.error('Failed to decline invitation');
