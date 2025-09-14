@@ -72,7 +72,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
           .from('games')
           .select('*')
           .eq('owner_user_id', user.id)
-          .in('status', ['pre_market', 'open', 'closed']),
+          .in('status', ['draft', 'pre_market', 'open', 'closed']),
         supabase
           .from('participants')
           .select('games(*)')
@@ -83,7 +83,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       const participatedGames = (participationsRes.data || [])
         .map(p => p.games)
         .filter((game): game is any => 
-          game !== null && ['pre_market', 'open', 'closed'].includes(game.status)
+          game !== null && ['draft', 'pre_market', 'open', 'closed'].includes(game.status)
         );
 
       // Combine and deduplicate
