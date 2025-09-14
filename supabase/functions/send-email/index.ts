@@ -118,7 +118,8 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    console.log(`Processing email request from user ${user.id} for game ${emailRequest.gameId}`);
+    console.log(`Processing ${emailRequest.type} email request from user ${user.id} for game ${emailRequest.gameId}`);
+    console.log(`Recipients: ${emailRequest.to.join(', ')}`);
 
     // Verify user is the game owner
     const { data: game, error: gameError } = await supabaseUser
@@ -284,8 +285,15 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     console.log("Email sent successfully:", emailResponse);
+    console.log(`Successfully sent ${emailRequest.type} email to: ${emailRequest.to.join(', ')}`);
 
-    return new Response(JSON.stringify(emailResponse), {
+    return new Response(JSON.stringify({
+      success: true,
+      messageId: emailResponse.data?.id,
+      type: emailRequest.type,
+      recipients: emailRequest.to,
+      message: `Email sent successfully to ${emailRequest.to.length} recipient(s)`
+    }), {
       status: 200,
       headers: {
         "Content-Type": "application/json",
@@ -294,8 +302,19 @@ const handler = async (req: Request): Promise<Response> => {
     });
   } catch (error: any) {
     console.error("Error in send-email function:", error);
+    console.error("Error details:", {
+      message: error.message,
+      stack: error.stack,
+      emailType: emailRequest?.type || 'unknown',
+      recipients: emailRequest?.to || []
+    });
+    
     return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
+      JSON.stringify({ 
+        error: error.message || 'Internal server error',
+        type: emailRequest?.type || 'unknown',
+        recipients: emailRequest?.to || []
+      }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },

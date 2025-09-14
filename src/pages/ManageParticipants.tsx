@@ -162,14 +162,14 @@ export default function ManageParticipants() {
         return;
       }
 
-      // Send invitation email (demo: sends to game owner's email)
+      // Send invitation email to the actual participant
       try {
-        const testEmail = user?.email || 'test@example.com';
-        await sendInviteEmail([testEmail], gameId!, gameInfo.name, gameInfo.locale);
-        toast.success(`Participant added! Demo invitation sent to ${testEmail} (would be sent to ${newParticipant.email} in production)`);
+        console.log(`Sending invitation email to: ${newParticipant.email}`);
+        await sendInviteEmail([newParticipant.email], gameId!, gameInfo.name, gameInfo.locale);
+        toast.success(`Participant ${newParticipant.first_name} ${newParticipant.last_name} added and invitation sent to ${newParticipant.email}!`);
       } catch (emailError) {
         console.error('Email sending failed:', emailError);
-        toast.success(`Participant added! (Note: Email invitation failed to send)`);
+        toast.success(`Participant added successfully! (Note: Email invitation failed to send - ${emailError})`);
       }
       
       setShowAddModal(false);
