@@ -7,9 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Loader2, ArrowLeft, Building, ExternalLink, DollarSign, TrendingUp, Users, Settings } from "lucide-react";
+import { Loader2, ArrowLeft, Building, ExternalLink, DollarSign, TrendingUp, Users, Settings, UserCircle } from "lucide-react";
 import { toast } from "sonner";
 import InvestModal from "@/components/InvestModal";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function VentureProfile() {
   const { gameId, slug } = useParams();
@@ -20,6 +21,7 @@ export default function VentureProfile() {
   const [participant, setParticipant] = useState<any>(null);
   const [pendingOrders, setPendingOrders] = useState<any[]>([]);
   const [recentTrades, setRecentTrades] = useState<any[]>([]);
+  const [teamMembers, setTeamMembers] = useState<any[]>([]);
   const [isFounder, setIsFounder] = useState(false);
   const [showInvestModal, setShowInvestModal] = useState(false);
 
@@ -114,6 +116,24 @@ export default function VentureProfile() {
           .limit(10);
 
         setRecentTrades(tradesData || []);
+
+        // Get team members (founder members) for this venture
+        const { data: teamData } = await supabase
+          .from("founder_members")
+          .select(`
+            *,
+            participant:participants!participant_id (
+              user:users!user_id (
+                first_name,
+                last_name,
+                avatar_url
+              )
+            )
+          `)
+          .eq("venture_id", ventureData.id)
+          .order("created_at", { ascending: true });
+
+        setTeamMembers(teamData || []);
 
       } catch (error: any) {
         console.error('Error loading venture:', error);
@@ -323,6 +343,7 @@ export default function VentureProfile() {
         <Tabs defaultValue="trades">
           <TabsList>
             <TabsTrigger value="trades">Recent Trades</TabsTrigger>
+            <TabsTrigger value="team">Team ({teamMembers.length})</TabsTrigger>
             {isFounder && <TabsTrigger value="orders">Pending Orders ({pendingOrders.length})</TabsTrigger>}
           </TabsList>
 
@@ -379,6 +400,55 @@ export default function VentureProfile() {
                         ))}
                       </TableBody>
                     </Table>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="team">
+            <Card>
+              <CardHeader>
+                <CardTitle>Team Members</CardTitle>
+                <CardDescription>The founding team behind this venture</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {teamMembers.length === 0 ? (
+                  <div className="text-center py-8">
+                    <UserCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">No team members added yet</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {teamMembers.map((member) => {
+                      const user = member.participant?.user;
+                      const fullName = user ? `${user.first_name} ${user.last_name}`.trim() : 'Unknown';
+                      const initials = user ? 
+                        `${user.first_name?.[0] || ''}${user.last_name?.[0] || ''}`.toUpperCase() : 
+                        'UN';
+                      
+                      return (
+                        <Card key={member.id} className="p-4">
+                          <div className="flex items-center gap-3">
+                            <Avatar className="h-12 w-12">
+                              <AvatarImage src={user?.avatar_url} alt={fullName} />
+                              <AvatarFallback>{initials}</AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1">
+                              <div className="font-medium">{fullName}</div>
+                              <div className="text-sm text-muted-foreground capitalize">
+                                {member.role === 'owner' ? 'Founder' : member.role}
+                              </div>
+                              {member.can_manage && (
+                                <Badge variant="secondary" className="text-xs mt-1">
+                                  Can Manage
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                        </Card>
+                      );
+                    })}
                   </div>
                 )}
               </CardContent>
