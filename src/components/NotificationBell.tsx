@@ -164,7 +164,8 @@ export function NotificationBell() {
         .from('notifications')
         .select('*')
         .in('to_participant_id', participantIds)
-        .eq('status', 'unread')
+        .in('status', ['unread', 'read'])
+        .not('status', 'in', '(accepted,refused)')
         .order('created_at', { ascending: false })
         .limit(20);
 
@@ -172,7 +173,7 @@ export function NotificationBell() {
 
       if (data) {
         setNotifications(data);
-        setUnreadCount(data.length);
+        setUnreadCount(data.filter(n => n.status === 'unread').length);
       }
     } catch (error) {
       console.error('Error loading notifications:', error);
@@ -366,10 +367,9 @@ export function NotificationBell() {
               {notifications.map((notification) => (
                 <Card
                   key={notification.id}
-                    className={`cursor-pointer transition-all duration-200 hover:shadow-md border-l-4 ${getNotificationColor(notification.type)} ${
-                      notification.status === 'unread' ? 'bg-blue-50/30' : 'bg-white'
-                    }`}
-                    onClick={() => notification.status === 'unread' && markAsRead(notification.id)}
+                  className={`transition-all duration-200 hover:shadow-md border-l-4 ${getNotificationColor(notification.type)} ${
+                    notification.status === 'unread' ? 'bg-blue-50/30' : 'bg-white'
+                  }`}
                 >
                   <CardContent className="p-3">
                     <div className="flex items-start gap-3">
@@ -409,7 +409,7 @@ export function NotificationBell() {
                         </p>
 
                         {/* Game invitation actions */}
-                        {notification.type === 'game_invitation' && notification.status === 'unread' && (
+                        {notification.type === 'game_invitation' && !['accepted', 'refused'].includes(notification.status) && (
                           <div className="flex gap-2 mt-3">
                             <Button
                               size="sm"
