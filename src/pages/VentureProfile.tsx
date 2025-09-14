@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Loader2, ArrowLeft, Building, ExternalLink, DollarSign, TrendingUp, Users, Settings } from "lucide-react";
 import { toast } from "sonner";
-import { InvestModal } from "@/components/InvestModal";
+import InvestModal from "@/components/InvestModal";
 
 export default function VentureProfile() {
   const { gameId, slug } = useParams();
