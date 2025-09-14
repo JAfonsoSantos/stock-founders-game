@@ -11,19 +11,23 @@ export interface EmailRequest {
 
 export async function sendEmail(request: EmailRequest) {
   try {
+    console.log('Sending email request:', { type: request.type, to: request.to, gameId: request.gameId });
+    
     const { data, error } = await supabase.functions.invoke('send-email', {
       body: request
     });
 
     if (error) {
-      console.error('Error sending email:', error);
-      throw error;
+      console.error('Supabase function error:', error);
+      throw new Error(`Email function error: ${error.message || 'Unknown error'}`);
     }
 
+    console.log('Email sent successfully:', data);
     return data;
   } catch (error) {
     console.error('Failed to send email:', error);
-    throw error;
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    throw new Error(`Email sending failed: ${errorMessage}`);
   }
 }
 

@@ -169,7 +169,8 @@ export default function ManageParticipants() {
         toast.success(`Participant ${newParticipant.first_name} ${newParticipant.last_name} added and invitation sent to ${newParticipant.email}!`);
       } catch (emailError) {
         console.error('Email sending failed:', emailError);
-        toast.success(`Participant added successfully! (Note: Email invitation failed to send - ${emailError})`);
+        const errorMessage = emailError instanceof Error ? emailError.message : String(emailError);
+        toast.error(`Participant added, but email failed: ${errorMessage}`);
       }
       
       setShowAddModal(false);
