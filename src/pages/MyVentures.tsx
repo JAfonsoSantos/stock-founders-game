@@ -145,19 +145,19 @@ export default function MyVentures() {
             </p>
           </div>
         </div>
-        <Button onClick={() => navigate('/games/new')}>
+        <Button onClick={() => navigate('/ventures/new')}>
           <Plus className="w-4 h-4 mr-2" />
-          Create New Game
+          Create New Venture
         </Button>
       </div>
 
       {ventures.length === 0 ? (
         <EmptyState
           title="No ventures yet"
-          description="You haven't created or joined any ventures. Join a game to get started!"
+          description="You haven't created any ventures yet. Start by creating your first startup, idea, or project!"
           action={{
-            label: "Browse Games",
-            onClick: () => navigate('/dashboard')
+            label: "Create New Venture",
+            onClick: () => navigate('/ventures/new')
           }}
         />
       ) : (
