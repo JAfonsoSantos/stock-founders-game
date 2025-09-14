@@ -569,21 +569,21 @@ export default function GameOrganizer() {
               <Card
                 role="button"
                 tabIndex={0}
-                onClick={() => navigate(`/games/${gameId}/startups`)}
+                onClick={() => navigate(`/games/${gameId}/ventures`)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") navigate(`/games/${gameId}/startups`);
+                  if (e.key === "Enter") navigate(`/games/${gameId}/ventures`);
                 }}
                 className="cursor-pointer hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white border-gray-100 hover:border-orange-200 group"
-                aria-label="Manage Startups"
+                aria-label="Manage Ventures"
               >
                 <CardContent className="flex items-center p-8">
                   <div className="p-4 bg-blue-50 rounded-xl mr-6 group-hover:bg-blue-100 transition-colors">
                     <Building2 className="h-8 w-8 text-blue-600" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">Manage Startups</h3>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">Manage Ventures</h3>
                     <p className="text-gray-600">
-                      Add and configure startup profiles and share distribution
+                      Add and configure venture profiles and share distribution
                     </p>
                   </div>
                 </CardContent>
