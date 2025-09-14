@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, ArrowLeft, Building2, UserPlus, ExternalLink } from "lucide-react";
+import { Loader2, ArrowLeft, Building2, UserPlus, ExternalLink, RefreshCw } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { EmptyState } from "@/components/EmptyState";
@@ -59,24 +59,32 @@ export default function ManageVentures() {
   const [inviteLoading, setInviteLoading] = useState<string | null>(null);
   const [selectedVentureIdea, setSelectedVentureIdea] = useState<VentureIdea | null>(null);
   const [showInviteDialog, setShowInviteDialog] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   // Fetch venture ideas from participants in this game
   const fetchVentureIdeas = async () => {
     try {
+      console.log("🔍 [ManageVentures] Starting fetchVentureIdeas for gameId:", gameId);
+      console.log("🔍 [ManageVentures] Current user:", user?.id, user?.email);
+      
       // First get all participants in this game
       const { data: participants, error: participantsError } = await supabase
         .from("participants")
         .select("user_id")
         .eq("game_id", gameId);
 
+      console.log("🔍 [ManageVentures] Participants query result:", { participants, participantsError });
+
       if (participantsError) throw participantsError;
 
       if (!participants || participants.length === 0) {
+        console.log("🔍 [ManageVentures] No participants found");
         setVentureIdeas([]);
         return;
       }
 
       const participantUserIds = participants.map(p => p.user_id);
+      console.log("🔍 [ManageVentures] Participant user IDs:", participantUserIds);
 
       // Get venture ideas from these participants
       const { data: ventureIdeasData, error: ventureIdeasError } = await supabase
@@ -84,6 +92,8 @@ export default function ManageVentures() {
         .select("*")
         .in("user_id", participantUserIds)
         .order("created_at", { ascending: false });
+
+      console.log("🔍 [ManageVentures] Venture ideas query result:", { ventureIdeasData, ventureIdeasError });
 
       if (ventureIdeasError) throw ventureIdeasError;
 
@@ -95,6 +105,8 @@ export default function ManageVentures() {
             .select("first_name, last_name, email")
             .eq("id", ventureIdea.user_id)
             .single();
+
+          console.log("🔍 [ManageVentures] User data for venture:", ventureIdea.name, userData);
 
           return {
             ...ventureIdea,
@@ -111,20 +123,38 @@ export default function ManageVentures() {
         .select("slug")
         .eq("game_id", gameId);
 
+      console.log("🔍 [ManageVentures] Existing ventures in game:", { existingVentures, existingVenturesError });
+
       if (existingVenturesError) throw existingVenturesError;
 
       const existingVentureSlugs = new Set(existingVentures?.map(v => v.slug) || []);
+      console.log("🔍 [ManageVentures] Existing venture slugs:", Array.from(existingVentureSlugs));
 
       const ventureIdeasWithStatus = ventureIdeasWithUsers.map(ventureIdea => ({
         ...ventureIdea,
         already_in_game: existingVentureSlugs.has(ventureIdea.slug)
       }));
 
+      console.log("🔍 [ManageVentures] Final venture ideas with status:", ventureIdeasWithStatus);
       setVentureIdeas(ventureIdeasWithStatus);
     } catch (error: any) {
-      console.error('Error fetching venture ideas:', error);
-      toast.error("Failed to fetch venture ideas");
+      console.error('🚨 [ManageVentures] Error fetching venture ideas:', error);
+      console.error('🚨 [ManageVentures] Error details:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      });
+      toast.error("Failed to fetch venture ideas: " + error.message);
     }
+  };
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    console.log("🔄 [ManageVentures] Manual refresh triggered");
+    await fetchVentureIdeas();
+    setRefreshing(false);
+    toast.success("Venture ideas refreshed");
   };
 
   useEffect(() => {
@@ -243,9 +273,20 @@ export default function ManageVentures() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Building2 className="h-5 w-5" />
-            Available Venture Ideas ({ventureIdeas.length})
+          <CardTitle className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <Building2 className="h-5 w-5" />
+              Available Venture Ideas ({ventureIdeas.length})
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={refreshing}
+            >
+              <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+              {refreshing ? 'Refreshing...' : 'Refresh'}
+            </Button>
           </CardTitle>
           <CardDescription>
             Venture ideas from participants in this game that you can invite to join
