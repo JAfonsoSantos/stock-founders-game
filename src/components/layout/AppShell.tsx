@@ -19,7 +19,7 @@ export function AppShell({ children }: AppShellProps) {
       )}>
         <div className="flex flex-1 relative overflow-hidden">
           <AppSidebar />
-          <div className="flex-1 flex flex-col md:pl-16 overflow-hidden">
+          <div className="flex-1 flex flex-col pl-16 overflow-hidden">
             <Header />
             <main className={cn(
               "flex-1 bg-background overflow-auto",
