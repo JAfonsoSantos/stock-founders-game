@@ -20,6 +20,8 @@ interface Game {
   ends_at: string;
   currency: string;
   created_at: string;
+  logo_url?: string;
+  hero_image_url?: string;
 }
 
 interface Participation {
@@ -99,6 +101,17 @@ export default function Dashboard() {
     }
   };
 
+  // Get active games (pre_market or open status)
+  const activeOwnedGames = ownedGames.filter(game => 
+    game.status === 'pre_market' || game.status === 'open'
+  );
+  
+  const activeParticipations = participations.filter(participation => 
+    participation.games.status === 'pre_market' || participation.games.status === 'open'
+  );
+  
+  const hasActiveGames = activeOwnedGames.length > 0 || activeParticipations.length > 0;
+
   const handleDemoClick = () => {
     setShowInDevelopmentModal(true);
   };
@@ -170,6 +183,151 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Active Games Section */}
+        {hasActiveGames && (
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Active Games</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Active Owned Games */}
+              {activeOwnedGames.map((game) => (
+                <Card key={`owned-${game.id}`} className="overflow-hidden hover:shadow-lg transition-all duration-200 hover:scale-[1.02] group bg-white border-gray-200">
+                  <div 
+                    className="relative h-32 bg-gradient-to-br from-orange-100 to-orange-50"
+                    style={game.hero_image_url ? {
+                      backgroundImage: `url(${game.hero_image_url})`,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center'
+                    } : {}}
+                  >
+                    <div className="absolute inset-0 bg-black/20"></div>
+                    {game.logo_url && (
+                      <div className="absolute top-3 left-3">
+                        <img 
+                          src={game.logo_url} 
+                          alt={`${game.name} logo`}
+                          className="w-10 h-10 rounded-lg bg-white p-1 shadow-sm"
+                        />
+                      </div>
+                    )}
+                    <div className="absolute top-3 right-3">
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(game.status)}`}>
+                        {game.status === 'pre_market' ? 'PRE-MARKET' : 'LIVE'}
+                      </span>
+                    </div>
+                    <div className="absolute bottom-3 left-3">
+                      <span className="text-xs bg-blue-600 text-white px-2 py-1 rounded-full font-medium">OWNER</span>
+                    </div>
+                  </div>
+                  <CardContent className="p-4">
+                    <h3 className="font-semibold text-gray-900 mb-2 truncate">{game.name}</h3>
+                    <p className="text-sm text-gray-600 mb-3">
+                      {new Date(game.starts_at).toLocaleDateString()} • {game.currency}
+                    </p>
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => navigate(`/games/${game.id}`)}
+                        className="flex-1 text-xs"
+                      >
+                        View Profile
+                      </Button>
+                      {game.status === 'open' ? (
+                        <Button 
+                          size="sm"
+                          onClick={() => navigate(`/games/${game.id}/discover`)}
+                          className="flex-1 bg-green-600 hover:bg-green-700 text-white text-xs"
+                        >
+                          Trade
+                        </Button>
+                      ) : (
+                        <Button 
+                          size="sm"
+                          onClick={() => navigate(`/games/${game.id}/organizer`)}
+                          className="flex-1 bg-[#FF6B35] hover:bg-[#E55A2B] text-white text-xs"
+                        >
+                          Manage
+                        </Button>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+
+              {/* Active Participations */}
+              {activeParticipations.map((participation) => (
+                <Card key={`participation-${participation.id}`} className="overflow-hidden hover:shadow-lg transition-all duration-200 hover:scale-[1.02] group bg-white border-gray-200">
+                  <div 
+                    className="relative h-32 bg-gradient-to-br from-blue-100 to-blue-50"
+                    style={participation.games.hero_image_url ? {
+                      backgroundImage: `url(${participation.games.hero_image_url})`,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center'
+                    } : {}}
+                  >
+                    <div className="absolute inset-0 bg-black/20"></div>
+                    {participation.games.logo_url && (
+                      <div className="absolute top-3 left-3">
+                        <img 
+                          src={participation.games.logo_url} 
+                          alt={`${participation.games.name} logo`}
+                          className="w-10 h-10 rounded-lg bg-white p-1 shadow-sm"
+                        />
+                      </div>
+                    )}
+                    <div className="absolute top-3 right-3">
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(participation.games.status)}`}>
+                        {participation.games.status === 'pre_market' ? 'PRE-MARKET' : 'LIVE'}
+                      </span>
+                    </div>
+                    <div className="absolute bottom-3 left-3">
+                      <span className={`text-xs px-2 py-1 rounded-full font-medium text-white ${
+                        participation.role === 'vc' ? 'bg-purple-600' : 
+                        participation.role === 'angel' ? 'bg-yellow-600' : 'bg-green-600'
+                      }`}>
+                        {participation.role.toUpperCase()}
+                      </span>
+                    </div>
+                  </div>
+                  <CardContent className="p-4">
+                    <h3 className="font-semibold text-gray-900 mb-1 truncate">{participation.games.name}</h3>
+                    <p className="text-xs text-gray-600 mb-3">
+                      {participation.games.currency} {participation.current_cash.toLocaleString()} available
+                    </p>
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => navigate(`/games/${participation.games.id}`)}
+                        className="flex-1 text-xs"
+                      >
+                        View Profile
+                      </Button>
+                      {participation.games.status === 'open' ? (
+                        <Button 
+                          size="sm"
+                          onClick={() => navigate(`/games/${participation.games.id}/discover`)}
+                          className="flex-1 bg-green-600 hover:bg-green-700 text-white text-xs"
+                        >
+                          Trade
+                        </Button>
+                      ) : (
+                        <Button 
+                          size="sm"
+                          onClick={() => navigate(`/games/${participation.games.id}/me`)}
+                          className="flex-1 bg-[#FF6B35] hover:bg-[#E55A2B] text-white text-xs"
+                        >
+                          Portfolio
+                        </Button>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Templates Section */}
         <div className="mb-12">
