@@ -106,8 +106,11 @@ export default function Dashboard() {
     game.status === 'pre_market' || game.status === 'open'
   );
   
+  // Include draft games for participants so they can see games they're invited to
   const activeParticipations = participations.filter(participation => 
-    participation.games.status === 'pre_market' || participation.games.status === 'open'
+    participation.games.status === 'draft' || 
+    participation.games.status === 'pre_market' || 
+    participation.games.status === 'open'
   );
   
   const hasActiveGames = activeOwnedGames.length > 0 || activeParticipations.length > 0;
@@ -212,7 +215,7 @@ export default function Dashboard() {
                     )}
                     <div className="absolute top-3 right-3">
                       <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(game.status)}`}>
-                        {game.status === 'pre_market' ? 'PRE-MARKET' : 'LIVE'}
+                        {game.status === 'draft' ? 'DRAFT' : game.status === 'pre_market' ? 'PRE-MARKET' : 'LIVE'}
                       </span>
                     </div>
                     <div className="absolute bottom-3 left-3">
@@ -278,7 +281,8 @@ export default function Dashboard() {
                     )}
                     <div className="absolute top-3 right-3">
                       <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(participation.games.status)}`}>
-                        {participation.games.status === 'pre_market' ? 'PRE-MARKET' : 'LIVE'}
+                        {participation.games.status === 'draft' ? 'EM PREPARAÇÃO' : 
+                         participation.games.status === 'pre_market' ? 'PRE-MARKET' : 'LIVE'}
                       </span>
                     </div>
                     <div className="absolute bottom-3 left-3">
@@ -311,6 +315,14 @@ export default function Dashboard() {
                           className="flex-1 bg-green-600 hover:bg-green-700 text-white text-xs"
                         >
                           Trade
+                        </Button>
+                      ) : participation.games.status === 'draft' ? (
+                        <Button 
+                          size="sm"
+                          onClick={() => navigate(`/games/${participation.games.id}`)}
+                          className="flex-1 bg-gray-500 hover:bg-gray-600 text-white text-xs"
+                        >
+                          Aguardar
                         </Button>
                       ) : (
                         <Button 
