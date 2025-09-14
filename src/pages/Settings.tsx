@@ -5,17 +5,28 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Globe, Palette, Smartphone, Moon, Sun, Monitor } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ArrowLeft, Globe, Palette, Smartphone, Moon, Sun, Monitor, Shield, Trash2, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useI18n, SUPPORTED_LOCALES } from "@/hooks/useI18n";
 import { useSettings } from "@/hooks/useSettings";
+import { useAuth } from "@/hooks/useAuth";
+import { AdminDeleteUsers } from "@/components/AdminDeleteUsers";
+import { AdminDeleteStartups } from "@/components/AdminDeleteStartups";
 import { toast } from "sonner";
 
 export default function Settings() {
   const navigate = useNavigate();
   const { t, locale, setLocale } = useI18n();
   const { compactMode, setCompactMode, theme, setTheme, resolvedTheme } = useSettings();
+  const { user } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
+  const [activeTab, setActiveTab] = useState("general");
+  const [showDeleteUsers, setShowDeleteUsers] = useState(false);
+  const [showDeleteStartups, setShowDeleteStartups] = useState(false);
+
+  // Check if user is admin
+  const isAdmin = user?.email === "joseafonsosantos@gmail.com";
 
   const handleSaveSettings = async () => {
     setIsSaving(true);
@@ -40,6 +51,14 @@ export default function Settings() {
 
   const currentLocale = SUPPORTED_LOCALES.find(l => l.code === locale);
 
+  if (showDeleteUsers) {
+    return <AdminDeleteUsers />;
+  }
+
+  if (showDeleteStartups) {
+    return <AdminDeleteStartups />;
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -63,11 +82,17 @@ export default function Settings() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8 max-w-2xl">
-        <div className="space-y-6">
-          
-          {/* Language Settings */}
-          <Card>
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-3">
+            <TabsTrigger value="general">Geral</TabsTrigger>
+            <TabsTrigger value="appearance">Aparência</TabsTrigger>
+            {isAdmin && <TabsTrigger value="admin">Admin</TabsTrigger>}
+          </TabsList>
+
+          <TabsContent value="general" className="space-y-6">
+            {/* Language Settings */}
+            <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Globe className="h-5 w-5 text-primary" />
@@ -110,9 +135,11 @@ export default function Settings() {
               </div>
             </CardContent>
           </Card>
+          </TabsContent>
 
-          {/* Appearance Settings */}
-          <Card>
+          <TabsContent value="appearance" className="space-y-6">
+            {/* Appearance Settings */}
+            <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Palette className="h-5 w-5 text-primary" />
@@ -247,7 +274,44 @@ export default function Settings() {
               )}
             </Button>
           </div>
-        </div>
+          </TabsContent>
+
+          {isAdmin && (
+            <TabsContent value="admin" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Shield className="h-5 w-5 text-primary" />
+                    Administração
+                  </CardTitle>
+                  <CardDescription>
+                    Ferramentas de administração do sistema
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Button
+                      variant="destructive"
+                      onClick={() => setShowDeleteUsers(true)}
+                      className="gap-2 h-20 flex-col"
+                    >
+                      <Users className="h-6 w-6" />
+                      <span>Delete Users</span>
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={() => setShowDeleteStartups(true)}
+                      className="gap-2 h-20 flex-col"
+                    >
+                      <Trash2 className="h-6 w-6" />
+                      <span>Delete Startups</span>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          )}
+        </Tabs>
       </div>
     </div>
   );
