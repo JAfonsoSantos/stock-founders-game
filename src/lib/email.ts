@@ -16,26 +16,57 @@ export async function sendEmail(request: EmailRequest) {
     // Get the current session to ensure we're authenticated
     const { data: { session } } = await supabase.auth.getSession();
     console.log('Auth session exists:', !!session);
-    console.log('User ID:', session?.user?.id);
     
-    const { data, error } = await supabase.functions.invoke('send-email', {
-      body: request,
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    });
-
-    console.log('Function invoke result:', { data, error });
-
-    if (error) {
-      console.error('Supabase function error:', error);
-      throw new Error(`Email function error: ${error.message || 'Unknown error'}`);
+    if (!session) {
+      throw new Error('User not authenticated');
     }
+    
+    console.log('User ID:', session.user.id);
+    
+    // Try to invoke the function with timeout and retry logic
+    let lastError;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        console.log(`Attempt ${attempt}: Invoking send-email function...`);
+        
+        const result = await Promise.race([
+          supabase.functions.invoke('send-email', {
+            body: request,
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${session.access_token}`
+            }
+          }),
+          new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Request timeout after 30 seconds')), 30000)
+          )
+        ]) as { data: any; error: any };
 
-    console.log('Email sent successfully:', data);
-    return data;
+        const { data, error } = result;
+
+        console.log('Function invoke result:', { data, error });
+
+        if (error) {
+          console.error('Supabase function error:', error);
+          throw new Error(`Email function error: ${error.message || 'Unknown error'}`);
+        }
+
+        console.log('Email sent successfully:', data);
+        return data;
+      } catch (attemptError) {
+        lastError = attemptError;
+        console.error(`Attempt ${attempt} failed:`, attemptError);
+        
+        if (attempt < 3) {
+          console.log(`Waiting 2 seconds before retry...`);
+          await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+      }
+    }
+    
+    throw lastError;
   } catch (error) {
-    console.error('Failed to send email:', error);
+    console.error('Failed to send email after all attempts:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     throw new Error(`Email sending failed: ${errorMessage}`);
   }
