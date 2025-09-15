@@ -420,53 +420,53 @@ export default function Dashboard() {
     
     return (
       <Card 
-        className="mb-12 hover:shadow-lg transition-all duration-200"
+        className="mb-6 lg:mb-12 hover:shadow-lg transition-all duration-200"
       >
-        <CardContent className="p-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+        <CardContent className="p-4 lg:p-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8 items-center">
             {/* Info Section */}
             <div>
-              <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">{game.name}</h2>
+              <h2 className="text-xl lg:text-3xl xl:text-4xl font-bold text-gray-900 mb-2">{game.name}</h2>
               
               {game.status !== 'open' && (
-                <div className="flex items-center gap-2 text-lg text-orange-600 font-semibold mb-4">
-                  <Clock className="h-5 w-5" />
+                <div className="flex items-center gap-2 text-sm lg:text-lg text-orange-600 font-semibold mb-3 lg:mb-4">
+                  <Clock className="h-4 w-4 lg:h-5 lg:w-5" />
                   {timeLeft}
                 </div>
               )}
               
               {game.status === 'open' && (
-                <div className="flex items-center gap-2 text-lg text-green-600 font-semibold mb-4">
-                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                <div className="flex items-center gap-2 text-sm lg:text-lg text-green-600 font-semibold mb-3 lg:mb-4">
+                  <div className="w-2 h-2 lg:w-3 lg:h-3 bg-green-500 rounded-full"></div>
                   Evento ativo!
                 </div>
               )}
               
               {userVenture && (
-                <div className="flex items-center gap-3 mb-4 p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center gap-2 lg:gap-3 mb-3 lg:mb-4 p-2 lg:p-3 bg-gray-50 rounded-lg">
                   {userVenture.logo_url && (
                     <img 
                       src={userVenture.logo_url} 
                       alt={userVenture.name}
-                      className="w-10 h-10 rounded-full object-cover"
+                      className="w-8 h-8 lg:w-10 lg:h-10 rounded-full object-cover"
                     />
                   )}
                   <div>
-                    <span className="text-sm text-gray-600">Your venture:</span>
-                    <p className="font-semibold text-gray-900">{userVenture.name}</p>
+                    <span className="text-xs lg:text-sm text-gray-600">Your venture:</span>
+                    <p className="font-semibold text-sm lg:text-base text-gray-900">{userVenture.name}</p>
                   </div>
                 </div>
               )}
               
-              <div className="flex items-center gap-4 mb-6">
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(game.status)}`}>
+              <div className="flex flex-wrap items-center gap-2 lg:gap-4 mb-4 lg:mb-6">
+                <span className={`px-2 lg:px-3 py-1 rounded-full text-xs lg:text-sm font-medium ${getStatusColor(game.status)}`}>
                   {game.status === 'draft' ? 'RASCUNHO' : 
                    game.status === 'pre_market' ? 'PRE-MARKET' : 
                    game.status === 'open' ? 'ABERTO' : game.status.toUpperCase()}
                 </span>
                 
                 {game.participationData && (
-                  <span className={`text-sm px-3 py-1 rounded-full font-medium text-white ${
+                  <span className={`text-xs lg:text-sm px-2 lg:px-3 py-1 rounded-full font-medium text-white ${
                     game.participationData.role === 'vc' ? 'bg-purple-600' : 
                     game.participationData.role === 'angel' ? 'bg-yellow-600' : 'bg-green-600'
                   }`}>
@@ -479,16 +479,16 @@ export default function Dashboard() {
                 )}
               </div>
               
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 lg:gap-2">
                 {actionButtons.map((button, index) => (
                   <Button 
                     key={index}
-                    size={button.iconOnly ? "icon" : "default"}
+                    size={button.iconOnly ? "icon" : "sm"}
                     variant={button.variant}
                     className={`
                       ${button.variant === 'default' ? "bg-[#FF6B35] hover:bg-[#E55A2B] text-white" : ""}
-                      ${!button.iconOnly && index < 2 ? "flex-1 min-w-0 max-w-[140px]" : ""}
-                      ${button.iconOnly ? "flex-shrink-0" : ""}
+                      ${!button.iconOnly && index < 2 ? "flex-1 min-w-0 text-xs lg:text-sm" : ""}
+                      ${button.iconOnly ? "flex-shrink-0 w-8 h-8 lg:w-10 lg:h-10" : "h-8 lg:h-10"}
                     `}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -496,7 +496,7 @@ export default function Dashboard() {
                     }}
                     title={button.iconOnly ? button.text : undefined}
                   >
-                    <button.icon className={button.iconOnly ? "h-4 w-4" : "h-4 w-4 mr-2"} />
+                    <button.icon className={button.iconOnly ? "h-3 w-3 lg:h-4 lg:w-4" : "h-3 w-3 lg:h-4 lg:w-4 mr-1 lg:mr-2"} />
                     {!button.iconOnly && button.text}
                   </Button>
                 ))}
@@ -504,29 +504,29 @@ export default function Dashboard() {
             </div>
             
             {/* Visual Section */}
-            <div className="relative">
+            <div className="relative mt-4 lg:mt-0">
               {game.hero_image_url ? (
                 <div 
-                  className="bg-gradient-to-br from-orange-100 to-orange-50 rounded-xl h-64 bg-cover bg-center"
+                  className="bg-gradient-to-br from-orange-100 to-orange-50 rounded-xl h-40 lg:h-64 bg-cover bg-center"
                   style={{ backgroundImage: `url(${game.hero_image_url})` }}
                 >
                   <div className="absolute inset-0 bg-black/10 rounded-xl"></div>
                 </div>
               ) : (
-                <div className="bg-gradient-to-br from-orange-100 to-orange-50 rounded-xl p-6 h-64 flex items-center justify-center">
+                <div className="bg-gradient-to-br from-orange-100 to-orange-50 rounded-xl p-4 lg:p-6 h-40 lg:h-64 flex items-center justify-center">
                   <div className="text-center">
-                    <TrendingUp className="h-16 w-16 text-orange-600 mx-auto mb-4" />
-                    <p className="text-gray-600 font-medium">Investment Simulation</p>
+                    <TrendingUp className="h-8 w-8 lg:h-16 lg:w-16 text-orange-600 mx-auto mb-2 lg:mb-4" />
+                    <p className="text-sm lg:text-base text-gray-600 font-medium">Investment Simulation</p>
                   </div>
                 </div>
               )}
               
               {game.logo_url && (
-                <div className="absolute top-4 left-4">
+                <div className="absolute top-2 left-2 lg:top-4 lg:left-4">
                   <img 
                     src={game.logo_url} 
                     alt={`${game.name} logo`}
-                    className="w-12 h-12 rounded-lg bg-white p-2 shadow-md"
+                    className="w-8 h-8 lg:w-12 lg:h-12 rounded-lg bg-white p-1 lg:p-2 shadow-md"
                   />
                 </div>
               )}
@@ -547,41 +547,41 @@ export default function Dashboard() {
 
   return (
     <div className="bg-gray-50 min-h-full">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-0 py-4 lg:py-8">
         {/* Single Active Game Card - appears first if applicable */}
         {shouldShowSingleGameCard && (
           <SingleActiveGameCard game={priorityGame} />
         )}
         
         {/* Hero Section - appears after single game card or first if no single game */}
-        <div className="mb-12">
+        <div className="mb-6 lg:mb-12">
           <Card className="bg-white border-gray-200 shadow-sm">
-            <CardContent className="p-8">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+            <CardContent className="p-4 lg:p-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8 items-center">
                 <div>
-                  <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+                  <h1 className="text-2xl lg:text-4xl xl:text-5xl font-bold text-gray-900 mb-3 lg:mb-4">
                     Build your startup investment portfolio
                   </h1>
-                  <p className="text-lg text-gray-600 mb-6">
+                  <p className="text-sm lg:text-lg text-gray-600 mb-4 lg:mb-6">
                     Create games, discover startups, and simulate investment strategies in a realistic market environment.
                   </p>
-                  <div className="flex flex-col sm:flex-row gap-3">
+                  <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
                     <Button 
                       onClick={() => navigate("/games/new")} 
-                      className="bg-[#FF6B35] hover:bg-[#E55A2B] text-white px-6 py-3"
-                      size="lg"
+                      className="bg-[#FF6B35] hover:bg-[#E55A2B] text-white px-4 lg:px-6 py-2 lg:py-3 h-9 lg:h-11"
+                      size="sm"
                     >
-                      <Plus className="h-5 w-5 mr-2" />
+                      <Plus className="h-4 w-4 lg:h-5 lg:w-5 mr-1 lg:mr-2" />
                       Create New Game
                     </Button>
                     <Button 
                       variant="surface" 
                       onClick={handleDemoClick}
-                      size="lg"
+                      size="sm"
                       disabled
-                      className="opacity-60 cursor-not-allowed"
+                      className="opacity-60 cursor-not-allowed h-9 lg:h-11"
                     >
-                      <Play className="h-5 w-5 mr-2" />
+                      <Play className="h-4 w-4 lg:h-5 lg:w-5 mr-1 lg:mr-2" />
                       Try Demo Game
                     </Button>
                   </div>
@@ -601,14 +601,14 @@ export default function Dashboard() {
 
         {/* Active Games Section - only show if NOT single game scenario */}
         {hasActiveGames && !shouldShowSingleGameCard && (
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Active Games</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="mb-6 lg:mb-12">
+            <h2 className="text-xl lg:text-2xl font-bold text-gray-900 mb-4 lg:mb-6">Active Games</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
               {/* Active Owned Games */}
               {activeOwnedGames.map((game) => (
                 <Card key={`owned-${game.id}`} className="overflow-hidden hover:shadow-lg transition-all duration-200 hover:scale-[1.02] group bg-white border-gray-200">
                   <div 
-                    className="relative h-32 bg-gradient-to-br from-orange-100 to-orange-50"
+                    className="relative h-24 lg:h-32 bg-gradient-to-br from-orange-100 to-orange-50"
                     style={game.hero_image_url ? {
                       backgroundImage: `url(${game.hero_image_url})`,
                       backgroundSize: 'cover',
@@ -617,34 +617,34 @@ export default function Dashboard() {
                   >
                     <div className="absolute inset-0 bg-black/20"></div>
                     {game.logo_url && (
-                      <div className="absolute top-3 left-3">
+                      <div className="absolute top-2 left-2 lg:top-3 lg:left-3">
                         <img 
                           src={game.logo_url} 
                           alt={`${game.name} logo`}
-                          className="w-10 h-10 rounded-lg bg-white p-1 shadow-sm"
+                          className="w-6 h-6 lg:w-10 lg:h-10 rounded-lg bg-white p-0.5 lg:p-1 shadow-sm"
                         />
                       </div>
                     )}
-                    <div className="absolute top-3 right-3">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(game.status)}`}>
+                    <div className="absolute top-2 right-2 lg:top-3 lg:right-3">
+                      <span className={`px-2 py-0.5 lg:px-3 lg:py-1 rounded-full text-xs font-medium ${getStatusColor(game.status)}`}>
                         {game.status === 'draft' ? 'DRAFT' : game.status === 'pre_market' ? 'PRE-MARKET' : 'LIVE'}
                       </span>
                     </div>
-                    <div className="absolute bottom-3 left-3">
-                      <span className="text-xs bg-blue-600 text-white px-2 py-1 rounded-full font-medium">OWNER</span>
+                    <div className="absolute bottom-2 left-2 lg:bottom-3 lg:left-3">
+                      <span className="text-xs bg-blue-600 text-white px-1.5 py-0.5 lg:px-2 lg:py-1 rounded-full font-medium">OWNER</span>
                     </div>
                   </div>
-                  <CardContent className="p-4">
-                    <h3 className="font-semibold text-gray-900 mb-2 truncate">{game.name}</h3>
-                    <p className="text-sm text-gray-600 mb-3">
+                  <CardContent className="p-3 lg:p-4">
+                    <h3 className="font-semibold text-sm lg:text-base text-gray-900 mb-1 lg:mb-2 truncate">{game.name}</h3>
+                    <p className="text-xs lg:text-sm text-gray-600 mb-2 lg:mb-3">
                       {new Date(game.starts_at).toLocaleDateString()} • {game.currency}
                     </p>
-                    <div className="flex gap-2">
+                    <div className="flex gap-1 lg:gap-2">
                       <Button 
                         variant="outline" 
                         size="sm"
                         onClick={() => navigate(`/games/${game.id}/preview`)}
-                        className="flex-1 text-xs"
+                        className="flex-1 text-xs h-7 lg:h-8"
                       >
                         View Profile
                       </Button>
