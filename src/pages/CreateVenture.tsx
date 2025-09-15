@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useI18n } from "@/hooks/useI18n";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,6 +17,9 @@ export default function CreateVenture() {
   const { user } = useAuth();
   const { t } = useI18n();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const fromVentureId = searchParams.get('from');
+  const isEditing = !!fromVentureId;
   
   const [formData, setFormData] = useState({
     name: "",
@@ -27,6 +30,41 @@ export default function CreateVenture() {
     logo_url: ""
   });
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(isEditing);
+
+  useEffect(() => {
+    if (fromVentureId && user) {
+      loadVentureIdea(fromVentureId);
+    }
+  }, [fromVentureId, user]);
+
+  const loadVentureIdea = async (id: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('venture_ideas')
+        .select('*')
+        .eq('id', id)
+        .eq('user_id', user!.id)
+        .single();
+
+      if (error) throw error;
+
+      setFormData({
+        name: data.name || "",
+        description: data.description || "",
+        type: data.type || "",
+        website: data.website || "",
+        linkedin: data.linkedin || "",
+        logo_url: data.logo_url || ""
+      });
+    } catch (error) {
+      console.error('Error loading venture idea:', error);
+      toast.error("Failed to load venture idea");
+      navigate('/my-ventures');
+    } finally {
+      setInitialLoading(false);
+    }
+  };
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -55,29 +93,50 @@ export default function CreateVenture() {
     try {
       const slug = generateSlug(formData.name);
       
-      // Create the venture idea record
-      const { data: venture, error: ventureError } = await supabase
-        .from('venture_ideas')
-        .insert({
-          name: formData.name,
-          slug: slug,
-          description: formData.description,
-          type: formData.type,
-          website: formData.website,
-          linkedin: formData.linkedin,
-          logo_url: formData.logo_url,
-          user_id: user.id
-        })
-        .select()
-        .single();
+      if (isEditing && fromVentureId) {
+        // Update existing venture idea
+        const { error } = await supabase
+          .from('venture_ideas')
+          .update({
+            name: formData.name,
+            slug: slug,
+            description: formData.description,
+            type: formData.type,
+            website: formData.website,
+            linkedin: formData.linkedin,
+            logo_url: formData.logo_url,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', fromVentureId)
+          .eq('user_id', user.id);
 
-      if (ventureError) throw ventureError;
+        if (error) throw error;
+        toast.success("Venture updated successfully!");
+      } else {
+        // Create new venture idea
+        const { data: venture, error: ventureError } = await supabase
+          .from('venture_ideas')
+          .insert({
+            name: formData.name,
+            slug: slug,
+            description: formData.description,
+            type: formData.type,
+            website: formData.website,
+            linkedin: formData.linkedin,
+            logo_url: formData.logo_url,
+            user_id: user.id
+          })
+          .select()
+          .single();
 
-      toast.success("Venture created successfully!");
+        if (ventureError) throw ventureError;
+        toast.success("Venture created successfully!");
+      }
+      
       navigate('/my-ventures');
     } catch (error) {
-      console.error('Error creating venture:', error);
-      toast.error("Failed to create venture. Please try again.");
+      console.error('Error saving venture:', error);
+      toast.error(`Failed to ${isEditing ? 'update' : 'create'} venture. Please try again.`);
     } finally {
       setLoading(false);
     }
@@ -88,6 +147,16 @@ export default function CreateVenture() {
     { value: 'idea', label: 'Idea', icon: Lightbulb },
     { value: 'project', label: 'Project', icon: Rocket }
   ];
+
+  if (initialLoading) {
+    return (
+      <div className="container mx-auto p-6 max-w-2xl">
+        <div className="flex justify-center items-center h-32">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-6 max-w-2xl">
@@ -101,9 +170,9 @@ export default function CreateVenture() {
           Back to My Ventures
         </Button>
         <div>
-          <h1 className="text-3xl font-bold">Create New Venture</h1>
+          <h1 className="text-3xl font-bold">{isEditing ? 'Edit' : 'Create New'} Venture</h1>
           <p className="text-muted-foreground">
-            Create your startup, idea, or project
+            {isEditing ? 'Update your venture information' : 'Create your startup, idea, or project'}
           </p>
         </div>
       </div>
@@ -233,7 +302,7 @@ export default function CreateVenture() {
                 disabled={loading || !formData.name || !formData.type}
                 className="flex-1"
               >
-                {loading ? "Creating..." : "Create Venture"}
+                {loading ? (isEditing ? "Updating..." : "Creating...") : (isEditing ? "Update Venture" : "Create Venture")}
               </Button>
             </div>
           </form>

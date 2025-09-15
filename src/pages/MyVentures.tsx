@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Building, Lightbulb, Rocket, Plus, ArrowLeft } from "lucide-react";
+import { Building, Lightbulb, Rocket, Plus, ArrowLeft, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { EmptyState } from "@/components/EmptyState";
@@ -17,12 +17,13 @@ interface Venture {
   logo_url?: string;
   description?: string;
   type: 'startup' | 'idea' | 'project';
-  game_id: string;
+  game_id: string | null;
   game_name: string;
   total_shares: number;
   primary_shares_remaining: number;
   last_vwap_price?: number;
   created_at: string;
+  is_venture_idea: boolean;
 }
 
 const getVentureIcon = (type: string) => {
@@ -61,30 +62,69 @@ export default function MyVentures() {
 
     try {
       // Get all venture ideas created by the user
-      const { data, error } = await supabase
+      const { data: ventureIdeasData, error: ventureIdeasError } = await supabase
         .from('venture_ideas')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (ventureIdeasError) throw ventureIdeasError;
 
-      const venturesData = data?.map((item: any) => ({
+      // Get all real ventures where user is a founder member
+      const { data: founderMembersData, error: founderError } = await supabase
+        .from('founder_members')
+        .select(`
+          *,
+          ventures!inner (
+            *,
+            games!inner (
+              id,
+              name,
+              status
+            )
+          ),
+          participants!inner (
+            user_id
+          )
+        `)
+        .eq('participants.user_id', user.id);
+
+      if (founderError) throw founderError;
+
+      const ventureIdeas = ventureIdeasData?.map((item: any) => ({
         id: item.id,
         name: item.name,
         slug: item.slug,
         logo_url: item.logo_url,
         description: item.description,
         type: item.type,
-        game_id: null, // Venture ideas don't belong to games yet
+        game_id: null,
         game_name: 'Independent Venture',
-        total_shares: 100, // Default for display
-        primary_shares_remaining: 100, // Default for display
+        total_shares: 100,
+        primary_shares_remaining: 100,
         last_vwap_price: null,
         created_at: item.created_at,
+        is_venture_idea: true,
       })) || [];
 
-      setVentures(venturesData);
+      const realVentures = founderMembersData?.map((item: any) => ({
+        id: item.ventures.id,
+        name: item.ventures.name,
+        slug: item.ventures.slug,
+        logo_url: item.ventures.logo_url,
+        description: item.ventures.description,
+        type: item.ventures.type,
+        game_id: item.ventures.game_id,
+        game_name: item.ventures.games.name,
+        total_shares: item.ventures.total_shares,
+        primary_shares_remaining: item.ventures.primary_shares_remaining,
+        last_vwap_price: item.ventures.last_vwap_price,
+        created_at: item.ventures.created_at,
+        is_venture_idea: false,
+      })) || [];
+
+      const allVentures = [...realVentures, ...ventureIdeas];
+      setVentures(allVentures);
     } catch (error) {
       console.error('Error fetching ventures:', error);
     } finally {
@@ -160,18 +200,21 @@ export default function MyVentures() {
                 return (
                   <Card 
                     key={venture.id} 
-                    className="hover:shadow-lg transition-shadow cursor-pointer"
-                    onClick={() => {
-                      if (venture.game_id) {
-                        navigate(`/games/${venture.game_id}/venture/${venture.slug}`);
-                      } else {
-                        navigate(`/ventures/${venture.id}/edit`);
-                      }
-                    }}
+                    className="hover:shadow-lg transition-shadow"
                   >
                     <CardHeader>
                       <div className="flex items-start justify-between">
-                        <div className="flex items-center gap-3">
+                        <div 
+                          className="flex items-center gap-3 cursor-pointer flex-1"
+                          onClick={() => {
+                            if (venture.game_id) {
+                              navigate(`/games/${venture.game_id}/venture/${venture.slug}`);
+                            } else {
+                              // For venture ideas, navigate to create venture page with pre-filled data
+                              navigate(`/ventures/new?from=${venture.id}`);
+                            }
+                          }}
+                        >
                           {venture.logo_url ? (
                             <img 
                               src={venture.logo_url} 
@@ -190,9 +233,24 @@ export default function MyVentures() {
                             </CardDescription>
                           </div>
                         </div>
-                        <Badge className={getVentureColor(venture.type)}>
-                          {venture.type}
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                          {!venture.is_venture_idea && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/games/${venture.game_id}/venture/${venture.slug}/admin`);
+                              }}
+                              className="p-2"
+                            >
+                              <Users className="w-4 h-4" />
+                            </Button>
+                          )}
+                          <Badge className={getVentureColor(venture.type)}>
+                            {venture.type}
+                          </Badge>
+                        </div>
                       </div>
                     </CardHeader>
                     

@@ -10,8 +10,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, ArrowLeft, DollarSign, TrendingUp, Users, Building } from "lucide-react";
+import { Loader2, ArrowLeft, DollarSign, TrendingUp, Users, Building, UserPlus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { LogoUpload } from "@/components/LogoUpload";
 
 interface PendingOrder {
@@ -67,6 +70,144 @@ export default function VentureAdmin() {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [isFounder, setIsFounder] = useState(false);
   const [processingOrder, setProcessingOrder] = useState<string | null>(null);
+  const [addMemberEmail, setAddMemberEmail] = useState("");
+  const [addMemberRole, setAddMemberRole] = useState<'owner' | 'member'>('member');
+  const [addMemberCanManage, setAddMemberCanManage] = useState(false);
+  const [addingMember, setAddingMember] = useState(false);
+  const [updatingMember, setUpdatingMember] = useState<string | null>(null);
+  const [removingMember, setRemovingMember] = useState<string | null>(null);
+  const [showAddDialog, setShowAddDialog] = useState(false);
+
+  const addTeamMember = async () => {
+    if (!venture || !addMemberEmail.trim()) return;
+
+    setAddingMember(true);
+    try {
+      // First, find the user by email
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('email', addMemberEmail.trim())
+        .single();
+
+      if (userError || !userData) {
+        toast.error("User not found with that email");
+        return;
+      }
+
+      // Check if user is a participant in this game
+      const { data: participantData, error: participantError } = await supabase
+        .from('participants')
+        .select('id')
+        .eq('game_id', gameId)
+        .eq('user_id', userData.id)
+        .single();
+
+      if (participantError || !participantData) {
+        toast.error("User is not a participant in this game");
+        return;
+      }
+
+      // Check if user is already a team member
+      const { data: existingMember } = await supabase
+        .from('founder_members')
+        .select('id')
+        .eq('venture_id', venture.id)
+        .eq('participant_id', participantData.id)
+        .single();
+
+      if (existingMember) {
+        toast.error("User is already a team member");
+        return;
+      }
+
+      // Add as team member
+      const { error: insertError } = await supabase
+        .from('founder_members')
+        .insert({
+          venture_id: venture.id,
+          participant_id: participantData.id,
+          role: addMemberRole,
+          can_manage: addMemberCanManage
+        });
+
+      if (insertError) throw insertError;
+
+      toast.success("Team member added successfully!");
+      
+      // Refresh team members
+      const { data: teamData } = await supabase
+        .from('founder_members')
+        .select(`
+          *,
+          participant:participants!participant_id (
+            user:users!user_id (
+              first_name,
+              last_name,
+              email
+            )
+          )
+        `)
+        .eq('venture_id', venture.id);
+
+      setTeamMembers(teamData || []);
+      setAddMemberEmail("");
+      setAddMemberRole('member');
+      setAddMemberCanManage(false);
+      setShowAddDialog(false);
+
+    } catch (error: any) {
+      toast.error(`Failed to add team member: ${error.message}`);
+    } finally {
+      setAddingMember(false);
+    }
+  };
+
+  const updateTeamMember = async (memberId: string, updates: { role?: 'owner' | 'member'; can_manage?: boolean }) => {
+    setUpdatingMember(memberId);
+    try {
+      const { error } = await supabase
+        .from('founder_members')
+        .update(updates)
+        .eq('id', memberId);
+
+      if (error) throw error;
+
+      toast.success("Team member updated successfully!");
+      
+      // Update local state
+      setTeamMembers(prev => prev.map(member => 
+        member.id === memberId ? { ...member, ...updates } : member
+      ));
+
+    } catch (error: any) {
+      toast.error(`Failed to update team member: ${error.message}`);
+    } finally {
+      setUpdatingMember(null);
+    }
+  };
+
+  const removeTeamMember = async (memberId: string, memberName: string) => {
+    setRemovingMember(memberId);
+    try {
+      const { error } = await supabase
+        .from('founder_members')
+        .delete()
+        .eq('id', memberId);
+
+      if (error) throw error;
+
+      toast.success(`${memberName} removed from team`);
+      
+      // Update local state
+      setTeamMembers(prev => prev.filter(member => member.id !== memberId));
+
+    } catch (error: any) {
+      toast.error(`Failed to remove team member: ${error.message}`);
+    } finally {
+      setRemovingMember(null);
+    }
+  };
 
   useEffect(() => {
     if (!user || !gameId || !slug) return;
@@ -507,50 +648,188 @@ export default function VentureAdmin() {
           <TabsContent value="team" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Team Members</CardTitle>
-                <CardDescription>
-                  Manage your venture's team members and their permissions
-                </CardDescription>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Team Members</CardTitle>
+                    <CardDescription>
+                      Manage your venture's team members and their permissions
+                    </CardDescription>
+                  </div>
+                  <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+                    <DialogTrigger asChild>
+                      <Button>
+                        <UserPlus className="h-4 w-4 mr-2" />
+                        Add Member
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Add Team Member</DialogTitle>
+                        <DialogDescription>
+                          Add a participant from this game to your venture team
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="member-email">Email</Label>
+                          <Input
+                            id="member-email"
+                            type="email"
+                            value={addMemberEmail}
+                            onChange={(e) => setAddMemberEmail(e.target.value)}
+                            placeholder="Enter participant email"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="member-role">Role</Label>
+                          <Select value={addMemberRole} onValueChange={(value: 'owner' | 'member') => setAddMemberRole(value)}>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="member">Member</SelectItem>
+                              <SelectItem value="owner">Owner</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            id="can-manage"
+                            checked={addMemberCanManage}
+                            onChange={(e) => setAddMemberCanManage(e.target.checked)}
+                            className="rounded"
+                          />
+                          <Label htmlFor="can-manage">Can manage venture</Label>
+                        </div>
+                      </div>
+                      <DialogFooter>
+                        <Button 
+                          variant="outline" 
+                          onClick={() => setShowAddDialog(false)}
+                          disabled={addingMember}
+                        >
+                          Cancel
+                        </Button>
+                        <Button 
+                          onClick={addTeamMember}
+                          disabled={addingMember || !addMemberEmail.trim()}
+                        >
+                          {addingMember ? (
+                            <>
+                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              Adding...
+                            </>
+                          ) : (
+                            'Add Member'
+                          )}
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Member</TableHead>
-                        <TableHead>Role</TableHead>
-                        <TableHead>Can Manage</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {teamMembers.map((member) => {
-                        const user = member.participant?.user;
-                        const fullName = user ? `${user.first_name} ${user.last_name}`.trim() : 'Unknown';
-                        
-                        return (
-                          <TableRow key={member.id}>
-                            <TableCell>
-                              <div>
-                                <div className="font-medium">{fullName}</div>
-                                <div className="text-sm text-muted-foreground">{user?.email}</div>
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant={member.role === 'owner' ? 'default' : 'secondary'}>
-                                {member.role}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant={member.can_manage ? 'default' : 'secondary'}>
-                                {member.can_manage ? 'Yes' : 'No'}
-                              </Badge>
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                </div>
+                {teamMembers.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">No team members yet</p>
+                    <p className="text-sm text-muted-foreground mb-4">Add participants from this game to your venture team</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Member</TableHead>
+                          <TableHead>Role</TableHead>
+                          <TableHead>Can Manage</TableHead>
+                          <TableHead>Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {teamMembers.map((member) => {
+                          const user = member.participant?.user;
+                          const fullName = user ? `${user.first_name} ${user.last_name}`.trim() : 'Unknown';
+                          
+                          return (
+                            <TableRow key={member.id}>
+                              <TableCell>
+                                <div>
+                                  <div className="font-medium">{fullName}</div>
+                                  <div className="text-sm text-muted-foreground">{user?.email}</div>
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                <Select 
+                                  value={member.role} 
+                                  onValueChange={(value: 'owner' | 'member') => 
+                                    updateTeamMember(member.id, { role: value })
+                                  }
+                                  disabled={updatingMember === member.id}
+                                >
+                                  <SelectTrigger className="w-32">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="member">Member</SelectItem>
+                                    <SelectItem value="owner">Owner</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </TableCell>
+                              <TableCell>
+                                <input
+                                  type="checkbox"
+                                  checked={member.can_manage}
+                                  onChange={(e) => 
+                                    updateTeamMember(member.id, { can_manage: e.target.checked })
+                                  }
+                                  disabled={updatingMember === member.id}
+                                  className="rounded"
+                                />
+                              </TableCell>
+                              <TableCell>
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm"
+                                      disabled={removingMember === member.id || teamMembers.length <= 1}
+                                      className="text-red-600 hover:text-red-700"
+                                    >
+                                      {removingMember === member.id ? (
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                      ) : (
+                                        <Trash2 className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>Remove Team Member</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        Are you sure you want to remove {fullName} from the team? This action cannot be undone.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                      <AlertDialogAction
+                                        className="bg-red-600 hover:bg-red-700"
+                                        onClick={() => removeTeamMember(member.id, fullName)}
+                                      >
+                                        Remove
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
