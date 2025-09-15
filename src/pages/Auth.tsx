@@ -418,16 +418,16 @@ export default function Auth() {
 
             {/* Remember Me and Forgot Password Link - always show */}
             <div className="flex justify-between items-center">
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 sm:space-x-3">
                 <Checkbox
                   id="remember-me"
                   checked={rememberMe}
                   onCheckedChange={(checked) => setRememberMe(checked as boolean)}
-                  className="data-[state=checked]:bg-orange-600 data-[state=checked]:border-orange-600"
+                  className="data-[state=checked]:bg-orange-600 data-[state=checked]:border-orange-600 border-gray-300 focus-visible:ring-orange-200"
                 />
                 <Label 
                   htmlFor="remember-me" 
-                  className="text-xs text-gray-400 cursor-pointer hover:text-gray-600 transition-colors"
+                  className="text-xs sm:text-sm text-gray-500 cursor-pointer hover:text-gray-700 transition-colors select-none"
                 >
                   Remember me
                 </Label>
