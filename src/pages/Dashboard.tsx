@@ -158,7 +158,7 @@ export default function Dashboard() {
     ...activeOwnedGames.map(game => ({ ...game, isOwner: true })),
     ...activeParticipations.map(participation => ({ 
       ...participation.games, 
-      isOwner: false, 
+      isOwner: participation.games.owner_user_id === user?.id, // Check if user is actually the owner
       participationData: participation 
     }))
   ];
