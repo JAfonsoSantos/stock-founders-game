@@ -3,7 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Users, Building2, Settings, Play, Pause, Mail, TrendingUp, BarChart3, Edit, Eye } from "lucide-react";
+import { ArrowLeft, Users, Building2, Settings, Play, Pause, Mail, TrendingUp, BarChart3, Edit, Eye, Trash2 } from "lucide-react";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -45,6 +46,8 @@ export default function GameOrganizer() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [editingImage, setEditingImage] = useState<'logo' | 'header' | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     if (!gameId) return;
@@ -216,6 +219,105 @@ export default function GameOrganizer() {
     }
   };
 
+  const handleDeleteGame = async () => {
+    if (!game || !gameId) return;
+    
+    setIsDeleting(true);
+    
+    try {
+      // Delete in the correct order to avoid foreign key constraint violations
+      // The order matters due to foreign key relationships
+      
+      // 1. Delete notifications
+      await supabase
+        .from("notifications")
+        .delete()
+        .eq("game_id", gameId);
+      
+      // 2. Delete trades  
+      await supabase
+        .from("trades")
+        .delete()
+        .eq("game_id", gameId);
+      
+      // 3. Delete positions (via participants of this game)
+      const { data: participantIds } = await supabase
+        .from("participants")
+        .select("id")
+        .eq("game_id", gameId);
+      
+      if (participantIds && participantIds.length > 0) {
+        const ids = participantIds.map(p => p.id);
+        await supabase
+          .from("positions")
+          .delete()
+          .in("participant_id", ids);
+      }
+      
+      // 4. Delete orders_primary
+      await supabase
+        .from("orders_primary")
+        .delete()
+        .eq("game_id", gameId);
+      
+      // 5. Delete founder_members (via ventures of this game)
+      const { data: ventureIds } = await supabase
+        .from("ventures")
+        .select("id")
+        .eq("game_id", gameId);
+      
+      if (ventureIds && ventureIds.length > 0) {
+        const ids = ventureIds.map(v => v.id);
+        await supabase
+          .from("founder_members")
+          .delete()
+          .in("venture_id", ids);
+      }
+      
+      // 6. Delete ventures
+      await supabase
+        .from("ventures")
+        .delete()
+        .eq("game_id", gameId);
+      
+      // 7. Delete participants
+      await supabase
+        .from("participants")
+        .delete()
+        .eq("game_id", gameId);
+      
+      // 8. Delete game_roles
+      await supabase
+        .from("game_roles")
+        .delete()
+        .eq("game_id", gameId);
+      
+      // 9. Delete game_team_members
+      await supabase
+        .from("game_team_members")
+        .delete()
+        .eq("game_id", gameId);
+      
+      // 10. Finally delete the game itself
+      const { error: gameError } = await supabase
+        .from("games")
+        .delete()
+        .eq("id", gameId);
+      
+      if (gameError) throw gameError;
+      
+      toast.success("Game deleted successfully");
+      navigate("/");
+      
+    } catch (error: any) {
+      console.error("Error deleting game:", error);
+      toast.error("Failed to delete game: " + error.message);
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteDialog(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -370,6 +472,18 @@ export default function GameOrganizer() {
                 <Edit className="h-4 w-4 mr-2" />
                 Edit
               </Button>
+
+              {/* Delete Game Button - only for draft games or games with no participants */}
+              {(game.status === 'draft' || stats.participants === 0) && (
+                <Button 
+                  variant="outline"
+                  onClick={() => setShowDeleteDialog(true)}
+                  className="px-4 text-red-600 border-red-300 hover:bg-red-50 hover:border-red-400"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete Game
+                </Button>
+              )}
 
               {/* Main status control button */}
               {game.status === 'draft' && (
@@ -669,6 +783,18 @@ export default function GameOrganizer() {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        title="Delete Game"
+        description={`Are you sure you want to delete "${game?.name}"? This action cannot be undone and will permanently remove all game data, including participants, ventures, trades, and notifications.${stats.participants > 0 ? ` This game has ${stats.participants} participants and ${stats.activeTrades} trades.` : ''}`}
+        confirmText={isDeleting ? "Deleting..." : "Delete Game"}
+        cancelText="Cancel"
+        onConfirm={handleDeleteGame}
+        variant="destructive"
+      />
     </div>
   );
 }
