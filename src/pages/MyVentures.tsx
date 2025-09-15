@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Building, Lightbulb, Rocket, Plus, ArrowLeft, Users } from "lucide-react";
+import { Building, Lightbulb, Rocket, Plus, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { EmptyState } from "@/components/EmptyState";
@@ -149,21 +149,11 @@ export default function MyVentures() {
   return (
     <div className="container mx-auto p-6 max-w-6xl">
       <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
-          <Button 
-            variant="ghost" 
-            size="sm"
-            onClick={() => navigate('/dashboard')}
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Dashboard
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold">My Ventures</h1>
-            <p className="text-muted-foreground">
-              Manage all your startups, ideas, and projects
-            </p>
-          </div>
+        <div>
+          <h1 className="text-3xl font-bold">My Ventures</h1>
+          <p className="text-muted-foreground">
+            Manage all your startups, ideas, and projects
+          </p>
         </div>
         <Button onClick={() => navigate('/ventures/new')}>
           <Plus className="w-4 h-4 mr-2" />
