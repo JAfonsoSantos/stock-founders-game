@@ -182,25 +182,27 @@ export default function PlayerDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-3 sm:p-6">
+    <div className="min-h-screen bg-background p-2 sm:p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">My Portfolio</h1>
-          <p className="text-gray-600 mt-2 text-sm sm:text-base">
+        <div className="mb-4 sm:mb-6 md:mb-8">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">My Portfolio</h1>
+          <p className="text-muted-foreground mt-1 sm:mt-2 text-xs sm:text-sm md:text-base">
             Track your investments and performance
           </p>
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="mt-2 sm:mt-4 flex flex-col sm:flex-row gap-2">
             <Button 
               variant="outline"
               onClick={() => navigate(`/games/${gameId}/discover`)}
-              className="border-gray-200 text-gray-700 hover:bg-gray-50"
+              className="w-full sm:w-auto text-xs sm:text-sm"
+              size="sm"
             >
               Discover Startups
             </Button>
             <Button 
               variant="outline"
               onClick={() => navigate(`/games/${gameId}/leaderboard`)}
-              className="border-gray-200 text-gray-700 hover:bg-gray-50"
+              className="w-full sm:w-auto text-xs sm:text-sm"
+              size="sm"
             >
               Leaderboard
             </Button>
@@ -217,54 +219,54 @@ export default function PlayerDashboard() {
           )}
 
           {/* Summary Cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
-          <Card className="bg-white border-gray-200 shadow-sm">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-700">Cash Balance</CardTitle>
-              <Wallet className="h-4 w-4 text-gray-500" />
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 md:gap-6 mb-4 sm:mb-6 md:mb-8">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2 p-2 sm:p-4 md:p-6">
+              <CardTitle className="text-xs sm:text-sm font-medium">Cash Balance</CardTitle>
+              <Wallet className="h-3 w-3 sm:h-4 sm:w-4" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-gray-900">{formatCurrency(participant?.current_cash || 0)}</div>
+            <CardContent className="p-2 sm:p-4 md:p-6 pt-0">
+              <div className="text-sm sm:text-lg md:text-2xl font-bold">{formatCurrency(participant?.current_cash || 0)}</div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Portfolio Value</CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2 p-2 sm:p-4 md:p-6">
+              <CardTitle className="text-xs sm:text-sm font-medium">Portfolio Value</CardTitle>
+              <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{formatCurrency(participant?.portfolio_value || 0)}</div>
+            <CardContent className="p-2 sm:p-4 md:p-6 pt-0">
+              <div className="text-sm sm:text-lg md:text-2xl font-bold">{formatCurrency(participant?.portfolio_value || 0)}</div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Value</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2 p-2 sm:p-4 md:p-6">
+              <CardTitle className="text-xs sm:text-sm font-medium">Total Value</CardTitle>
+              <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{formatCurrency(participant?.total_value || 0)}</div>
+            <CardContent className="p-2 sm:p-4 md:p-6 pt-0">
+              <div className="text-sm sm:text-lg md:text-2xl font-bold">{formatCurrency(participant?.total_value || 0)}</div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">ROI</CardTitle>
-              <Activity className="h-4 w-4 text-muted-foreground" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2 p-2 sm:p-4 md:p-6">
+              <CardTitle className="text-xs sm:text-sm font-medium">ROI</CardTitle>
+              <Activity className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
+            <CardContent className="p-2 sm:p-4 md:p-6 pt-0">
+              <div className="text-sm sm:text-lg md:text-2xl font-bold">
                 {participant?.roi_percentage ? `${participant.roi_percentage.toFixed(2)}%` : "0%"}
               </div>
             </CardContent>
           </Card>
         </div>
 
-        <Tabs defaultValue="positions" className="space-y-6">
-          <TabsList>
-            <TabsTrigger value="positions">My Positions</TabsTrigger>
-            <TabsTrigger value="trades">Trade History</TabsTrigger>
+        <Tabs defaultValue="positions" className="space-y-4 sm:space-y-6">
+          <TabsList className="w-full sm:w-auto">
+            <TabsTrigger value="positions" className="text-xs sm:text-sm">My Positions</TabsTrigger>
+            <TabsTrigger value="trades" className="text-xs sm:text-sm">Trade History</TabsTrigger>
           </TabsList>
 
           <TabsContent value="positions">

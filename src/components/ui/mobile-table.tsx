@@ -16,9 +16,9 @@ export function MobileTable({ data, renderItem, emptyState, className = "" }: Mo
   }
 
   return (
-    <div className={`space-y-3 sm:hidden ${className}`}>
+    <div className={`space-y-2 sm:space-y-3 block sm:hidden ${className}`}>
       {data.map((item, index) => (
-        <Card key={item.id || index} className="p-3">
+        <Card key={item.id || index} className="p-2 sm:p-3">
           {renderItem(item, index)}
         </Card>
       ))}

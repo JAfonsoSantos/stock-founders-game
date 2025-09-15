@@ -539,14 +539,15 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-full flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   return (
-    <div className="bg-gray-50 min-h-full">
+    <div className="bg-background min-h-screen p-2 sm:p-4 md:p-6">
+      <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 md:space-y-8">
       <div className="container mx-auto px-0 py-4 lg:py-8">
         {/* Single Active Game Card - appears first if applicable */}
         {shouldShowSingleGameCard && (
@@ -554,34 +555,34 @@ export default function Dashboard() {
         )}
         
         {/* Hero Section - appears after single game card or first if no single game */}
-        <div className="mb-6 lg:mb-12">
+        <div className="mb-4 sm:mb-6 md:mb-8">
           <Card className="bg-white border-gray-200 shadow-sm">
-            <CardContent className="p-4 lg:p-8">
+            <CardContent className="p-3 sm:p-4 md:p-6 lg:p-8">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8 items-center">
                 <div>
-                  <h1 className="text-2xl lg:text-4xl xl:text-5xl font-bold text-gray-900 mb-3 lg:mb-4">
+                  <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-2 sm:mb-3 lg:mb-4">
                     Build your startup investment portfolio
                   </h1>
-                  <p className="text-sm lg:text-lg text-gray-600 mb-4 lg:mb-6">
+                  <p className="text-xs sm:text-sm md:text-base lg:text-lg text-muted-foreground mb-3 sm:mb-4 lg:mb-6">
                     Create games, discover startups, and simulate investment strategies in a realistic market environment.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
                     <Button 
                       onClick={() => navigate("/games/new")} 
-                      className="bg-[#FF6B35] hover:bg-[#E55A2B] text-white px-4 lg:px-6 py-2 lg:py-3 h-9 lg:h-11"
+                      className="w-full sm:w-auto h-8 sm:h-9 lg:h-11 text-xs sm:text-sm"
                       size="sm"
                     >
-                      <Plus className="h-4 w-4 lg:h-5 lg:w-5 mr-1 lg:mr-2" />
+                      <Plus className="h-3 w-3 sm:h-4 sm:w-4 lg:h-5 lg:w-5 mr-1 lg:mr-2" />
                       Create New Game
                     </Button>
                     <Button 
-                      variant="surface" 
+                      variant="outline" 
                       onClick={handleDemoClick}
                       size="sm"
                       disabled
-                      className="opacity-60 cursor-not-allowed h-9 lg:h-11"
+                      className="w-full sm:w-auto opacity-60 cursor-not-allowed h-8 sm:h-9 lg:h-11 text-xs sm:text-sm"
                     >
-                      <Play className="h-4 w-4 lg:h-5 lg:w-5 mr-1 lg:mr-2" />
+                      <Play className="h-3 w-3 sm:h-4 sm:w-4 lg:h-5 lg:w-5 mr-1 lg:mr-2" />
                       Try Demo Game
                     </Button>
                   </div>
@@ -1012,6 +1013,7 @@ export default function Dashboard() {
         cancelText=""
         onConfirm={() => setShowInDevelopmentModal(false)}
       />
+      </div>
     </div>
   );
 }
