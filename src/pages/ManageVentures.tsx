@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, ArrowLeft, Building2, UserPlus, ExternalLink, RefreshCw } from "lucide-react";
+import { Loader2, ArrowLeft, Building2, UserPlus, ExternalLink, RefreshCw, Send, Trash2 } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { EmptyState } from "@/components/EmptyState";
@@ -60,6 +60,10 @@ export default function ManageVentures() {
   const [selectedVentureIdea, setSelectedVentureIdea] = useState<VentureIdea | null>(null);
   const [showInviteDialog, setShowInviteDialog] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [reInviteLoading, setReInviteLoading] = useState<string | null>(null);
+  const [removeLoading, setRemoveLoading] = useState<string | null>(null);
+  const [showRemoveDialog, setShowRemoveDialog] = useState(false);
+  const [selectedVentureForRemoval, setSelectedVentureForRemoval] = useState<VentureIdea | null>(null);
 
   // Fetch venture ideas from participants in this game
   const fetchVentureIdeas = async () => {
@@ -243,6 +247,142 @@ export default function ManageVentures() {
     setShowInviteDialog(true);
   };
 
+  const handleReInvite = async (ventureIdea: VentureIdea) => {
+    setReInviteLoading(ventureIdea.id);
+    
+    try {
+      // Find the venture in the game
+      const { data: venture, error: ventureError } = await supabase
+        .from("ventures")
+        .select("id")
+        .eq("game_id", gameId)
+        .eq("slug", ventureIdea.slug)
+        .single();
+
+      if (ventureError || !venture) {
+        throw new Error("Venture not found in game");
+      }
+
+      // Find all founder members of this venture
+      const { data: founderMembers, error: foundersError } = await supabase
+        .from("founder_members")
+        .select(`
+          id,
+          participant_id,
+          participants!inner(id, user_id)
+        `)
+        .eq("venture_id", venture.id);
+
+      if (foundersError) throw foundersError;
+
+      // Send notification to each founder
+      if (founderMembers && founderMembers.length > 0) {
+        const notifications = founderMembers.map(member => ({
+          game_id: gameId,
+          to_participant_id: member.participant_id,
+          type: 'venture_re_invited',
+          payload: {
+            venture_id: venture.id,
+            venture_name: ventureIdea.name,
+            message: `You have been re-invited to manage ${ventureIdea.name} in the game ${gameInfo?.name}`
+          }
+        }));
+
+        const { error: notificationError } = await supabase
+          .from("notifications")
+          .insert(notifications);
+
+        if (notificationError) throw notificationError;
+      }
+
+      toast.success(`Re-invitation sent to ${ventureIdea.name} members!`);
+    } catch (error: any) {
+      console.error('Error re-inviting venture:', error);
+      toast.error("Failed to send re-invitation: " + error.message);
+    } finally {
+      setReInviteLoading(null);
+    }
+  };
+
+  const openRemoveDialog = (ventureIdea: VentureIdea) => {
+    setSelectedVentureForRemoval(ventureIdea);
+    setShowRemoveDialog(true);
+  };
+
+  const handleRemoveFromGame = async (ventureIdea: VentureIdea) => {
+    setRemoveLoading(ventureIdea.id);
+    
+    try {
+      // Find the venture in the game
+      const { data: venture, error: ventureError } = await supabase
+        .from("ventures")
+        .select("id")
+        .eq("game_id", gameId)
+        .eq("slug", ventureIdea.slug)
+        .single();
+
+      if (ventureError || !venture) {
+        throw new Error("Venture not found in game");
+      }
+
+      // Check if there are any trades for this venture
+      const { data: trades, error: tradesError } = await supabase
+        .from("trades")
+        .select("id")
+        .eq("venture_id", venture.id)
+        .limit(1);
+
+      if (tradesError) throw tradesError;
+
+      if (trades && trades.length > 0) {
+        toast.error("Cannot remove venture with existing trades. Contact support if needed.");
+        return;
+      }
+
+      // Remove founder members
+      const { error: foundersError } = await supabase
+        .from("founder_members")
+        .delete()
+        .eq("venture_id", venture.id);
+
+      if (foundersError) throw foundersError;
+
+      // Remove positions (if any)
+      const { error: positionsError } = await supabase
+        .from("positions")
+        .delete()
+        .eq("venture_id", venture.id);
+
+      if (positionsError) throw positionsError;
+
+      // Remove orders
+      const { error: ordersError } = await supabase
+        .from("orders_primary")
+        .delete()
+        .eq("venture_id", venture.id);
+
+      if (ordersError) throw ordersError;
+
+      // Finally remove the venture
+      const { error: deleteError } = await supabase
+        .from("ventures")
+        .delete()
+        .eq("id", venture.id);
+
+      if (deleteError) throw deleteError;
+
+      toast.success(`${ventureIdea.name} has been removed from the game!`);
+      await fetchVentureIdeas(); // Refresh the list
+    } catch (error: any) {
+      console.error('Error removing venture from game:', error);
+      toast.error("Failed to remove venture from game: " + error.message);
+    } finally {
+      setRemoveLoading(null);
+      setShowRemoveDialog(false);
+      setSelectedVentureForRemoval(null);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -402,25 +542,54 @@ export default function ManageVentures() {
                           </Badge>
                         )}
                       </TableCell>
-                      <TableCell>
-                        <div className="flex gap-2">
-                          {!ventureIdea.already_in_game && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => openInviteDialog(ventureIdea)}
-                              disabled={inviteLoading === ventureIdea.id}
-                            >
-                              {inviteLoading === ventureIdea.id ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                              ) : (
-                                <UserPlus className="h-4 w-4" />
-                              )}
-                              Invite
-                            </Button>
-                          )}
-                        </div>
-                      </TableCell>
+                       <TableCell>
+                         <div className="flex gap-2">
+                           {!ventureIdea.already_in_game ? (
+                             <Button
+                               variant="outline"
+                               size="sm"
+                               onClick={() => openInviteDialog(ventureIdea)}
+                               disabled={inviteLoading === ventureIdea.id}
+                             >
+                               {inviteLoading === ventureIdea.id ? (
+                                 <Loader2 className="h-4 w-4 animate-spin" />
+                               ) : (
+                                 <UserPlus className="h-4 w-4" />
+                               )}
+                               Invite
+                             </Button>
+                           ) : (
+                             <>
+                               <Button
+                                 variant="outline"
+                                 size="sm"
+                                 onClick={() => handleReInvite(ventureIdea)}
+                                 disabled={reInviteLoading === ventureIdea.id}
+                               >
+                                 {reInviteLoading === ventureIdea.id ? (
+                                   <Loader2 className="h-4 w-4 animate-spin" />
+                                 ) : (
+                                   <Send className="h-4 w-4" />
+                                 )}
+                                 Re-invite
+                               </Button>
+                               <Button
+                                 variant="outline"
+                                 size="sm"
+                                 onClick={() => openRemoveDialog(ventureIdea)}
+                                 disabled={removeLoading === ventureIdea.id}
+                               >
+                                 {removeLoading === ventureIdea.id ? (
+                                   <Loader2 className="h-4 w-4 animate-spin" />
+                                 ) : (
+                                   <Trash2 className="h-4 w-4" />
+                                 )}
+                                 Remove
+                               </Button>
+                             </>
+                           )}
+                         </div>
+                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -453,6 +622,37 @@ export default function ManageVentures() {
                 </>
               ) : (
                 "Invite to Game"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Remove Confirmation Dialog */}
+      <AlertDialog open={showRemoveDialog} onOpenChange={setShowRemoveDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove Venture from Game</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to remove "{selectedVentureForRemoval?.name}" from this game? 
+              This action cannot be undone. All founder members, positions, and orders will be removed.
+              Note: Ventures with existing trades cannot be removed.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => selectedVentureForRemoval && handleRemoveFromGame(selectedVentureForRemoval)}
+              disabled={!!removeLoading}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {removeLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  Removing...
+                </>
+              ) : (
+                "Remove from Game"
               )}
             </AlertDialogAction>
           </AlertDialogFooter>
