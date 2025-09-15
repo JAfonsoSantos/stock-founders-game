@@ -53,7 +53,7 @@ export default function GameView() {
         .from('users')
         .select('*')
         .eq('id', game.owner_user_id)
-        .single();
+        .maybeSingle();
 
       // Check if user is already a participant
       const { data: participant } = await supabase
@@ -61,7 +61,7 @@ export default function GameView() {
         .select('*')
         .eq('game_id', gameId)
         .eq('user_id', user?.id)
-        .single();
+        .maybeSingle();
 
       // Get participants count
       const { count: participantsCount } = await supabase

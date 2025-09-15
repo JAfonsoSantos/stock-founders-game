@@ -38,7 +38,7 @@ export default function PlayerDashboard() {
         .from('games')
         .select('*')
         .eq('id', gameId)
-        .single();
+        .maybeSingle();
 
       if (gameData) {
         setGameAllowsSecondary(gameData.allow_secondary);
@@ -50,7 +50,7 @@ export default function PlayerDashboard() {
         .select("*")
         .eq("game_id", gameId)
         .eq("user_id", user.id)
-        .single();
+        .maybeSingle();
       
       if (!participantData) {
         navigate(`/join/${gameId}`);

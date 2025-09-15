@@ -38,7 +38,7 @@ export default function Join() {
         .from("games")
         .select("name, status")
         .eq("id", gameId)
-        .single();
+        .maybeSingle();
       
       if (error) {
         toast.error("Game not found");
@@ -71,7 +71,7 @@ export default function Join() {
       .select("id, role, status")
       .eq("game_id", gameId)
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
     
     if (data) {
       // Activate participant status on first login
