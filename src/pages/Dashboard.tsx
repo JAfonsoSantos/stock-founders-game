@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { LanguageSelector } from "@/components/LanguageSelector";
-import { Plus, Users, TrendingUp, Settings, Play, Sparkles, Crown, User, LogOut } from "lucide-react";
+import { Plus, Users, TrendingUp, Settings, Play, Sparkles, Crown, User, LogOut, Clock } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -33,6 +33,18 @@ interface Participation {
   games: Game;
 }
 
+interface Venture {
+  id: string;
+  name: string;
+  logo_url?: string;
+  slug: string;
+}
+
+interface ExtendedGame extends Game {
+  isOwner: boolean;
+  participationData?: Participation;
+}
+
 import { mergeAccounts } from "@/utils/mergeAccounts";
 
 export default function Dashboard() {
@@ -43,6 +55,7 @@ export default function Dashboard() {
   const [participations, setParticipations] = useState<Participation[]>([]);
   const [loading, setLoading] = useState(true);
   const [showInDevelopmentModal, setShowInDevelopmentModal] = useState(false);
+  const [userVenture, setUserVenture] = useState<Venture | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -102,6 +115,30 @@ export default function Dashboard() {
     }
   };
 
+  const fetchUserVenture = async (gameId: string, participantId: string) => {
+    try {
+      const { data: founderMember } = await supabase
+        .from('founder_members')
+        .select(`
+          ventures (
+            id,
+            name,
+            logo_url,
+            slug
+          )
+        `)
+        .eq('participant_id', participantId)
+        .single();
+      
+      if (founderMember?.ventures) {
+        setUserVenture(founderMember.ventures as Venture);
+      }
+    } catch (error) {
+      console.log('No venture found for user in this game');
+      setUserVenture(null);
+    }
+  };
+
   // Get active games (pre_market or open status)
   const activeOwnedGames = ownedGames.filter(game => 
     game.status === 'pre_market' || game.status === 'open'
@@ -115,6 +152,36 @@ export default function Dashboard() {
   );
   
   const hasActiveGames = activeOwnedGames.length > 0 || activeParticipations.length > 0;
+
+  // Logic to detect priority game scenario
+  const allActiveGames: ExtendedGame[] = [
+    ...activeOwnedGames.map(game => ({ ...game, isOwner: true })),
+    ...activeParticipations.map(participation => ({ 
+      ...participation.games, 
+      isOwner: false, 
+      participationData: participation 
+    }))
+  ];
+
+  // Remove duplicates (case where user is owner and participant of same game)
+  const uniqueActiveGames = allActiveGames.filter((game, index, self) => 
+    index === self.findIndex(g => g.id === game.id)
+  );
+
+  // Sort by start date (next first)
+  const sortedActiveGames = uniqueActiveGames.sort((a, b) => 
+    new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime()
+  );
+
+  const shouldShowSingleGameCard = sortedActiveGames.length > 0;
+  const priorityGame = sortedActiveGames[0];
+
+  // Fetch venture for priority game if user is a founder
+  useEffect(() => {
+    if (priorityGame && !priorityGame.isOwner && priorityGame.participationData?.role === 'founder') {
+      fetchUserVenture(priorityGame.id, priorityGame.participationData.id);
+    }
+  }, [priorityGame]);
 
   const handleDemoClick = () => {
     setShowInDevelopmentModal(true);
@@ -131,6 +198,178 @@ export default function Dashboard() {
     }
   };
 
+  // Countdown hook
+  const useCountdown = (targetDate: string) => {
+    const [timeLeft, setTimeLeft] = useState('');
+    
+    useEffect(() => {
+      const timer = setInterval(() => {
+        const now = new Date().getTime();
+        const target = new Date(targetDate).getTime();
+        const difference = target - now;
+        
+        if (difference > 0) {
+          const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+          const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+          
+          if (days > 0) {
+            setTimeLeft(`Começa em ${days} ${days === 1 ? 'dia' : 'dias'}`);
+          } else if (hours > 0) {
+            setTimeLeft(`Começa em ${hours} ${hours === 1 ? 'hora' : 'horas'}`);
+          } else if (minutes > 0) {
+            setTimeLeft(`Começa em ${minutes} ${minutes === 1 ? 'minuto' : 'minutos'}`);
+          } else {
+            setTimeLeft('Começando agora!');
+          }
+        } else {
+          setTimeLeft('Evento ativo!');
+        }
+      }, 1000);
+      
+      return () => clearInterval(timer);
+    }, [targetDate]);
+    
+    return timeLeft;
+  };
+
+  // Single Active Game Card Component
+  const SingleActiveGameCard = ({ game }: { game: ExtendedGame }) => {
+    const timeLeft = useCountdown(game.starts_at);
+    
+    const getActionButton = () => {
+      if (game.isOwner) {
+        if (game.status === 'open') {
+          return { text: 'Start Trading', path: `/games/${game.id}/discover` };
+        }
+        return { text: 'Manage Game', path: `/games/${game.id}/organizer` };
+      }
+      
+      if (game.participationData?.role === 'founder' && userVenture) {
+        return { text: 'Manage Venture', path: `/games/${game.id}/ventures/${userVenture.slug}/admin` };
+      }
+      
+      if (game.participationData?.role === 'founder' && !userVenture) {
+        return { text: 'Setup Venture', path: `/games/${game.id}/founder-onboarding` };
+      }
+      
+      if (game.status === 'open') {
+        return { text: 'Start Trading', path: `/games/${game.id}/discover` };
+      }
+      
+      return { text: 'View Portfolio', path: `/games/${game.id}/me` };
+    };
+
+    const actionButton = getActionButton();
+    
+    return (
+      <Card 
+        className="mb-12 cursor-pointer hover:shadow-lg transition-all duration-200 hover:scale-[1.01]"
+        onClick={() => navigate(actionButton.path)}
+      >
+        <CardContent className="p-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+            {/* Info Section */}
+            <div>
+              <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">{game.name}</h2>
+              
+              {game.status !== 'open' && (
+                <div className="flex items-center gap-2 text-lg text-orange-600 font-semibold mb-4">
+                  <Clock className="h-5 w-5" />
+                  {timeLeft}
+                </div>
+              )}
+              
+              {game.status === 'open' && (
+                <div className="flex items-center gap-2 text-lg text-green-600 font-semibold mb-4">
+                  <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                  Evento ativo!
+                </div>
+              )}
+              
+              {userVenture && (
+                <div className="flex items-center gap-3 mb-4 p-3 bg-gray-50 rounded-lg">
+                  {userVenture.logo_url && (
+                    <img 
+                      src={userVenture.logo_url} 
+                      alt={userVenture.name}
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                  )}
+                  <div>
+                    <span className="text-sm text-gray-600">Your venture:</span>
+                    <p className="font-semibold text-gray-900">{userVenture.name}</p>
+                  </div>
+                </div>
+              )}
+              
+              <div className="flex items-center gap-4 mb-6">
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(game.status)}`}>
+                  {game.status === 'draft' ? 'RASCUNHO' : 
+                   game.status === 'pre_market' ? 'PRE-MARKET' : 
+                   game.status === 'open' ? 'ABERTO' : game.status.toUpperCase()}
+                </span>
+                
+                {game.participationData && (
+                  <span className={`text-sm px-3 py-1 rounded-full font-medium text-white ${
+                    game.participationData.role === 'vc' ? 'bg-purple-600' : 
+                    game.participationData.role === 'angel' ? 'bg-yellow-600' : 'bg-green-600'
+                  }`}>
+                    {game.participationData.role.toUpperCase()}
+                  </span>
+                )}
+
+                {game.isOwner && (
+                  <span className="text-sm bg-blue-600 text-white px-3 py-1 rounded-full font-medium">OWNER</span>
+                )}
+              </div>
+              
+              <Button 
+                size="lg" 
+                className="bg-[#FF6B35] hover:bg-[#E55A2B] text-white"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(actionButton.path);
+                }}
+              >
+                {actionButton.text}
+              </Button>
+            </div>
+            
+            {/* Visual Section */}
+            <div className="relative">
+              {game.hero_image_url ? (
+                <div 
+                  className="bg-gradient-to-br from-orange-100 to-orange-50 rounded-xl h-64 bg-cover bg-center"
+                  style={{ backgroundImage: `url(${game.hero_image_url})` }}
+                >
+                  <div className="absolute inset-0 bg-black/10 rounded-xl"></div>
+                </div>
+              ) : (
+                <div className="bg-gradient-to-br from-orange-100 to-orange-50 rounded-xl p-6 h-64 flex items-center justify-center">
+                  <div className="text-center">
+                    <TrendingUp className="h-16 w-16 text-orange-600 mx-auto mb-4" />
+                    <p className="text-gray-600 font-medium">Investment Simulation</p>
+                  </div>
+                </div>
+              )}
+              
+              {game.logo_url && (
+                <div className="absolute top-4 left-4">
+                  <img 
+                    src={game.logo_url} 
+                    alt={`${game.name} logo`}
+                    className="w-12 h-12 rounded-lg bg-white p-2 shadow-md"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
   if (loading) {
     return (
       <div className="min-h-full flex items-center justify-center">
@@ -142,7 +381,12 @@ export default function Dashboard() {
   return (
     <div className="bg-gray-50 min-h-full">
       <div className="container mx-auto px-4 py-8">
-        {/* Hero Section */}
+        {/* Single Active Game Card - appears first if applicable */}
+        {shouldShowSingleGameCard && (
+          <SingleActiveGameCard game={priorityGame} />
+        )}
+        
+        {/* Hero Section - appears after single game card or first if no single game */}
         <div className="mb-12">
           <Card className="bg-white border-gray-200 shadow-sm">
             <CardContent className="p-8">
@@ -188,8 +432,8 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        {/* Active Games Section */}
-        {hasActiveGames && (
+        {/* Active Games Section - only show if NOT single game scenario */}
+        {hasActiveGames && !shouldShowSingleGameCard && (
           <div className="mb-12">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Active Games</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
