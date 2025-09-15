@@ -23,6 +23,7 @@ interface Game {
   logo_url?: string;
   hero_image_url?: string;
   owner_user_id: string;
+  asset_singular?: string;
 }
 
 interface Participation {
@@ -56,6 +57,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [showInDevelopmentModal, setShowInDevelopmentModal] = useState(false);
   const [userVenture, setUserVenture] = useState<Venture | null>(null);
+  const [venturesByGame, setVenturesByGame] = useState<Record<string, Venture | null>>({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -131,11 +133,32 @@ export default function Dashboard() {
         .single();
       
       if (founderMember?.ventures) {
-        setUserVenture(founderMember.ventures as Venture);
+        setVenturesByGame(prev => ({
+          ...prev,
+          [gameId]: founderMember.ventures as Venture
+        }));
+        // Keep the old userVenture for backward compatibility with priorityGame
+        if (gameId === priorityGame?.id) {
+          setUserVenture(founderMember.ventures as Venture);
+        }
+      } else {
+        setVenturesByGame(prev => ({
+          ...prev,
+          [gameId]: null
+        }));
+        if (gameId === priorityGame?.id) {
+          setUserVenture(null);
+        }
       }
     } catch (error) {
-      console.log('No venture found for user in this game');
-      setUserVenture(null);
+      console.log('No venture found for user in game:', gameId);
+      setVenturesByGame(prev => ({
+        ...prev,
+        [gameId]: null
+      }));
+      if (gameId === priorityGame?.id) {
+        setUserVenture(null);
+      }
     }
   };
 
@@ -182,6 +205,14 @@ export default function Dashboard() {
       fetchUserVenture(priorityGame.id, priorityGame.participationData.id);
     }
   }, [priorityGame]);
+
+  // Fetch ventures for all games where user is a founder
+  useEffect(() => {
+    const founderParticipations = activeParticipations.filter(p => p.role === 'founder');
+    founderParticipations.forEach(participation => {
+      fetchUserVenture(participation.games.id, participation.id);
+    });
+  }, [activeParticipations]);
 
   const handleDemoClick = () => {
     setShowInDevelopmentModal(true);
@@ -255,15 +286,20 @@ export default function Dashboard() {
         ];
       }
       
-      if (game.participationData?.role === 'founder' && userVenture) {
+      // Check if user is founder and get venture for this specific game
+      const gameVenture = venturesByGame[game.id];
+      const assetName = game.asset_singular || 'Startup';
+      
+      if (game.participationData?.role === 'founder' && gameVenture) {
         return [
-          { text: 'Manage Venture', path: `/games/${game.id}/ventures/${userVenture.slug}/admin`, icon: Store, variant: 'default' as const }
+          { text: 'View Game', path: `/games/${game.id}/discover`, icon: Play, variant: 'default' as const, iconOnly: false },
+          { text: `Edit ${assetName}`, path: `/games/${game.id}/ventures/${gameVenture.slug}/admin`, icon: Store, variant: 'outline' as const, iconOnly: false }
         ];
       }
       
-      if (game.participationData?.role === 'founder' && !userVenture) {
+      if (game.participationData?.role === 'founder' && gameVenture === null) {
         return [
-          { text: 'Setup Venture', path: `/games/${game.id}/founder-onboarding`, icon: Plus, variant: 'default' as const }
+          { text: `Create ${assetName}`, path: `/games/${game.id}/founder-onboarding`, icon: Plus, variant: 'default' as const, iconOnly: false }
         ];
       }
       
