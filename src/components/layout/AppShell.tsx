@@ -28,15 +28,13 @@ export function AppShell({ children }: AppShellProps) {
   // Desktop layout with sidebar
   return (
     <SidebarProvider defaultOpen={true}>
-      <div className="w-full flex flex-col min-h-screen">
-        <div className="flex flex-1 relative overflow-hidden">
-          <AppSidebar />
-          <div className="flex-1 flex flex-col pl-16 overflow-hidden">
-            <Header />
-            <main className="flex-1 bg-background overflow-auto px-4 md:px-0">
-              {children}
-            </main>
-          </div>
+      <div className="w-full flex min-h-screen relative">
+        <AppSidebar />
+        <div className="flex-1 flex flex-col">
+          <Header />
+          <main className="flex-1 bg-background overflow-auto px-4 md:px-6 py-4">
+            {children}
+          </main>
         </div>
       </div>
     </SidebarProvider>

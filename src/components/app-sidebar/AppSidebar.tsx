@@ -44,10 +44,10 @@ export function AppSidebar() {
       <Sidebar 
         variant="sidebar" 
         collapsible="none"
-        className="fixed left-0 top-0 h-screen w-16 bg-gray-50 border-r border-gray-200 z-20 overflow-hidden"
+        className="fixed left-0 top-0 h-screen w-16 bg-sidebar border-r border-sidebar-border z-50 overflow-hidden"
       >
         {/* Main Navigation - Icons Only */}
-        <SidebarContent className="p-2 pt-4 flex flex-col items-center justify-between h-full">
+        <SidebarContent className="p-2 pt-4 flex flex-col items-center justify-between h-full bg-sidebar">
           {/* Top Section */}
           <div className="flex flex-col items-center">
             {/* Avatar - at the top */}
@@ -56,11 +56,11 @@ export function AppSidebar() {
                 <TooltipTrigger asChild>
                   <button 
                     onClick={() => navigate('/profile')}
-                    className="h-10 w-10 shrink-0 border-2 border-gray-300 rounded-full overflow-hidden bg-transparent p-0 hover:border-gray-400 transition-colors"
+                    className="h-10 w-10 shrink-0 border-2 border-sidebar-border rounded-full overflow-hidden bg-transparent p-0 hover:border-sidebar-accent transition-colors"
                   >
                     <Avatar className="h-full w-full">
                       <AvatarImage src={profile?.avatar_url || ''} alt={displayName} />
-                      <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
+                      <AvatarFallback className="bg-sidebar-primary text-sidebar-primary-foreground font-semibold">
                         {initials}
                       </AvatarFallback>
                     </Avatar>
@@ -79,7 +79,7 @@ export function AppSidebar() {
                   <TooltipTrigger asChild>
                     <SidebarMenuButton
                       onClick={() => navigate('/')}
-                      className="h-8 w-8 justify-center p-0 hover:bg-gray-200 rounded-lg text-gray-600 hover:text-gray-800"
+                      className="h-8 w-8 justify-center p-0 hover:bg-sidebar-accent rounded-lg text-sidebar-foreground hover:text-sidebar-accent-foreground"
                       size="sm"
                     >
                       <Home className="h-4 w-4" />
@@ -97,7 +97,7 @@ export function AppSidebar() {
                   <TooltipTrigger asChild>
                     <SidebarMenuButton
                       onClick={() => navigate('/my-ventures')}
-                      className="h-8 w-8 justify-center p-0 hover:bg-gray-200 rounded-lg text-gray-600 hover:text-gray-800"
+                      className="h-8 w-8 justify-center p-0 hover:bg-sidebar-accent rounded-lg text-sidebar-foreground hover:text-sidebar-accent-foreground"
                       size="sm"
                     >
                       <Store className="h-4 w-4" />
@@ -115,7 +115,7 @@ export function AppSidebar() {
                   <TooltipTrigger asChild>
                     <SidebarMenuButton
                       onClick={handleGameNavigation}
-                      className="h-8 w-8 justify-center p-0 hover:bg-gray-200 rounded-lg text-gray-600 hover:text-gray-800"
+                      className="h-8 w-8 justify-center p-0 hover:bg-sidebar-accent rounded-lg text-sidebar-foreground hover:text-sidebar-accent-foreground"
                       size="sm"
                     >
                       <Trophy className="h-4 w-4" />
@@ -133,7 +133,7 @@ export function AppSidebar() {
                   <TooltipTrigger asChild>
                     <SidebarMenuButton
                       onClick={handleTransactionsNavigation}
-                      className="h-8 w-8 justify-center p-0 hover:bg-gray-200 rounded-lg text-gray-600 hover:text-gray-800"
+                      className="h-8 w-8 justify-center p-0 hover:bg-sidebar-accent rounded-lg text-sidebar-foreground hover:text-sidebar-accent-foreground"
                       size="sm"
                     >
                       <ArrowLeftRight className="h-4 w-4" />
@@ -149,17 +149,17 @@ export function AppSidebar() {
 
           {/* Bottom Section */}
           <div className="flex flex-col items-center gap-[4px] pb-1 min-h-[80px] justify-end">
-            <div className="text-lg font-bold text-gray-600 leading-none tracking-tight select-none">stox</div>
+            <div className="text-lg font-bold text-sidebar-foreground leading-none tracking-tight select-none">stox</div>
             
             <Tooltip>
               <TooltipTrigger asChild>
               <button
                 onClick={() => navigate('/profile')}
-                className="mt-[2px] h-7 w-7 flex items-center justify-center rounded-lg text-gray-600 hover:text-gray-800 hover:bg-gray-200 transition-colors"
+                className="mt-[2px] h-7 w-7 flex items-center justify-center rounded-lg text-sidebar-foreground hover:text-sidebar-accent-foreground hover:bg-sidebar-accent transition-colors"
                 aria-label="Settings"
               >
-                  <Settings className="h-4 w-4" />
-                </button>
+                <Settings className="h-4 w-4" />
+              </button>
               </TooltipTrigger>
               <TooltipContent side="right" className="ml-2">Settings</TooltipContent>
             </Tooltip>
@@ -168,7 +168,7 @@ export function AppSidebar() {
               <TooltipTrigger asChild>
                 <button
                   onClick={signOut}
-                  className="mt-[2px] h-7 w-7 flex items-center justify-center rounded-lg text-gray-600 hover:text-red-600 hover:bg-red-100 transition-colors"
+                  className="mt-[2px] h-7 w-7 flex items-center justify-center rounded-lg text-sidebar-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
                   aria-label="Log out"
                 >
                   <LogOut className="h-4 w-4" />
