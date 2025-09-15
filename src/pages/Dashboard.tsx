@@ -125,8 +125,8 @@ export default function Dashboard() {
     try {
       console.log(`Fetching venture for game ${gameId}, participant ${participantId}`);
       
-      // Use limit(1).maybeSingle() to handle multiple ventures gracefully
-      const { data: founderMembers, error } = await supabase
+      // Use maybeSingle() to get exactly one result or null - this prevents array issues
+      const { data: founderMember, error } = await supabase
         .from('founder_members')
         .select(`
           ventures (
@@ -137,15 +137,13 @@ export default function Dashboard() {
           )
         `)
         .eq('participant_id', participantId)
-        .limit(1);
+        .maybeSingle();
 
       if (error) {
-        console.log('Error fetching founder_members:', error);
+        console.error('Error fetching founder_members:', error);
         throw error;
       }
 
-      const founderMember = founderMembers?.[0];
-      
       if (founderMember?.ventures) {
         console.log(`Found venture for game ${gameId}:`, founderMember.ventures);
         const venture = founderMember.ventures as Venture;
@@ -160,16 +158,24 @@ export default function Dashboard() {
           setUserVenture(venture);
         }
       } else {
-        console.log(`No venture found in founder_members for game ${gameId}`);
+        console.log(`No venture found in founder_members for game ${gameId} and participant ${participantId}`);
         // If no founder_member link found, try to find orphan ventures and auto-fix
         await checkAndFixOrphanVentures(gameId, participantId);
       }
-    } catch (error) {
-      console.log('Error in fetchUserVenture for game:', gameId, error);
-      // Try to find and fix orphan ventures as fallback
-      await checkAndFixOrphanVentures(gameId, participantId);
+    } catch (error: any) {
+      console.error('Error in fetchUserVenture for game:', gameId, 'participant:', participantId, error);
+      // Clear any venture data for this game to prevent stale state
+      setVenturesByGame(prev => ({
+        ...prev,
+        [gameId]: undefined
+      }));
+      
+      // Only try orphan venture fix if it's not a PGRST116 (no rows) error
+      if (!error.code || error.code !== 'PGRST116') {
+        await checkAndFixOrphanVentures(gameId, participantId);
+      }
     } finally {
-      // Clear loading state
+      // Always clear loading state
       setVentureLoadingState(prev => ({ ...prev, [gameId]: false }));
     }
   };
