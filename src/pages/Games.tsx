@@ -129,15 +129,6 @@ export default function Games() {
           <div>
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold text-gray-900">Your Games</h2>
-              <Button 
-                onClick={() => navigate("/games/new")} 
-                variant="outline" 
-                size="sm"
-                className="text-gray-700 border-gray-300"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                New Game
-              </Button>
             </div>
             
             <div className="space-y-4">
