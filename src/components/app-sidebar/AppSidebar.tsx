@@ -39,6 +39,8 @@ export function AppSidebar() {
   };
 
 
+  console.log('AppSidebar rendering');
+
   return (
     <TooltipProvider>
       <Sidebar 

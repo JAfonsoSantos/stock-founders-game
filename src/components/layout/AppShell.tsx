@@ -12,6 +12,8 @@ interface AppShellProps {
 export function AppShell({ children }: AppShellProps) {
   const isMobile = useIsMobile();
   
+  console.log('AppShell render - isMobile:', isMobile);
+  
   if (isMobile) {
     // Mobile-first layout with bottom navigation
     return (
@@ -28,9 +30,9 @@ export function AppShell({ children }: AppShellProps) {
   // Desktop layout with sidebar
   return (
     <SidebarProvider defaultOpen={true}>
-      <div className="w-full flex min-h-screen relative">
+      <div className="w-full flex min-h-screen relative bg-background">
         <AppSidebar />
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col ml-16">
           <Header />
           <main className="flex-1 bg-background overflow-auto px-4 md:px-6 py-4">
             {children}
