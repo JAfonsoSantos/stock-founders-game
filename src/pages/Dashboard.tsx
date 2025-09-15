@@ -241,17 +241,17 @@ export default function Dashboard() {
       if (game.isOwner) {
         if (game.status === 'open') {
           return [
-            { text: 'Start Trading', path: `/games/${game.id}/discover`, icon: Play, variant: 'default' as const },
-            { text: 'Manage Game', path: `/games/${game.id}/organizer`, icon: Settings, variant: 'outline' as const },
-            { text: 'Manage Participants', path: `/games/${game.id}/participants`, icon: UserPlus, variant: 'outline' as const },
-            { text: 'Manage Ventures', path: `/games/${game.id}/ventures`, icon: Store, variant: 'outline' as const }
+            { text: 'Start Trading', path: `/games/${game.id}/discover`, icon: Play, variant: 'default' as const, iconOnly: false },
+            { text: 'Manage Game', path: `/games/${game.id}/organizer`, icon: Settings, variant: 'outline' as const, iconOnly: false },
+            { text: 'Manage Participants', path: `/games/${game.id}/participants`, icon: UserPlus, variant: 'outline' as const, iconOnly: true },
+            { text: 'Manage Ventures', path: `/games/${game.id}/ventures`, icon: Store, variant: 'outline' as const, iconOnly: true }
           ];
         }
         return [
-          { text: 'View Game', path: `/games/${game.id}/preview`, icon: Play, variant: 'default' as const },
-          { text: 'Manage Game', path: `/games/${game.id}/organizer`, icon: Settings, variant: 'outline' as const },
-          { text: 'Manage Participants', path: `/games/${game.id}/participants`, icon: UserPlus, variant: 'outline' as const },
-          { text: 'Manage Ventures', path: `/games/${game.id}/ventures`, icon: Store, variant: 'outline' as const }
+          { text: 'View Game', path: `/games/${game.id}/preview`, icon: Play, variant: 'default' as const, iconOnly: false },
+          { text: 'Manage Game', path: `/games/${game.id}/organizer`, icon: Settings, variant: 'outline' as const, iconOnly: false },
+          { text: 'Manage Participants', path: `/games/${game.id}/participants`, icon: UserPlus, variant: 'outline' as const, iconOnly: true },
+          { text: 'Manage Ventures', path: `/games/${game.id}/ventures`, icon: Store, variant: 'outline' as const, iconOnly: true }
         ];
       }
       
@@ -341,20 +341,25 @@ export default function Dashboard() {
                 )}
               </div>
               
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-wrap gap-2">
                 {actionButtons.map((button, index) => (
                   <Button 
                     key={index}
-                    size="lg" 
+                    size={button.iconOnly ? "icon" : "default"}
                     variant={button.variant}
-                    className={button.variant === 'default' ? "bg-[#FF6B35] hover:bg-[#E55A2B] text-white" : ""}
+                    className={`
+                      ${button.variant === 'default' ? "bg-[#FF6B35] hover:bg-[#E55A2B] text-white" : ""}
+                      ${!button.iconOnly && index < 2 ? "flex-1 min-w-0 max-w-[140px]" : ""}
+                      ${button.iconOnly ? "flex-shrink-0" : ""}
+                    `}
                     onClick={(e) => {
                       e.stopPropagation();
                       navigate(button.path);
                     }}
+                    title={button.iconOnly ? button.text : undefined}
                   >
-                    <button.icon className="h-4 w-4 mr-2" />
-                    {button.text}
+                    <button.icon className={button.iconOnly ? "h-4 w-4" : "h-4 w-4 mr-2"} />
+                    {!button.iconOnly && button.text}
                   </Button>
                 ))}
               </div>
