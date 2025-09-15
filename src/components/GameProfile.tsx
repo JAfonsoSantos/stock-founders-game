@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -19,10 +19,13 @@ import {
   Play,
   Crown,
   Building,
-  Eye
+  Eye,
+  ChevronDown,
+  ChevronUp
 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
 
 interface GameData {
   name: string;
@@ -50,9 +53,28 @@ interface GameData {
   startups_count?: number;
 }
 
+interface Participant {
+  id: string;
+  role: string;
+  user: {
+    first_name: string;
+    last_name: string;
+    avatar_url?: string;
+  };
+}
+
+interface Venture {
+  id: string;
+  name: string;
+  logo_url?: string;
+  founder_count: number;
+  founders?: Participant[];
+}
+
 interface GameProfileProps {
   gameData: GameData;
   isPreview?: boolean;
+  gameId?: string;
   onBack?: () => void;
   onEdit?: (type?: 'logo' | 'header') => void;
   onCreateGame?: () => void;
@@ -68,12 +90,19 @@ const CURRENCY_SYMBOLS: Record<string, string> = {
 export function GameProfile({ 
   gameData, 
   isPreview = false, 
+  gameId,
   onBack, 
   onEdit, 
   onCreateGame, 
   onJoinGame,
   onAdminView
 }: GameProfileProps) {
+  const [activeTab, setActiveTab] = useState<'participants' | 'ventures' | null>(null);
+  const [participants, setParticipants] = useState<Participant[]>([]);
+  const [ventures, setVentures] = useState<Venture[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [expandedVenture, setExpandedVenture] = useState<string | null>(null);
+
   const currencySymbol = CURRENCY_SYMBOLS[gameData.currency] || gameData.currency;
   
   const formatCurrency = (amount: number) => {
@@ -95,6 +124,98 @@ export function GameProfile({
       return `${hours}h ${minutes}m`;
     }
     return `${minutes}m`;
+  };
+
+  const fetchParticipants = async () => {
+    if (!gameId) return;
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("participants")
+        .select(`
+          id,
+          role,
+          user:users(first_name, last_name, avatar_url)
+        `)
+        .eq("game_id", gameId)
+        .eq("status", "active");
+
+      if (error) throw error;
+      setParticipants(data || []);
+    } catch (error) {
+      console.error("Error fetching participants:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchVentures = async () => {
+    if (!gameId) return;
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("ventures")
+        .select(`
+          id,
+          name,
+          logo_url,
+          founder_members!inner(
+            participant:participants!inner(
+              id,
+              role,
+              user:users(first_name, last_name, avatar_url)
+            )
+          )
+        `)
+        .eq("game_id", gameId);
+
+      if (error) throw error;
+      
+      const venturesWithCount = (data || []).map(venture => ({
+        id: venture.id,
+        name: venture.name,
+        logo_url: venture.logo_url,
+        founder_count: venture.founder_members?.length || 0,
+        founders: venture.founder_members?.map(fm => ({
+          id: fm.participant.id,
+          role: fm.participant.role,
+          user: fm.participant.user
+        })) || []
+      }));
+
+      setVentures(venturesWithCount);
+    } catch (error) {
+      console.error("Error fetching ventures:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleTabClick = (tab: 'participants' | 'ventures') => {
+    if (activeTab === tab) {
+      setActiveTab(null);
+      return;
+    }
+    
+    setActiveTab(tab);
+    if (tab === 'participants') {
+      fetchParticipants();
+    } else {
+      fetchVentures();
+    }
+  };
+
+  const getInitials = (firstName: string, lastName: string) => {
+    return `${firstName?.[0] || ''}${lastName?.[0] || ''}`.toUpperCase();
+  };
+
+  const getRoleColor = (role: string) => {
+    switch (role) {
+      case 'founder': return 'bg-amber-100 text-amber-800 border-amber-200';
+      case 'angel': return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'vc': return 'bg-emerald-100 text-emerald-800 border-emerald-200';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
   };
 
   return (
@@ -208,16 +329,40 @@ export function GameProfile({
           <div className="flex justify-between items-center mb-8">
             <div className="flex items-center gap-3">
               {gameData.participants_count && (
-                <Badge variant="outline" className="text-sm border-gray-200 bg-white px-3 py-1">
-                  <Users className="h-4 w-4 mr-2 text-gray-600" />
+                <button
+                  onClick={() => handleTabClick('participants')}
+                  className={cn(
+                    "flex items-center gap-2 px-3 py-2 text-sm border rounded-lg transition-colors",
+                    activeTab === 'participants' 
+                      ? "bg-blue-50 border-blue-200 text-blue-800" 
+                      : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
+                  )}
+                >
+                  <Users className="h-4 w-4" />
                   {gameData.participants_count} participants
-                </Badge>
+                  {activeTab === 'participants' ? 
+                    <ChevronUp className="h-4 w-4" /> : 
+                    <ChevronDown className="h-4 w-4" />
+                  }
+                </button>
               )}
               {gameData.startups_count && (
-                <Badge variant="outline" className="text-sm border-gray-200 bg-white px-3 py-1">
-                  <Building className="h-4 w-4 mr-2 text-gray-600" />
+                <button
+                  onClick={() => handleTabClick('ventures')}
+                  className={cn(
+                    "flex items-center gap-2 px-3 py-2 text-sm border rounded-lg transition-colors",
+                    activeTab === 'ventures' 
+                      ? "bg-purple-50 border-purple-200 text-purple-800" 
+                      : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
+                  )}
+                >
+                  <Building className="h-4 w-4" />
                   {gameData.startups_count} startups
-                </Badge>
+                  {activeTab === 'ventures' ? 
+                    <ChevronUp className="h-4 w-4" /> : 
+                    <ChevronDown className="h-4 w-4" />
+                  }
+                </button>
               )}
             </div>
             
@@ -247,6 +392,110 @@ export function GameProfile({
               )}
             </div>
           </div>
+
+          {/* Expandable Tab Content */}
+          {activeTab && (
+            <Card className="bg-white shadow-sm border-gray-100 mb-8">
+              <CardContent className="pt-6 pb-6 px-6">
+                {loading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="text-gray-500">Loading...</div>
+                  </div>
+                ) : (
+                  <>
+                    {activeTab === 'participants' && (
+                      <div className="space-y-3">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Participants</h3>
+                        {participants.map((participant) => (
+                          <div key={participant.id} className="flex items-center gap-4 p-3 rounded-lg border border-gray-100 bg-gray-50/50">
+                            <Avatar className="h-10 w-10">
+                              <AvatarImage src={participant.user.avatar_url} />
+                              <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-sm font-semibold">
+                                {getInitials(participant.user.first_name, participant.user.last_name)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1">
+                              <div className="font-medium text-gray-900">
+                                {participant.user.first_name} {participant.user.last_name}
+                              </div>
+                            </div>
+                            <Badge variant="outline" className={cn("text-xs font-medium", getRoleColor(participant.role))}>
+                              {participant.role}
+                            </Badge>
+                          </div>
+                        ))}
+                        {participants.length === 0 && (
+                          <div className="text-center py-8 text-gray-500">
+                            No participants found
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {activeTab === 'ventures' && (
+                      <div className="space-y-3">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Startups</h3>
+                        {ventures.map((venture) => (
+                          <div key={venture.id} className="border border-gray-100 rounded-lg bg-gray-50/50">
+                            <div className="flex items-center gap-4 p-3">
+                              <div className="h-12 w-12 rounded-lg border-2 border-white shadow-sm bg-white flex items-center justify-center overflow-hidden">
+                                {venture.logo_url ? (
+                                  <img 
+                                    src={venture.logo_url} 
+                                    alt={venture.name} 
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  <Building className="h-6 w-6 text-gray-400" />
+                                )}
+                              </div>
+                              <div className="flex-1">
+                                <div className="font-medium text-gray-900">{venture.name}</div>
+                              </div>
+                              <button
+                                onClick={() => setExpandedVenture(expandedVenture === venture.id ? null : venture.id)}
+                                className="flex items-center gap-2 px-3 py-1 text-sm text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                              >
+                                {venture.founder_count} founder{venture.founder_count !== 1 ? 's' : ''}
+                                {expandedVenture === venture.id ? 
+                                  <ChevronUp className="h-4 w-4" /> : 
+                                  <ChevronDown className="h-4 w-4" />
+                                }
+                              </button>
+                            </div>
+                            
+                            {expandedVenture === venture.id && venture.founders && (
+                              <div className="px-3 pb-3 space-y-2">
+                                <Separator className="mb-2" />
+                                {venture.founders.map((founder) => (
+                                  <div key={founder.id} className="flex items-center gap-3 p-2 rounded bg-white">
+                                    <Avatar className="h-8 w-8">
+                                      <AvatarImage src={founder.user.avatar_url} />
+                                      <AvatarFallback className="bg-gradient-to-br from-amber-500 to-orange-600 text-white text-xs font-semibold">
+                                        {getInitials(founder.user.first_name, founder.user.last_name)}
+                                      </AvatarFallback>
+                                    </Avatar>
+                                    <div className="text-sm font-medium text-gray-900">
+                                      {founder.user.first_name} {founder.user.last_name}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                        {ventures.length === 0 && (
+                          <div className="text-center py-8 text-gray-500">
+                            No startups found
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
           {/* Description */}
           {gameData.description && (

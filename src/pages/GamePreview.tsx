@@ -158,6 +158,7 @@ export default function GamePreview() {
     <GameProfile
       gameData={gameData}
       isPreview={true}
+      gameId={gameId}
       onBack={handleBack}
       onEdit={handleEdit}
       onAdminView={handleAdminView}
