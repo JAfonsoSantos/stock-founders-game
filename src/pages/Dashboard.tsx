@@ -58,6 +58,7 @@ export default function Dashboard() {
   const [showInDevelopmentModal, setShowInDevelopmentModal] = useState(false);
   const [userVenture, setUserVenture] = useState<Venture | null>(null);
   const [venturesByGame, setVenturesByGame] = useState<Record<string, Venture | null>>({});
+  const [ventureLoadingState, setVentureLoadingState] = useState<Record<string, boolean>>({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -118,8 +119,14 @@ export default function Dashboard() {
   };
 
   const fetchUserVenture = async (gameId: string, participantId: string) => {
+    // Set loading state
+    setVentureLoadingState(prev => ({ ...prev, [gameId]: true }));
+    
     try {
-      const { data: founderMember } = await supabase
+      console.log(`Fetching venture for game ${gameId}, participant ${participantId}`);
+      
+      // Use limit(1).maybeSingle() to handle multiple ventures gracefully
+      const { data: founderMembers, error } = await supabase
         .from('founder_members')
         .select(`
           ventures (
@@ -130,25 +137,40 @@ export default function Dashboard() {
           )
         `)
         .eq('participant_id', participantId)
-        .single();
+        .limit(1);
+
+      if (error) {
+        console.log('Error fetching founder_members:', error);
+        throw error;
+      }
+
+      const founderMember = founderMembers?.[0];
       
       if (founderMember?.ventures) {
+        console.log(`Found venture for game ${gameId}:`, founderMember.ventures);
+        const venture = founderMember.ventures as Venture;
+        
         setVenturesByGame(prev => ({
           ...prev,
-          [gameId]: founderMember.ventures as Venture
+          [gameId]: venture
         }));
+        
         // Keep the old userVenture for backward compatibility with priorityGame
         if (gameId === priorityGame?.id) {
-          setUserVenture(founderMember.ventures as Venture);
+          setUserVenture(venture);
         }
       } else {
+        console.log(`No venture found in founder_members for game ${gameId}`);
         // If no founder_member link found, try to find orphan ventures and auto-fix
         await checkAndFixOrphanVentures(gameId, participantId);
       }
     } catch (error) {
-      console.log('No venture found for user in game:', gameId);
+      console.log('Error in fetchUserVenture for game:', gameId, error);
       // Try to find and fix orphan ventures as fallback
       await checkAndFixOrphanVentures(gameId, participantId);
+    } finally {
+      // Clear loading state
+      setVentureLoadingState(prev => ({ ...prev, [gameId]: false }));
     }
   };
 
@@ -170,7 +192,7 @@ export default function Dashboard() {
         }
 
         // Retry fetching the venture after attempting fix
-        const { data: founderMember } = await supabase
+        const { data: retryFounderMembers } = await supabase
           .from('founder_members')
           .select(`
             ventures (
@@ -181,7 +203,9 @@ export default function Dashboard() {
             )
           `)
           .eq('participant_id', participantId)
-          .maybeSingle();
+          .limit(1);
+        
+        const founderMember = retryFounderMembers?.[0];
 
         if (founderMember?.ventures) {
           setVenturesByGame(prev => ({
@@ -341,18 +365,37 @@ export default function Dashboard() {
       
       // Check if user is founder and get venture for this specific game
       const gameVenture = venturesByGame[game.id];
+      const isLoadingVenture = ventureLoadingState[game.id];
       const assetName = game.asset_singular || 'Startup';
       
-      if (game.participationData?.role === 'founder' && gameVenture) {
-        return [
-          { text: 'View Game', path: `/games/${game.id}/discover`, icon: Play, variant: 'default' as const, iconOnly: false },
-          { text: `Edit ${assetName}`, path: `/games/${game.id}/ventures/${gameVenture.slug}/admin`, icon: Store, variant: 'outline' as const, iconOnly: false }
-        ];
-      }
+      console.log(`Game ${game.id} - Venture:`, gameVenture, 'Loading:', isLoadingVenture, 'Role:', game.participationData?.role);
       
-      if (game.participationData?.role === 'founder' && gameVenture === null) {
+      if (game.participationData?.role === 'founder') {
+        // Show loading state while fetching venture
+        if (isLoadingVenture) {
+          return [
+            { text: 'Loading...', path: '#', icon: Clock, variant: 'outline' as const, iconOnly: false }
+          ];
+        }
+        
+        // If we have venture data (not null and not undefined)
+        if (gameVenture) {
+          return [
+            { text: 'View Game', path: `/games/${game.id}/discover`, icon: Play, variant: 'default' as const, iconOnly: false },
+            { text: `Edit ${assetName}`, path: `/games/${game.id}/ventures/${gameVenture.slug}/admin`, icon: Store, variant: 'outline' as const, iconOnly: false }
+          ];
+        }
+        
+        // Only show "Create Startup" if we've finished loading and definitely have no venture
+        if (gameVenture === null && !isLoadingVenture) {
+          return [
+            { text: `Create ${assetName}`, path: `/games/${game.id}/founder-onboarding`, icon: Plus, variant: 'default' as const, iconOnly: false }
+          ];
+        }
+        
+        // While we're still determining the venture status, show a neutral state
         return [
-          { text: `Create ${assetName}`, path: `/games/${game.id}/founder-onboarding`, icon: Plus, variant: 'default' as const, iconOnly: false }
+          { text: 'Loading...', path: '#', icon: Clock, variant: 'outline' as const, iconOnly: false }
         ];
       }
       
@@ -388,7 +431,7 @@ export default function Dashboard() {
               
               {game.status === 'open' && (
                 <div className="flex items-center gap-2 text-lg text-green-600 font-semibold mb-4">
-                  <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                   Evento ativo!
                 </div>
               )}
