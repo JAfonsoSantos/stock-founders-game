@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { LanguageSelector } from "@/components/LanguageSelector";
-import { Plus, Users, TrendingUp, Settings, Play, Sparkles, Crown, User, LogOut, Clock } from "lucide-react";
+import { Plus, Users, TrendingUp, Settings, Play, Sparkles, Crown, User, LogOut, Clock, Store, UserPlus } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -237,35 +237,52 @@ export default function Dashboard() {
   const SingleActiveGameCard = ({ game }: { game: ExtendedGame }) => {
     const timeLeft = useCountdown(game.starts_at);
     
-    const getActionButton = () => {
+    const getActionButtons = () => {
       if (game.isOwner) {
         if (game.status === 'open') {
-          return { text: 'Start Trading', path: `/games/${game.id}/discover` };
+          return [
+            { text: 'Start Trading', path: `/games/${game.id}/discover`, icon: Play, variant: 'default' as const },
+            { text: 'Manage Game', path: `/games/${game.id}/organizer`, icon: Settings, variant: 'outline' as const },
+            { text: 'Manage Participants', path: `/games/${game.id}/participants`, icon: UserPlus, variant: 'outline' as const },
+            { text: 'Manage Ventures', path: `/games/${game.id}/ventures`, icon: Store, variant: 'outline' as const }
+          ];
         }
-        return { text: 'Manage Game', path: `/games/${game.id}/organizer` };
+        return [
+          { text: 'View Game', path: `/games/${game.id}/preview`, icon: Play, variant: 'default' as const },
+          { text: 'Manage Game', path: `/games/${game.id}/organizer`, icon: Settings, variant: 'outline' as const },
+          { text: 'Manage Participants', path: `/games/${game.id}/participants`, icon: UserPlus, variant: 'outline' as const },
+          { text: 'Manage Ventures', path: `/games/${game.id}/ventures`, icon: Store, variant: 'outline' as const }
+        ];
       }
       
       if (game.participationData?.role === 'founder' && userVenture) {
-        return { text: 'Manage Venture', path: `/games/${game.id}/ventures/${userVenture.slug}/admin` };
+        return [
+          { text: 'Manage Venture', path: `/games/${game.id}/ventures/${userVenture.slug}/admin`, icon: Store, variant: 'default' as const }
+        ];
       }
       
       if (game.participationData?.role === 'founder' && !userVenture) {
-        return { text: 'Setup Venture', path: `/games/${game.id}/founder-onboarding` };
+        return [
+          { text: 'Setup Venture', path: `/games/${game.id}/founder-onboarding`, icon: Plus, variant: 'default' as const }
+        ];
       }
       
       if (game.status === 'open') {
-        return { text: 'Start Trading', path: `/games/${game.id}/discover` };
+        return [
+          { text: 'Start Trading', path: `/games/${game.id}/discover`, icon: Play, variant: 'default' as const }
+        ];
       }
       
-      return { text: 'View Portfolio', path: `/games/${game.id}/me` };
+      return [
+        { text: 'View Game', path: `/games/${game.id}`, icon: Play, variant: 'default' as const }
+      ];
     };
 
-    const actionButton = getActionButton();
+    const actionButtons = getActionButtons();
     
     return (
       <Card 
-        className="mb-12 cursor-pointer hover:shadow-lg transition-all duration-200 hover:scale-[1.01]"
-        onClick={() => navigate(actionButton.path)}
+        className="mb-12 hover:shadow-lg transition-all duration-200"
       >
         <CardContent className="p-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
@@ -324,16 +341,23 @@ export default function Dashboard() {
                 )}
               </div>
               
-              <Button 
-                size="lg" 
-                className="bg-[#FF6B35] hover:bg-[#E55A2B] text-white"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate(actionButton.path);
-                }}
-              >
-                {actionButton.text}
-              </Button>
+              <div className="flex flex-wrap gap-3">
+                {actionButtons.map((button, index) => (
+                  <Button 
+                    key={index}
+                    size="lg" 
+                    variant={button.variant}
+                    className={button.variant === 'default' ? "bg-[#FF6B35] hover:bg-[#E55A2B] text-white" : ""}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(button.path);
+                    }}
+                  >
+                    <button.icon className="h-4 w-4 mr-2" />
+                    {button.text}
+                  </Button>
+                ))}
+              </div>
             </div>
             
             {/* Visual Section */}
