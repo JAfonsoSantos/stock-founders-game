@@ -713,6 +713,10 @@ export type Database = {
         }
         Returns: Json
       }
+      fix_orphan_ventures: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       get_all_users_admin: {
         Args: Record<PropertyKey, never>
         Returns: {

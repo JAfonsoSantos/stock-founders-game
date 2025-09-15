@@ -142,16 +142,69 @@ export default function Dashboard() {
           setUserVenture(founderMember.ventures as Venture);
         }
       } else {
-        setVenturesByGame(prev => ({
-          ...prev,
-          [gameId]: null
-        }));
-        if (gameId === priorityGame?.id) {
-          setUserVenture(null);
-        }
+        // If no founder_member link found, try to find orphan ventures and auto-fix
+        await checkAndFixOrphanVentures(gameId, participantId);
       }
     } catch (error) {
       console.log('No venture found for user in game:', gameId);
+      // Try to find and fix orphan ventures as fallback
+      await checkAndFixOrphanVentures(gameId, participantId);
+    }
+  };
+
+  const checkAndFixOrphanVentures = async (gameId: string, participantId: string) => {
+    try {
+      // Check if there are ventures in this game where the user is a founder but not linked
+      const { data: orphanVentures } = await supabase
+        .from('ventures')
+        .select('id, name, slug, logo_url')
+        .eq('game_id', gameId);
+
+      if (orphanVentures && orphanVentures.length > 0) {
+        // Try to call the fix function (this might help in some cases)
+        try {
+          const { data } = await supabase.rpc('fix_orphan_ventures');
+          console.log('Auto-fix orphan ventures result:', data);
+        } catch (fixError) {
+          console.log('Could not auto-fix orphan ventures:', fixError);
+        }
+
+        // Retry fetching the venture after attempting fix
+        const { data: founderMember } = await supabase
+          .from('founder_members')
+          .select(`
+            ventures (
+              id,
+              name,
+              logo_url,
+              slug
+            )
+          `)
+          .eq('participant_id', participantId)
+          .maybeSingle();
+
+        if (founderMember?.ventures) {
+          setVenturesByGame(prev => ({
+            ...prev,
+            [gameId]: founderMember.ventures as Venture
+          }));
+          if (gameId === priorityGame?.id) {
+            setUserVenture(founderMember.ventures as Venture);
+          }
+          return;
+        }
+      }
+
+      // If still no venture found, set as null
+      setVenturesByGame(prev => ({
+        ...prev,
+        [gameId]: null
+      }));
+      if (gameId === priorityGame?.id) {
+        setUserVenture(null);
+      }
+    } catch (error) {
+      console.log('Error checking for orphan ventures:', error);
       setVenturesByGame(prev => ({
         ...prev,
         [gameId]: null
