@@ -473,18 +473,6 @@ export default function GameOrganizer() {
                 Edit
               </Button>
 
-              {/* Delete Game Button - only for draft games or games with no participants */}
-              {(game.status === 'draft' || stats.participants === 0) && (
-                <Button 
-                  variant="outline"
-                  onClick={() => setShowDeleteDialog(true)}
-                  className="px-4 text-red-600 border-red-300 hover:bg-red-50 hover:border-red-400"
-                >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Delete Game
-                </Button>
-              )}
-
               {/* Main status control button */}
               {game.status === 'draft' && (
                 <Button 
@@ -755,6 +743,32 @@ export default function GameOrganizer() {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Delete Game Card - only for draft games or games with no participants */}
+              {(game.status === 'draft' || stats.participants === 0) && (
+                <Card
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setShowDeleteDialog(true)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") setShowDeleteDialog(true);
+                  }}
+                  className="cursor-pointer hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 bg-white border-gray-100 hover:border-red-200 group"
+                  aria-label="Delete Game"
+                >
+                  <CardContent className="flex items-center p-8">
+                    <div className="p-4 bg-red-50 rounded-xl mr-6 group-hover:bg-red-100 transition-colors">
+                      <Trash2 className="h-8 w-8 text-red-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-semibold text-gray-900 mb-2">Delete Game</h3>
+                      <p className="text-gray-600">
+                        Permanently delete this game and all its data
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </div>
           </div>
         </div>
