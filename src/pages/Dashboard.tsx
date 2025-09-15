@@ -423,8 +423,37 @@ export default function Dashboard() {
         className="mb-6 lg:mb-12 hover:shadow-lg transition-all duration-200"
       >
         <CardContent className="p-4 lg:p-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8 items-center">
-            {/* Info Section */}
+          <div className="space-y-4 lg:space-y-6">
+            {/* Visual Section - Cover em primeiro lugar */}
+            <div className="relative">
+              {game.hero_image_url ? (
+                <div 
+                  className="bg-gradient-to-br from-orange-100 to-orange-50 rounded-xl h-40 lg:h-64 bg-cover bg-center"
+                  style={{ backgroundImage: `url(${game.hero_image_url})` }}
+                >
+                  <div className="absolute inset-0 bg-black/10 rounded-xl"></div>
+                </div>
+              ) : (
+                <div className="bg-gradient-to-br from-orange-100 to-orange-50 rounded-xl p-4 lg:p-6 h-40 lg:h-64 flex items-center justify-center">
+                  <div className="text-center">
+                    <TrendingUp className="h-8 w-8 lg:h-16 lg:w-16 text-orange-600 mx-auto mb-2 lg:mb-4" />
+                    <p className="text-sm lg:text-base text-gray-600 font-medium">Investment Simulation</p>
+                  </div>
+                </div>
+              )}
+              
+              {game.logo_url && (
+                <div className="absolute top-2 left-2 lg:top-4 lg:left-4">
+                  <img 
+                    src={game.logo_url} 
+                    alt={`${game.name} logo`}
+                    className="w-8 h-8 lg:w-12 lg:h-12 rounded-lg bg-white p-1 lg:p-2 shadow-md"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Info Section - Título e informações em segundo lugar */}
             <div>
               <h2 className="text-xl lg:text-3xl xl:text-4xl font-bold text-gray-900 mb-2">{game.name}</h2>
               
@@ -501,35 +530,6 @@ export default function Dashboard() {
                   </Button>
                 ))}
               </div>
-            </div>
-            
-            {/* Visual Section */}
-            <div className="relative mt-4 lg:mt-0">
-              {game.hero_image_url ? (
-                <div 
-                  className="bg-gradient-to-br from-orange-100 to-orange-50 rounded-xl h-40 lg:h-64 bg-cover bg-center"
-                  style={{ backgroundImage: `url(${game.hero_image_url})` }}
-                >
-                  <div className="absolute inset-0 bg-black/10 rounded-xl"></div>
-                </div>
-              ) : (
-                <div className="bg-gradient-to-br from-orange-100 to-orange-50 rounded-xl p-4 lg:p-6 h-40 lg:h-64 flex items-center justify-center">
-                  <div className="text-center">
-                    <TrendingUp className="h-8 w-8 lg:h-16 lg:w-16 text-orange-600 mx-auto mb-2 lg:mb-4" />
-                    <p className="text-sm lg:text-base text-gray-600 font-medium">Investment Simulation</p>
-                  </div>
-                </div>
-              )}
-              
-              {game.logo_url && (
-                <div className="absolute top-2 left-2 lg:top-4 lg:left-4">
-                  <img 
-                    src={game.logo_url} 
-                    alt={`${game.name} logo`}
-                    className="w-8 h-8 lg:w-12 lg:h-12 rounded-lg bg-white p-1 lg:p-2 shadow-md"
-                  />
-                </div>
-              )}
             </div>
           </div>
         </CardContent>
