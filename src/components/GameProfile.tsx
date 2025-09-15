@@ -61,6 +61,13 @@ interface Participant {
     last_name: string;
     avatar_url?: string;
   };
+  founder_members?: Array<{
+    venture: {
+      id: string;
+      name: string;
+      logo_url?: string;
+    };
+  }>;
 }
 
 interface Venture {
@@ -130,7 +137,8 @@ export function GameProfile({
     if (!gameId) return;
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      // Get all participants
+      const { data: participantsData, error: participantsError } = await supabase
         .from("participants")
         .select(`
           id,
@@ -140,8 +148,30 @@ export function GameProfile({
         .eq("game_id", gameId)
         .eq("status", "active");
 
-      if (error) throw error;
-      setParticipants(data || []);
+      if (participantsError) throw participantsError;
+
+      // For founders, get their venture info
+      const participantsWithVentures = await Promise.all(
+        (participantsData || []).map(async (participant) => {
+          if (participant.role === 'founder') {
+            const { data: founderData } = await supabase
+              .from("founder_members")
+              .select(`
+                venture:ventures(id, name, logo_url)
+              `)
+              .eq("participant_id", participant.id)
+              .single();
+
+            return {
+              ...participant,
+              founder_members: founderData ? [founderData] : []
+            };
+          }
+          return participant;
+        })
+      );
+
+      setParticipants(participantsWithVentures);
     } catch (error) {
       console.error("Error fetching participants:", error);
     } finally {
@@ -153,37 +183,46 @@ export function GameProfile({
     if (!gameId) return;
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      // First get all ventures
+      const { data: venturesData, error: venturesError } = await supabase
         .from("ventures")
-        .select(`
-          id,
-          name,
-          logo_url,
-          founder_members!inner(
-            participant:participants!inner(
-              id,
-              role,
-              user:users(first_name, last_name, avatar_url)
-            )
-          )
-        `)
+        .select("id, name, logo_url")
         .eq("game_id", gameId);
 
-      if (error) throw error;
-      
-      const venturesWithCount = (data || []).map(venture => ({
-        id: venture.id,
-        name: venture.name,
-        logo_url: venture.logo_url,
-        founder_count: venture.founder_members?.length || 0,
-        founders: venture.founder_members?.map(fm => ({
-          id: fm.participant.id,
-          role: fm.participant.role,
-          user: fm.participant.user
-        })) || []
-      }));
+      if (venturesError) throw venturesError;
 
-      setVentures(venturesWithCount);
+      // Then get founder counts for each venture
+      const venturesWithCounts = await Promise.all(
+        (venturesData || []).map(async (venture) => {
+          const { data: foundersData, error: foundersError } = await supabase
+            .from("founder_members")
+            .select(`
+              participant:participants!inner(
+                id,
+                role,
+                user:users(first_name, last_name, avatar_url)
+              )
+            `)
+            .eq("venture_id", venture.id);
+
+          if (foundersError) {
+            console.error("Error fetching founders for venture:", venture.id, foundersError);
+            return {
+              ...venture,
+              founder_count: 0,
+              founders: []
+            };
+          }
+
+          return {
+            ...venture,
+            founder_count: foundersData?.length || 0,
+            founders: foundersData?.map(fm => fm.participant) || []
+          };
+        })
+      );
+
+      setVentures(venturesWithCounts);
     } catch (error) {
       console.error("Error fetching ventures:", error);
     } finally {
@@ -418,6 +457,25 @@ export function GameProfile({
                               <div className="font-medium text-gray-900">
                                 {participant.user.first_name} {participant.user.last_name}
                               </div>
+                              {/* Show startup info for founders */}
+                              {participant.role === 'founder' && participant.founder_members?.[0]?.venture && (
+                                <div className="flex items-center gap-2 mt-1">
+                                  <div className="h-4 w-4 rounded border bg-white flex items-center justify-center overflow-hidden">
+                                    {participant.founder_members[0].venture.logo_url ? (
+                                      <img 
+                                        src={participant.founder_members[0].venture.logo_url} 
+                                        alt={participant.founder_members[0].venture.name}
+                                        className="w-full h-full object-cover"
+                                      />
+                                    ) : (
+                                      <Building className="h-2 w-2 text-gray-400" />
+                                    )}
+                                  </div>
+                                  <span className="text-xs text-gray-600">
+                                    {participant.founder_members[0].venture.name}
+                                  </span>
+                                </div>
+                              )}
                             </div>
                             <Badge variant="outline" className={cn("text-xs font-medium", getRoleColor(participant.role))}>
                               {participant.role}
