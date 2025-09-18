@@ -29,7 +29,7 @@ import VentureAdmin from "./pages/VentureAdmin";
 import Leaderboard from "./pages/Leaderboard";
 import FounderOnboarding from "./pages/FounderOnboarding";
 import ResetPassword from "./pages/ResetPassword";
-import GameView from "./pages/GameView";
+import Trading from './pages/Trading';
 import GamePreview from "./pages/GamePreview";
 import Setup from "./pages/Setup";
 import SetupColors from "./pages/SetupColors";
@@ -164,6 +164,11 @@ const App = () => (
               <Route path="/games/:gameId/ventures" element={
                 <ProtectedShellRoute>
                   <ManageVentures />
+                </ProtectedShellRoute>
+              } />
+              <Route path="/games/:gameId/trading" element={
+                <ProtectedShellRoute>
+                  <Trading />
                 </ProtectedShellRoute>
               } />
               <Route path="/games/:gameId/settings" element={

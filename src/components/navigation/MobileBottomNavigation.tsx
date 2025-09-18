@@ -1,4 +1,4 @@
-import { Home, Store, Trophy, TrendingUp, User } from "lucide-react";
+import { Home, Store, Trophy, ArrowLeftRight, User } from 'lucide-react';
 import { useNavigate, useLocation } from "react-router-dom";
 import { useGameContext } from "@/context/GameContext";
 import { useI18n } from "@/hooks/useI18n";
@@ -19,9 +19,9 @@ export function MobileBottomNavigation() {
     }
 
     if (currentGameId) {
-      navigate(`/games/${currentGameId}/me`);
+      navigate(`/games/${currentGameId}/trading`);
     } else if (activeGames.length === 1) {
-      navigate(`/games/${activeGames[0].id}/me`);
+      navigate(`/games/${activeGames[0].id}/trading`);
     } else {
       navigate('/games');
     }
@@ -54,9 +54,9 @@ export function MobileBottomNavigation() {
       onClick: () => navigate('/games')
     },
     {
-      icon: TrendingUp,
-      label: 'Inbox',
-      path: '/inbox',
+      icon: ArrowLeftRight,
+      label: 'Trading',
+      path: '/trading',
       onClick: handleTransactionsNavigation
     },
     {

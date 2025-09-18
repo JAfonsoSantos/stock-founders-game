@@ -1,7 +1,7 @@
 import { Sidebar, SidebarContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Home, Store, Trophy, TrendingUp, Settings, LogOut } from "lucide-react";
+import { Home, Store, Trophy, ArrowLeftRight, Settings, LogOut } from "lucide-react";
 import { useGameContext } from "@/context/GameContext";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/hooks/useI18n";
@@ -29,9 +29,9 @@ export function AppSidebar() {
     }
 
     if (currentGameId) {
-      navigate(`/games/${currentGameId}/me`);
+      navigate(`/games/${currentGameId}/trading`);
     } else if (activeGames.length === 1) {
-      navigate(`/games/${activeGames[0].id}/me`);
+      navigate(`/games/${activeGames[0].id}/trading`);
     } else {
       // If multiple games, navigate to games page to select one
       navigate('/games');
@@ -138,11 +138,11 @@ export function AppSidebar() {
                       className="h-8 w-8 justify-center p-0 hover:bg-sidebar-accent rounded-lg text-sidebar-foreground hover:text-sidebar-accent-foreground"
                       size="sm"
                     >
-                      <TrendingUp className="h-4 w-4" />
+                      <ArrowLeftRight className="h-4 w-4" />
                     </SidebarMenuButton>
                   </TooltipTrigger>
                   <TooltipContent side="right" className="ml-2">
-                    Inbox
+                    Trading
                   </TooltipContent>
                 </Tooltip>
               </SidebarMenuItem>
