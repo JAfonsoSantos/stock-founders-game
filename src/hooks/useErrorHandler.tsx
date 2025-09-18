@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 
 export type ErrorSeverity = "info" | "warning" | "error";
 
@@ -11,7 +11,6 @@ interface ErrorDetails {
 }
 
 export function useErrorHandler() {
-  const { toast } = useToast();
   const [lastError, setLastError] = useState<ErrorDetails | null>(null);
 
   const handleError = useCallback((error: any, customMessage?: string) => {
@@ -52,17 +51,17 @@ export function useErrorHandler() {
     setLastError(errorDetails);
 
     // Show toast notification
-    toast({
-      title: getErrorTitle(errorDetails.severity),
-      description: errorDetails.message,
-      variant: errorDetails.severity === "error" ? "destructive" : "default"
-    });
+    if (errorDetails.severity === "error") {
+      toast.error(errorDetails.message);
+    } else {
+      toast(errorDetails.message);
+    }
 
     // Log error for debugging
     console.error("Error handled:", errorDetails);
 
     return errorDetails;
-  }, [toast]);
+  }, []);
 
   const handleWarning = useCallback((message: string, details?: any) => {
     const warningDetails: ErrorDetails = {
@@ -73,15 +72,11 @@ export function useErrorHandler() {
 
     setLastError(warningDetails);
 
-    toast({
-      title: "Warning",
-      description: message,
-      variant: "default"
-    });
+    toast.warning(message);
 
     console.warn("Warning:", warningDetails);
     return warningDetails;
-  }, [toast]);
+  }, []);
 
   const handleInfo = useCallback((message: string, details?: any) => {
     const infoDetails: ErrorDetails = {
@@ -92,15 +87,11 @@ export function useErrorHandler() {
 
     setLastError(infoDetails);
 
-    toast({
-      title: "Info",
-      description: message,
-      variant: "default"
-    });
+    toast.info(message);
 
     console.info("Info:", infoDetails);
     return infoDetails;
-  }, [toast]);
+  }, []);
 
   const clearError = useCallback(() => {
     setLastError(null);

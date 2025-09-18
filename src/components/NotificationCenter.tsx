@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { Bell, Check, X } from "lucide-react";
 import { useNotificationUpdates } from "@/hooks/useRealtime";
 
@@ -15,7 +15,6 @@ interface NotificationCenterProps {
 export function NotificationCenter({ participantId, gameId }: NotificationCenterProps) {
   const [notifications, setNotifications] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
 
   // Real-time notifications
   useNotificationUpdates(participantId, (newNotification) => {
@@ -55,28 +54,17 @@ export function NotificationCenter({ participantId, gameId }: NotificationCenter
       if (error) throw error;
 
       if (data && typeof data === 'object' && 'error' in data && data.error) {
-        toast({
-          title: "Erro",
-          description: data.error as string,
-          variant: "destructive"
-        });
+        toast.error(data.error as string);
         return;
       }
 
-      toast({
-        title: "Sucesso",
-        description: "Trade aceito com sucesso!"
-      });
+      toast.success("Trade aceito com sucesso!");
 
       // Remove notification from list
       setNotifications(prev => prev.filter(n => n.id !== notificationId));
     } catch (error) {
       console.error('Error accepting trade:', error);
-      toast({
-        title: "Erro",
-        description: "Erro ao aceitar trade",
-        variant: "destructive"
-      });
+      toast.error("Erro ao aceitar trade");
     } finally {
       setIsLoading(false);
     }
@@ -91,10 +79,7 @@ export function NotificationCenter({ participantId, gameId }: NotificationCenter
 
       if (error) throw error;
 
-      toast({
-        title: "Rejeitado",
-        description: "Pedido de trade rejeitado"
-      });
+      toast.success("Pedido de trade rejeitado");
 
       // Remove notification from list
       setNotifications(prev => prev.filter(n => n.id !== notificationId));

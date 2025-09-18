@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Loader2, Wallet, TrendingUp, DollarSign, Activity, ArrowUpDown, Zap } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { SecondaryTradeModal } from "@/components/SecondaryTradeModal";
 import { NotificationCenter } from "@/components/NotificationCenter";
 import { MobileTable, MobilePositionCard, MobileTradeCard } from "@/components/ui/mobile-table";
@@ -18,7 +18,6 @@ export default function PlayerDashboard() {
   const { gameId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { toast } = useToast();
   const [participant, setParticipant] = useState<any>(null);
   const [positions, setPositions] = useState<any[]>([]);
   const [trades, setTrades] = useState<any[]>([]);

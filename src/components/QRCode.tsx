@@ -3,7 +3,7 @@ import QRCodeLib from "qrcode";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download, Copy, QrCode } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 
 interface QRCodeProps {
   url: string;
@@ -22,7 +22,6 @@ export function QRCode({
 }: QRCodeProps) {
   const [qrDataUrl, setQrDataUrl] = useState<string>("");
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
 
   useEffect(() => {
     generateQR();
@@ -42,11 +41,7 @@ export function QRCode({
       setQrDataUrl(qrDataUrl);
     } catch (error) {
       console.error('Error generating QR code:', error);
-      toast({
-        title: "Erro",
-        description: "Erro ao gerar QR code",
-        variant: "destructive"
-      });
+      toast.error("Erro ao gerar QR code");
     } finally {
       setLoading(false);
     }
@@ -62,25 +57,15 @@ export function QRCode({
     link.click();
     document.body.removeChild(link);
     
-    toast({
-      title: "Sucesso",
-      description: "QR code baixado com sucesso",
-    });
+    toast.success("QR code baixado com sucesso");
   };
 
   const copyUrl = async () => {
     try {
       await navigator.clipboard.writeText(url);
-      toast({
-        title: "Sucesso",
-        description: "URL copiada para clipboard",
-      });
+      toast.success("URL copiada para clipboard");
     } catch (error) {
-      toast({
-        title: "Erro",
-        description: "Erro ao copiar URL",
-        variant: "destructive"
-      });
+      toast.error("Erro ao copiar URL");
     }
   };
 

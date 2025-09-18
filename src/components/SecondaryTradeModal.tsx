@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 
 interface SecondaryTradeModalProps {
   isOpen: boolean;
@@ -27,24 +27,15 @@ export function SecondaryTradeModal({
   const [quantity, setQuantity] = useState(1);
   const [pricePerShare, setPricePerShare] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
 
   const handleSubmit = async () => {
     if (!buyerEmail || quantity <= 0 || pricePerShare <= 0) {
-      toast({
-        title: "Erro",
-        description: "Por favor, preencha todos os campos corretamente",
-        variant: "destructive"
-      });
+      toast.error("Por favor, preencha todos os campos corretamente");
       return;
     }
 
     if (quantity > maxQuantity) {
-      toast({
-        title: "Erro", 
-        description: `Quantidade máxima disponível: ${maxQuantity}`,
-        variant: "destructive"
-      });
+      toast.error(`Quantidade máxima disponível: ${maxQuantity}`);
       return;
     }
 
@@ -61,18 +52,11 @@ export function SecondaryTradeModal({
       if (error) throw error;
 
       if (data && typeof data === 'object' && 'error' in data && data.error) {
-        toast({
-          title: "Erro",
-          description: data.error as string,
-          variant: "destructive"
-        });
+        toast.error(data.error as string);
         return;
       }
 
-      toast({
-        title: "Sucesso",
-        description: "Pedido de venda enviado com sucesso!"
-      });
+      toast.success("Pedido de venda enviado com sucesso!");
 
       onClose();
       setBuyerEmail("");
@@ -80,11 +64,7 @@ export function SecondaryTradeModal({
       setPricePerShare(0);
     } catch (error) {
       console.error('Error creating secondary trade request:', error);
-      toast({
-        title: "Erro",
-        description: "Erro ao criar pedido de venda",
-        variant: "destructive"
-      });
+      toast.error("Erro ao criar pedido de venda");
     } finally {
       setIsLoading(false);
     }

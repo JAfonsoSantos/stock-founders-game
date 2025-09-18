@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { Upload, Image } from "lucide-react";
 
 interface LogoUploadProps {
@@ -14,7 +14,6 @@ interface LogoUploadProps {
 
 export function LogoUpload({ startupSlug, currentLogoUrl, onLogoUploaded }: LogoUploadProps) {
   const [uploading, setUploading] = useState(false);
-  const { toast } = useToast();
 
   const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
@@ -55,18 +54,11 @@ export function LogoUpload({ startupSlug, currentLogoUrl, onLogoUploaded }: Logo
 
       onLogoUploaded(publicUrl);
       
-      toast({
-        title: "Sucesso",
-        description: "Logo uploaded successfully!"
-      });
+      toast.success("Logo uploaded successfully!");
 
     } catch (error: any) {
       console.error('Error uploading logo:', error);
-      toast({
-        title: "Erro",
-        description: error.message || "Error uploading logo",
-        variant: "destructive"
-      });
+      toast.error(error.message || "Error uploading logo");
     } finally {
       setUploading(false);
     }
