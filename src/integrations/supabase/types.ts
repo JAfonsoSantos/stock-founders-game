@@ -238,6 +238,7 @@ export type Database = {
           status: string
           to_participant_id: string
           type: string
+          updated_at: string | null
         }
         Insert: {
           created_at?: string
@@ -248,6 +249,7 @@ export type Database = {
           status?: string
           to_participant_id: string
           type: string
+          updated_at?: string | null
         }
         Update: {
           created_at?: string
@@ -258,6 +260,7 @@ export type Database = {
           status?: string
           to_participant_id?: string
           type?: string
+          updated_at?: string | null
         }
         Relationships: [
           {
