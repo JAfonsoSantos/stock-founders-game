@@ -213,6 +213,11 @@ const App = () => (
                   <GamePreview />
                 </ProtectedRoute>
               } />
+              <Route path="/games/:gameId/trading" element={
+                <ProtectedShellRoute>
+                  <Trading />
+                </ProtectedShellRoute>
+              } />
               <Route path="/games/:gameId" element={
                 <ProtectedRoute>
                   <GameView />

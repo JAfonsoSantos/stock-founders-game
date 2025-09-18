@@ -704,13 +704,22 @@ export type Database = {
         Returns: Json
       }
       create_secondary_trade_request: {
-        Args: {
-          p_buyer_email: string
-          p_game_id: string
-          p_price_per_share: number
-          p_qty: number
-          p_venture_id: string
-        }
+        Args:
+          | {
+              p_buyer_email: string
+              p_game_id: string
+              p_price_per_share: number
+              p_qty: number
+              p_venture_id: string
+            }
+          | {
+              p_buyer_participant_id: string
+              p_game_id: string
+              p_price_per_share: number
+              p_qty: number
+              p_seller_email: string
+              p_venture_id: string
+            }
         Returns: Json
       }
       decide_primary_order: {
