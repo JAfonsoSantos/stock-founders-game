@@ -522,9 +522,6 @@ export default function GameOrganizer() {
           <div className={cn("gap-6", isMobile ? "space-y-6" : "grid lg:grid-cols-2 gap-8")}>
             {/* Left Column - Game Controls & Statistics */}
             <div className="space-y-6">
-              {/* Organizer Notifications */}
-              <OrganizerNotifications gameId={gameId!} />
-
               {/* Game Details */}
               <Card className="bg-white shadow-sm border-gray-100">
                 <CardHeader className="pb-6">
