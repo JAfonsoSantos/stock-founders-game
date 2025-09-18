@@ -89,7 +89,7 @@ export async function sendInviteEmail(to: string[], gameId: string, gameName: st
     gameName,
     locale,
     data: {
-      joinUrl: `https://stox.games/join/${gameId}`
+      joinUrl: `${window.location.origin}/join/${gameId}`
     }
   });
 }
@@ -102,7 +102,7 @@ export async function sendMarketOpenEmail(to: string[], gameId: string, gameName
     gameName,
     locale,
     data: {
-      gameUrl: `https://stox.games/games/${gameId}/discover`
+      gameUrl: `${window.location.origin}/games/${gameId}/discover`
     }
   });
 }
@@ -115,7 +115,7 @@ export async function sendLastMinutesEmail(to: string[], gameId: string, gameNam
     gameName,
     locale,
     data: {
-      gameUrl: `https://stox.games/games/${gameId}/discover`,
+      gameUrl: `${window.location.origin}/games/${gameId}/discover`,
       minutesLeft
     }
   });

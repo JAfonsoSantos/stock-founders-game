@@ -184,7 +184,7 @@ const handler = async (req: Request): Promise<Response> => {
         let qrCodeBase64 = '';
         const qrCid = 'qr-code';
         try {
-          const joinUrl = `https://stox.games/join/${emailRequest.gameId}`;
+          const joinUrl = `${req.headers.get('origin') || 'https://loving-impala-66.lovable.app'}/join/${emailRequest.gameId}`;
           const qrDataUrl = await QRCode.toDataURL(joinUrl, {
             width: 200,
             margin: 2,
@@ -222,7 +222,7 @@ const handler = async (req: Request): Promise<Response> => {
           gameName: emailRequest.gameName,
           gameId: emailRequest.gameId,
           locale: emailRequest.locale || 'en',
-          gameUrl: `https://stox.games/games/${emailRequest.gameId}/discover` // Override with secure URL
+          gameUrl: `${req.headers.get('origin') || 'https://loving-impala-66.lovable.app'}/games/${emailRequest.gameId}/discover`
         });
         subject = emailRequest.locale === 'pt' 
           ? `🚀 ${emailRequest.gameName} - Mercado Aberto!` 
@@ -234,7 +234,7 @@ const handler = async (req: Request): Promise<Response> => {
           gameName: emailRequest.gameName,
           gameId: emailRequest.gameId,
           locale: emailRequest.locale || 'en',
-          gameUrl: `https://stox.games/games/${emailRequest.gameId}/discover`, // Override with secure URL
+          gameUrl: `${req.headers.get('origin') || 'https://loving-impala-66.lovable.app'}/games/${emailRequest.gameId}/discover`,
           minutesLeft: emailRequest.data?.minutesLeft || 10
         });
         subject = emailRequest.locale === 'pt' 
