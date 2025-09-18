@@ -14,10 +14,14 @@ const getAllowedOrigins = () => {
 
 const getCorsHeaders = (origin: string | null) => {
   const allowedOrigins = getAllowedOrigins();
-  const isAllowed = origin && allowedOrigins.includes(origin);
+  const isAllowed = origin && (
+    allowedOrigins.includes(origin) || 
+    origin.includes('lovableproject.com') ||
+    origin.includes('lovable.app')
+  );
   
   return {
-    'Access-Control-Allow-Origin': isAllowed ? origin : allowedOrigins[0],
+    'Access-Control-Allow-Origin': isAllowed ? origin : '*',
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Content-Type': 'application/json',

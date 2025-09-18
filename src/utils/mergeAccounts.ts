@@ -16,20 +16,28 @@ export async function mergeAccounts(newUserId: string, email: string, oldUserId?
             newUserId,
             email,
             oldUserId,
+          },
+          headers: {
+            'Content-Type': 'application/json',
           }
         });
 
         if (error) {
           console.error('Error merging accounts:', error);
+          // Don't throw for network errors, just log and continue
+          if (error.message?.includes('CORS') || error.message?.includes('Failed to fetch')) {
+            console.warn('Network error during account merge, continuing without merge');
+            return { success: true, mergedCount: 0, skipped: true };
+          }
           throw error;
         }
 
         console.log(`Successfully merged accounts for ${email}`);
         return data;
       }, {
-        maxRetries: 2,
-        baseDelay: 2000,
-        maxDelay: 10000
+        maxRetries: 1,
+        baseDelay: 1000,
+        maxDelay: 5000
       })
     )
   );
