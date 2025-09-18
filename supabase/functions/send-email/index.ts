@@ -7,6 +7,7 @@ import QRCode from "npm:qrcode@1.5.4";
 import { InviteEmail } from "./templates/invite.tsx";
 import { MarketOpenEmail } from "./templates/market-open.tsx";
 import { LastMinutesEmail } from "./templates/last-minutes.tsx";
+import { ResultsEmail } from "./templates/results.tsx";
 import { StatusChangeEmail } from "./templates/status-change.tsx";
 import { ParticipantRemovedEmail } from "./templates/participant-removed.tsx";
 
@@ -16,7 +17,7 @@ const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 const getAllowedOrigins = () => {
   const allowedOrigins = [
     'https://stox.games',
-    'https://loving-impala-66.lovable.app',
+    'https://7549b806-c708-474d-989f-9838a83ae185.lovableproject.com',
     'http://localhost:3000',
     'http://127.0.0.1:3000'
   ];
@@ -251,7 +252,7 @@ const handler = async (req: Request): Promise<Response> => {
         let qrCodeBase64 = '';
         const qrCid = 'qr-code';
         try {
-          const joinUrl = `${req.headers.get('origin') || 'https://loving-impala-66.lovable.app'}/join/${emailRequest.gameId}`;
+          const joinUrl = `${req.headers.get('origin') || 'https://7549b806-c708-474d-989f-9838a83ae185.lovableproject.com'}/join/${emailRequest.gameId}`;
           const qrDataUrl = await QRCode.toDataURL(joinUrl, {
             width: 200,
             margin: 2,
@@ -275,7 +276,7 @@ const handler = async (req: Request): Promise<Response> => {
           gameName: emailRequest.gameName,
           gameId: emailRequest.gameId,
           locale: emailRequest.locale || 'en',
-          joinUrl: `${req.headers.get('origin') || 'https://loving-impala-66.lovable.app'}/join/${emailRequest.gameId}`,
+          joinUrl: `${req.headers.get('origin') || 'https://7549b806-c708-474d-989f-9838a83ae185.lovableproject.com'}/join/${emailRequest.gameId}`,
           qrCodeBase64: qrCodeBase64,
           qrCid
         });
@@ -289,7 +290,7 @@ const handler = async (req: Request): Promise<Response> => {
           gameName: emailRequest.gameName,
           gameId: emailRequest.gameId,
           locale: emailRequest.locale || 'en',
-          gameUrl: `${req.headers.get('origin') || 'https://loving-impala-66.lovable.app'}/games/${emailRequest.gameId}/discover`
+          gameUrl: `${req.headers.get('origin') || 'https://7549b806-c708-474d-989f-9838a83ae185.lovableproject.com'}/games/${emailRequest.gameId}/discover`
         });
         subject = emailRequest.locale === 'pt' 
           ? `🚀 ${emailRequest.gameName} - Mercado Aberto!` 
@@ -301,7 +302,7 @@ const handler = async (req: Request): Promise<Response> => {
           gameName: emailRequest.gameName,
           gameId: emailRequest.gameId,
           locale: emailRequest.locale || 'en',
-          gameUrl: `${req.headers.get('origin') || 'https://loving-impala-66.lovable.app'}/games/${emailRequest.gameId}/discover`,
+          gameUrl: `${req.headers.get('origin') || 'https://7549b806-c708-474d-989f-9838a83ae185.lovableproject.com'}/games/${emailRequest.gameId}/discover`,
           minutesLeft: emailRequest.data?.minutesLeft || 10
         });
         subject = emailRequest.locale === 'pt' 
