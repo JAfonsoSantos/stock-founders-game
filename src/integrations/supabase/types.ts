@@ -765,6 +765,14 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_available_founders_for_transfer: {
+        Args: { p_exclude_participant_id: string; p_game_id: string }
+        Returns: {
+          participant_id: string
+          user_email: string
+          user_name: string
+        }[]
+      }
       get_participant_profile_secure: {
         Args: { participant_user_id: string }
         Returns: {

@@ -16,6 +16,8 @@ import { toast } from "sonner";
 import { sendInviteEmail, sendParticipantRemovedEmail } from "@/lib/email";
 import CSVParticipantImport from "@/components/CSVParticipantImport";
 import { QRCode } from "@/components/QRCode";
+import { VentureOrphanDialog } from "@/components/VentureOrphanDialog";
+import { VentureTransferDialog } from "@/components/VentureTransferDialog";
 
 export default function ManageParticipants() {
   const { gameId } = useParams();
@@ -49,6 +51,10 @@ export default function ManageParticipants() {
   });
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [showQRCode, setShowQRCode] = useState(false);
+  const [showOrphanDialog, setShowOrphanDialog] = useState(false);
+  const [showTransferDialog, setShowTransferDialog] = useState(false);
+  const [orphanVentures, setOrphanVentures] = useState<any[]>([]);
+  const [pendingDeleteAction, setPendingDeleteAction] = useState<'proceed' | 'transfer' | 'delete' | null>(null);
 
   // Helper function to fetch and format participants
   const fetchParticipants = async () => {
@@ -289,9 +295,83 @@ export default function ManageParticipants() {
     }
   };
 
-  const openDeleteDialog = (participant: any) => {
+  const openDeleteDialog = async (participant: any) => {
     setSelectedParticipant(participant);
+    
+    // Check if this participant is the only founder of any ventures
+    try {
+      const { data, error } = await supabase
+        .rpc('check_orphan_ventures_for_participant', {
+          p_participant_id: participant.id
+        });
+
+      if (error) throw error;
+
+      const result = data as { has_orphan_ventures: boolean; ventures: any[] };
+      
+      if (result.has_orphan_ventures && result.ventures.length > 0) {
+        setOrphanVentures(result.ventures);
+        setShowOrphanDialog(true);
+      } else {
+        setShowDeleteDialog(true);
+      }
+    } catch (error: any) {
+      console.error('Error checking orphan ventures:', error);
+      toast.error('Failed to check venture ownership');
+    }
+  };
+
+  const handleOrphanVentureAction = (action: 'transfer' | 'delete') => {
+    setPendingDeleteAction(action);
+    setShowOrphanDialog(false);
+    
+    if (action === 'transfer') {
+      setShowTransferDialog(true);
+    } else if (action === 'delete') {
+      handleDeleteVentures();
+    }
+  };
+
+  const handleTransferComplete = () => {
+    setShowTransferDialog(false);
+    setPendingDeleteAction('proceed');
     setShowDeleteDialog(true);
+  };
+
+  const handleDeleteVentures = async () => {
+    if (!orphanVentures.length) return;
+    
+    try {
+      // Delete all orphan ventures
+      for (const venture of orphanVentures) {
+        const { data, error } = await supabase
+          .rpc('delete_venture_completely', {
+            p_venture_id: venture.id
+          });
+
+        if (error) throw error;
+        
+        const result = data as { error?: string; success?: boolean; venture_name?: string };
+        if (result?.error) {
+          throw new Error(result.error);
+        }
+      }
+
+      toast.success(`Deleted ${orphanVentures.length} venture(s) successfully`);
+      setPendingDeleteAction('proceed');
+      setShowDeleteDialog(true);
+    } catch (error: any) {
+      console.error('Error deleting ventures:', error);
+      toast.error(`Failed to delete ventures: ${error.message}`);
+    }
+  };
+
+  const handleCancelRemoval = () => {
+    setShowOrphanDialog(false);
+    setShowTransferDialog(false);
+    setSelectedParticipant(null);
+    setOrphanVentures([]);
+    setPendingDeleteAction(null);
   };
 
   const confirmDeleteParticipant = async () => {
@@ -311,7 +391,7 @@ export default function ManageParticipants() {
         .delete()
         .eq("participant_id", selectedParticipant.id);
 
-      // Delete founder_members if any
+      // Delete founder_members if any (only if ventures were already handled)
       await supabase
         .from("founder_members")
         .delete()
@@ -357,6 +437,9 @@ export default function ManageParticipants() {
 
       toast.success("Participant deleted successfully!");
       setShowDeleteDialog(false);
+      setSelectedParticipant(null);
+      setOrphanVentures([]);
+      setPendingDeleteAction(null);
       
       // Refresh participants list
       await fetchParticipants();
@@ -723,6 +806,32 @@ export default function ManageParticipants() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+
+        {/* Venture Orphan Dialog */}
+        <VentureOrphanDialog
+          open={showOrphanDialog}
+          onOpenChange={setShowOrphanDialog}
+          ventures={orphanVentures}
+          participantName={
+            selectedParticipant?.users
+              ? `${selectedParticipant.users.first_name || ''} ${selectedParticipant.users.last_name || ''}`.trim()
+              : 'Demo User'
+          }
+          onTransferVentures={() => handleOrphanVentureAction('transfer')}
+          onDeleteVentures={() => handleOrphanVentureAction('delete')}
+          onCancel={handleCancelRemoval}
+        />
+
+        {/* Venture Transfer Dialog */}
+        <VentureTransferDialog
+          open={showTransferDialog}
+          onOpenChange={setShowTransferDialog}
+          ventures={orphanVentures}
+          gameId={gameId!}
+          excludeParticipantId={selectedParticipant?.id || ''}
+          onTransferComplete={handleTransferComplete}
+          onCancel={handleCancelRemoval}
+        />
       </div>
     </div>
   );
