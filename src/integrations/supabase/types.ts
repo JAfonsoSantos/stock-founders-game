@@ -685,6 +685,10 @@ export type Database = {
         Args: { venture_uuid: string }
         Returns: number
       }
+      can_access_participant_email: {
+        Args: { target_user_id: string }
+        Returns: boolean
+      }
       create_primary_order: {
         Args: {
           p_auto_accept_min_price?: number
@@ -753,6 +757,15 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_participant_profile_secure: {
+        Args: { participant_user_id: string }
+        Returns: {
+          avatar_url: string
+          first_name: string
+          id: string
+          last_name: string
+        }[]
+      }
       get_portfolio_data: {
         Args: { p_game_id?: string }
         Returns: {
@@ -818,6 +831,10 @@ export type Database = {
       is_user_participant_in_game: {
         Args: { game_uuid: string }
         Returns: boolean
+      }
+      log_security_event: {
+        Args: { details?: Json; event_type: string; user_id?: string }
+        Returns: undefined
       }
       reset_expired_circuit_breakers: {
         Args: Record<PropertyKey, never>

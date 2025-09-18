@@ -1,12 +1,35 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': 'https://stox.games',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-}
+// Environment-aware CORS configuration for better security
+const getAllowedOrigins = () => {
+  const allowedOrigins = [
+    'https://stox.games',
+    'https://loving-impala-66.lovable.app',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000'
+  ];
+  return allowedOrigins;
+};
+
+const getCorsHeaders = (origin: string | null) => {
+  const allowedOrigins = getAllowedOrigins();
+  const isAllowed = origin && allowedOrigins.includes(origin);
+  
+  return {
+    'Access-Control-Allow-Origin': isAllowed ? origin : allowedOrigins[0],
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+    'X-XSS-Protection': '1; mode=block',
+    'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+  };
+};
 
 Deno.serve(async (req) => {
+  const origin = req.headers.get('origin');
+  const corsHeaders = getCorsHeaders(origin);
+  
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -20,6 +43,14 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Enhanced input validation - check content-type
+    const contentType = req.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      return new Response(
+        JSON.stringify({ error: 'Content-Type must be application/json' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      );
+    }
     // Get JWT token from Authorization header
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
@@ -60,12 +91,40 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Parse request body - ignore client-provided newUserId/email, use authenticated user's data
-    const { oldUserId } = await req.json();
+    // Parse request body with validation - ignore client-provided newUserId/email, use authenticated user's data
+    let requestBody;
+    try {
+      const bodyText = await req.text();
+      if (bodyText.length > 1000) { // 1KB limit for merge requests
+        return new Response(
+          JSON.stringify({ error: 'Request body too large' }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 413 }
+        );
+      }
+      requestBody = JSON.parse(bodyText || '{}');
+    } catch (parseError) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid JSON in request body' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      );
+    }
+
+    const { oldUserId } = requestBody;
     const authenticatedUserId = user.id;
     const authenticatedEmail = user.email;
 
+    // Validate oldUserId format if provided
+    if (oldUserId && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(oldUserId)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid UUID format for oldUserId' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      );
+    }
+
     console.log(`Merging accounts for authenticated user ${authenticatedUserId} with email ${authenticatedEmail}${oldUserId ? ` (explicit old user ${oldUserId})` : ''}`);
+
+    // Security audit log
+    console.log(`SECURITY_AUDIT: Account merge initiated by user ${authenticatedUserId} from origin ${origin}`);
 
     // Create service role client for write operations
     const supabaseAdmin = createClient(

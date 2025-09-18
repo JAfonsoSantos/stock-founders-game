@@ -12,11 +12,31 @@ import { ParticipantRemovedEmail } from "./templates/participant-removed.tsx";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Max-Age": "86400",
+// Environment-aware CORS configuration for better security
+const getAllowedOrigins = () => {
+  const allowedOrigins = [
+    'https://stox.games',
+    'https://loving-impala-66.lovable.app',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000'
+  ];
+  return allowedOrigins;
+};
+
+const getCorsHeaders = (origin: string | null) => {
+  const allowedOrigins = getAllowedOrigins();
+  const isAllowed = origin && allowedOrigins.includes(origin);
+  
+  return {
+    'Access-Control-Allow-Origin': isAllowed ? origin : allowedOrigins[0],
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Max-Age': '86400',
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+    'X-XSS-Protection': '1; mode=block',
+    'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+  };
 };
 
 interface EmailRequest {
@@ -60,6 +80,9 @@ function isValidStoxUrl(url: string): boolean {
 }
 
 const handler = async (req: Request): Promise<Response> => {
+  const origin = req.headers.get('origin');
+  const corsHeaders = getCorsHeaders(origin);
+
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -72,6 +95,14 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    // Enhanced input validation - check content-type
+    const contentType = req.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      return new Response(
+        JSON.stringify({ error: 'Content-Type must be application/json' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      );
+    }
     // Get JWT token from Authorization header
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
@@ -104,6 +135,42 @@ const handler = async (req: Request): Promise<Response> => {
 
     const emailRequest: EmailRequest = await req.json();
     
+    // Enhanced validation of required fields
+    if (!emailRequest.type || !emailRequest.to || !Array.isArray(emailRequest.to) || 
+        !emailRequest.gameId || !emailRequest.gameName) {
+      return new Response(
+        JSON.stringify({ error: 'Missing required fields: type, to, gameId, gameName' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      );
+    }
+
+    // Validate email type
+    const allowedTypes = ['invite', 'market_open', 'last_minutes', 'results', 'status_change', 'participant_removed'];
+    if (!allowedTypes.includes(emailRequest.type)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid email type' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      );
+    }
+
+    // Validate recipient count
+    if (emailRequest.to.length === 0 || emailRequest.to.length > 1000) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid recipient count (0 or >1000)' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      );
+    }
+
+    // Validate email addresses format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const invalidEmails = emailRequest.to.filter(email => !emailRegex.test(email));
+    if (invalidEmails.length > 0) {
+      return new Response(
+        JSON.stringify({ error: `Invalid email addresses: ${invalidEmails.join(', ')}` }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      );
+    }
+
     // Validate input size
     if (JSON.stringify(emailRequest).length > 100000) { // 100KB limit
       return new Response(
@@ -121,7 +188,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     console.log(`Processing ${emailRequest.type} email request from user ${user.id} for game ${emailRequest.gameId}`);
-    console.log(`Recipients: ${emailRequest.to.join(', ')}`);
+    // Don't log actual email addresses for privacy
 
     // Verify user is the game owner
     const { data: game, error: gameError } = await supabaseUser
@@ -300,7 +367,7 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     console.log("Email sent successfully:", emailResponse);
-    console.log(`Successfully sent ${emailRequest.type} email to: ${emailRequest.to.join(', ')}`);
+    console.log(`Successfully sent ${emailRequest.type} email to ${emailRequest.to.length} recipients`);
 
     return new Response(JSON.stringify({
       success: true,
