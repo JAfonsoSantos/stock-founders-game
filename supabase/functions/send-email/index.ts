@@ -8,6 +8,7 @@ import { InviteEmail } from "./templates/invite.tsx";
 import { MarketOpenEmail } from "./templates/market-open.tsx";
 import { LastMinutesEmail } from "./templates/last-minutes.tsx";
 import { StatusChangeEmail } from "./templates/status-change.tsx";
+import { ParticipantRemovedEmail } from "./templates/participant-removed.tsx";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -19,7 +20,7 @@ const corsHeaders = {
 };
 
 interface EmailRequest {
-  type: 'invite' | 'market_open' | 'last_minutes' | 'results' | 'status_change';
+  type: 'invite' | 'market_open' | 'last_minutes' | 'results' | 'status_change' | 'participant_removed';
   to: string[];
   gameId: string;
   gameName: string;
@@ -266,6 +267,19 @@ const handler = async (req: Request): Promise<Response> => {
         subject = emailRequest.data?.subject || (emailRequest.locale === 'pt' 
           ? `📢 ${emailRequest.gameName} - Status Atualizado` 
           : `📢 ${emailRequest.gameName} - Status Updated`);
+        break;
+
+      case 'participant_removed':
+        template = React.createElement(ParticipantRemovedEmail, {
+          gameName: emailRequest.gameName,
+          gameId: emailRequest.gameId,
+          locale: emailRequest.locale || 'en',
+          participantName: emailRequest.data?.participantName || 'Participant',
+          reason: emailRequest.data?.reason
+        });
+        subject = emailRequest.locale === 'pt' 
+          ? `❌ ${emailRequest.gameName} - Participação Removida` 
+          : `❌ ${emailRequest.gameName} - Participation Removed`;
         break;
 
       default:

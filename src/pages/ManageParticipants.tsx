@@ -13,7 +13,7 @@ import { Loader2, Plus, UserPlus, Mail, Trash2, Edit, RotateCcw, QrCode } from "
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { sendInviteEmail } from "@/lib/email";
+import { sendInviteEmail, sendParticipantRemovedEmail } from "@/lib/email";
 import CSVParticipantImport from "@/components/CSVParticipantImport";
 import { QRCode } from "@/components/QRCode";
 
@@ -299,11 +299,35 @@ export default function ManageParticipants() {
     
     setActionLoading(selectedParticipant.id);
     try {
+      // Get participant details for email before deletion
+      const participantName = selectedParticipant.users 
+        ? `${selectedParticipant.users.first_name || ''} ${selectedParticipant.users.last_name || ''}`.trim()
+        : 'Demo User';
+      const participantEmail = selectedParticipant.users?.email;
+
       // First delete related positions
       await supabase
         .from("positions")
         .delete()
         .eq("participant_id", selectedParticipant.id);
+
+      // Delete founder_members if any
+      await supabase
+        .from("founder_members")
+        .delete()
+        .eq("participant_id", selectedParticipant.id);
+
+      // Delete orders
+      await supabase
+        .from("orders_primary")
+        .delete()
+        .eq("buyer_participant_id", selectedParticipant.id);
+
+      // Delete notifications
+      await supabase
+        .from("notifications")
+        .delete()
+        .or(`to_participant_id.eq.${selectedParticipant.id},from_participant_id.eq.${selectedParticipant.id}`);
 
       // Then delete the participant
       const { error } = await supabase
@@ -312,6 +336,24 @@ export default function ManageParticipants() {
         .eq("id", selectedParticipant.id);
 
       if (error) throw error;
+
+      // Send email notification to the removed participant
+      if (participantEmail && gameInfo) {
+        try {
+          await sendParticipantRemovedEmail(
+            [participantEmail],
+            gameInfo.id,
+            gameInfo.name,
+            participantName,
+            undefined, // No specific reason provided
+            gameInfo.locale || 'en'
+          );
+          console.log('Participant removal email sent successfully');
+        } catch (emailError) {
+          console.error('Failed to send participant removal email:', emailError);
+          // Don't fail the deletion if email fails
+        }
+      }
 
       toast.success("Participant deleted successfully!");
       setShowDeleteDialog(false);

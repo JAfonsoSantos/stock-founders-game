@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 
 export interface EmailRequest {
-  type: 'invite' | 'market_open' | 'last_minutes' | 'results';
+  type: 'invite' | 'market_open' | 'last_minutes' | 'results' | 'participant_removed';
   to: string[];
   gameId: string;
   gameName: string;
@@ -130,6 +130,20 @@ export async function sendResultsEmail(to: string[], gameId: string, gameName: s
     locale,
     data: {
       results
+    }
+  });
+}
+
+export async function sendParticipantRemovedEmail(to: string[], gameId: string, gameName: string, participantName: string, reason?: string, locale = 'en') {
+  return sendEmail({
+    type: 'participant_removed',
+    to,
+    gameId,
+    gameName,
+    locale,
+    data: {
+      participantName,
+      reason
     }
   });
 }
