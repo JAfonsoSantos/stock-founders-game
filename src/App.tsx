@@ -30,6 +30,7 @@ import Leaderboard from "./pages/Leaderboard";
 import FounderOnboarding from "./pages/FounderOnboarding";
 import ResetPassword from "./pages/ResetPassword";
 import Trading from './pages/Trading';
+import GameView from "./pages/GameView";
 import GamePreview from "./pages/GamePreview";
 import Setup from "./pages/Setup";
 import SetupColors from "./pages/SetupColors";
