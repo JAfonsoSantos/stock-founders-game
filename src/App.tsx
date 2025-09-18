@@ -9,6 +9,7 @@ import { SettingsProvider } from "@/hooks/useSettings";
 import { ThemeProvider } from "next-themes";
 import { GameProvider } from "@/context/GameContext";
 import { AppShell } from "@/components/layout/AppShell";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 import Dashboard from "./pages/Dashboard";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
@@ -93,13 +94,14 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
 }
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <I18nProvider>
-        <AuthProvider>
-          <GameProvider>
-            <SettingsProvider>
-              <TooltipProvider>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <I18nProvider>
+          <AuthProvider>
+            <GameProvider>
+              <SettingsProvider>
+                <TooltipProvider>
             <Toaster />
             <Sonner />
             <BrowserRouter>
@@ -228,13 +230,14 @@ const App = () => (
               <Route path="*" element={<NotFound />} />
             </Routes>
            </BrowserRouter>
-             </TooltipProvider>
-           </SettingsProvider>
-          </GameProvider>
-        </AuthProvider>
-      </I18nProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
+               </TooltipProvider>
+             </SettingsProvider>
+            </GameProvider>
+          </AuthProvider>
+        </I18nProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;

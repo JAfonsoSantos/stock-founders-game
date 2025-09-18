@@ -4,7 +4,8 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 const getAllowedOrigins = () => {
   const allowedOrigins = [
     'https://stox.games',
-    'https://loving-impala-66.lovable.app',
+    'https://loving-impala-66.lovable.app', 
+    'https://7549b806-c708-474d-989f-9838a83ae185.lovableproject.com',
     'http://localhost:3000',
     'http://127.0.0.1:3000'
   ];
@@ -19,12 +20,31 @@ const getCorsHeaders = (origin: string | null) => {
     'Access-Control-Allow-Origin': isAllowed ? origin : allowedOrigins[0],
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'X-Content-Type-Options': 'nosniff',
-    'X-Frame-Options': 'DENY',
-    'X-XSS-Protection': '1; mode=block',
-    'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+    'Content-Type': 'application/json',
   };
 };
+
+// Rate limiting to prevent abuse
+const requestCounts = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT = 10; // requests per minute
+const RATE_WINDOW = 60000; // 1 minute in milliseconds
+
+function checkRateLimit(identifier: string): boolean {
+  const now = Date.now();
+  const userLimit = requestCounts.get(identifier);
+  
+  if (!userLimit || now > userLimit.resetTime) {
+    requestCounts.set(identifier, { count: 1, resetTime: now + RATE_WINDOW });
+    return true;
+  }
+  
+  if (userLimit.count >= RATE_LIMIT) {
+    return false;
+  }
+  
+  userLimit.count += 1;
+  return true;
+}
 
 Deno.serve(async (req) => {
   const origin = req.headers.get('origin');

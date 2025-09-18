@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { useI18n } from "@/hooks/useI18n";
+import { useCountdown } from "@/hooks/useCountdown";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
@@ -60,19 +61,22 @@ export default function Dashboard() {
   const [venturesByGame, setVenturesByGame] = useState<Record<string, Venture | null>>({});
   const [ventureLoadingState, setVentureLoadingState] = useState<Record<string, boolean>>({});
   const navigate = useNavigate();
+  
+  // Refs to prevent infinite loops
+  const isInitializedRef = useRef(false);
+  const lastUserIdRef = useRef<string | null>(null);
 
-  useEffect(() => {
-    if (user) {
-      autoMergeAndFetchData();
-    }
-  }, [user]);
-
-  const autoMergeAndFetchData = async () => {
+  // Memoized functions to prevent re-renders
+  const autoMergeAndFetchData = useCallback(async () => {
+    if (!user?.email || !user?.id) return;
+    
     try {
-      // Silently merge accounts in background
-      if (user?.email) {
+      // Only merge accounts once per user session
+      if (user.id !== lastUserIdRef.current) {
+        lastUserIdRef.current = user.id;
         try {
           await mergeAccounts(user.id, user.email);
+          console.log('Accounts merged successfully');
         } catch (error) {
           // Silently fail - this is not critical
           console.log("Auto-merge not needed or failed:", error);
@@ -82,12 +86,22 @@ export default function Dashboard() {
       // Fetch data after merge
       await fetchData();
     } catch (error: any) {
+      console.error('Error in autoMergeAndFetchData:', error);
       toast.error("Failed to load data: " + error.message);
       setLoading(false);
     }
-  };
+  }, [user?.id, user?.email]);
 
-  const fetchData = async () => {
+  // Initialize only once when user is available
+  useEffect(() => {
+    if (user && !isInitializedRef.current) {
+      isInitializedRef.current = true;
+      autoMergeAndFetchData();
+    }
+  }, [user, autoMergeAndFetchData]);
+
+  const fetchData = useCallback(async () => {
+    if (!user?.id) return;
     try {
       // Fetch owned games
       const { data: games, error: gamesError } = await supabase
@@ -116,7 +130,7 @@ export default function Dashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user?.id]);
 
   const fetchUserVenture = async (gameId: string, participantId: string) => {
     // Set loading state
@@ -282,20 +296,32 @@ export default function Dashboard() {
   const shouldShowSingleGameCard = sortedActiveGames.length > 0;
   const priorityGame = sortedActiveGames[0];
 
-  // Fetch venture for priority game if user is a founder
+  // Fetch venture for priority game if user is a founder - with proper dependencies
   useEffect(() => {
     if (priorityGame && !priorityGame.isOwner && priorityGame.participationData?.role === 'founder') {
-      fetchUserVenture(priorityGame.id, priorityGame.participationData.id);
+      const gameId = priorityGame.id;
+      const participantId = priorityGame.participationData.id;
+      
+      // Only fetch if we haven't already loaded this venture
+      if (venturesByGame[gameId] === undefined && !ventureLoadingState[gameId]) {
+        fetchUserVenture(gameId, participantId);
+      }
     }
-  }, [priorityGame]);
+  }, [priorityGame?.id, priorityGame?.participationData?.id]);
 
-  // Fetch ventures for all games where user is a founder
+  // Fetch ventures for all games where user is a founder - with proper dependencies
   useEffect(() => {
     const founderParticipations = activeParticipations.filter(p => p.role === 'founder');
     founderParticipations.forEach(participation => {
-      fetchUserVenture(participation.games.id, participation.id);
+      const gameId = participation.games.id;
+      const participantId = participation.id;
+      
+      // Only fetch if we haven't already loaded this venture
+      if (venturesByGame[gameId] === undefined && !ventureLoadingState[gameId]) {
+        fetchUserVenture(gameId, participantId);
+      }
     });
-  }, [activeParticipations]);
+  }, [activeParticipations.length, activeParticipations.map(p => p.id).join(',')]);
 
   const handleDemoClick = () => {
     setShowInDevelopmentModal(true);
@@ -312,40 +338,7 @@ export default function Dashboard() {
     }
   };
 
-  // Countdown hook
-  const useCountdown = (targetDate: string) => {
-    const [timeLeft, setTimeLeft] = useState('');
-    
-    useEffect(() => {
-      const timer = setInterval(() => {
-        const now = new Date().getTime();
-        const target = new Date(targetDate).getTime();
-        const difference = target - now;
-        
-        if (difference > 0) {
-          const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-          const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-          const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-          
-          if (days > 0) {
-            setTimeLeft(`Começa em ${days} ${days === 1 ? 'dia' : 'dias'}`);
-          } else if (hours > 0) {
-            setTimeLeft(`Começa em ${hours} ${hours === 1 ? 'hora' : 'horas'}`);
-          } else if (minutes > 0) {
-            setTimeLeft(`Começa em ${minutes} ${minutes === 1 ? 'minuto' : 'minutos'}`);
-          } else {
-            setTimeLeft('Começando agora!');
-          }
-        } else {
-          setTimeLeft('Evento ativo!');
-        }
-      }, 1000);
-      
-      return () => clearInterval(timer);
-    }, [targetDate]);
-    
-    return timeLeft;
-  };
+  // Remove the inline useCountdown hook - now using the imported one
 
   // Single Active Game Card Component
   const SingleActiveGameCard = ({ game }: { game: ExtendedGame }) => {
