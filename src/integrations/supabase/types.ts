@@ -844,6 +844,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      transfer_venture_ownership: {
+        Args: { p_new_founder_participant_id: string; p_venture_id: string }
+        Returns: Json
+      }
     }
     Enums: {
       founder_member_role: "owner" | "member"
