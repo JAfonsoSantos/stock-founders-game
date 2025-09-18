@@ -689,6 +689,10 @@ export type Database = {
         Args: { target_user_id: string }
         Returns: boolean
       }
+      check_orphan_ventures_for_participant: {
+        Args: { p_participant_id: string }
+        Returns: Json
+      }
       create_primary_order: {
         Args: {
           p_auto_accept_min_price?: number
