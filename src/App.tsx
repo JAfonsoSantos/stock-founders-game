@@ -218,8 +218,8 @@ const App = () => (
                 <ProtectedShellRoute>
                   <Trading />
                 </ProtectedShellRoute>
-              } />
-              <Route path="/games/:gameId" element={
+               } />
+               <Route path="/games/:gameId" element={
                 <ProtectedRoute>
                   <GameView />
                 </ProtectedRoute>
