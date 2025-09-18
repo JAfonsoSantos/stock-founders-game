@@ -721,6 +721,10 @@ export type Database = {
         }
         Returns: Json
       }
+      delete_venture_completely: {
+        Args: { p_venture_id: string }
+        Returns: Json
+      }
       fix_orphan_ventures: {
         Args: Record<PropertyKey, never>
         Returns: Json
