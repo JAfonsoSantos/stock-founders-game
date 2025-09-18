@@ -72,9 +72,9 @@ const MACRO_TEMPLATES = [
     defaultAsset: { singular: 'Asset', plural: 'Assets' },
     defaultRoles: [
       { id: 'founder', label: 'Founder', canTrade: false, voteWeight: 1, isIssuer: true },
-      { id: 'investor', label: 'Investor', canTrade: true, voteWeight: 1, isIssuer: false }
+      { id: 'angel', label: 'Angel', canTrade: true, voteWeight: 1, isIssuer: false }
     ],
-    defaultBudgets: { founder: 10000, investor: 100000 }
+    defaultBudgets: { founder: 10000, angel: 100000 }
   }
 ];
 
@@ -82,11 +82,11 @@ const ROLE_CATALOG = [
   { id: 'founder', label: 'Founder' },
   { id: 'angel', label: 'Angel' },
   { id: 'vc', label: 'VC' },
+  { id: 'organizer', label: 'Organizer' },
   { id: 'team', label: 'Team' },
   { id: 'employee', label: 'Employee' },
   { id: 'judge', label: 'Judge' },
-  { id: 'attendee', label: 'Attendee' },
-  { id: 'visitor', label: 'Visitor' }
+  { id: 'attendee', label: 'Attendee' }
 ];
 
 const CURRENCIES = [
