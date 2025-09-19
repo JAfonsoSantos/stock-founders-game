@@ -438,7 +438,7 @@ export default function ManageVentures() {
             <EmptyState
               icon={<Building2 className="h-12 w-12 text-muted-foreground" />}
               title="No venture ideas found"
-              description="Participants in this game haven't created any venture ideas yet."
+              description="Participants in this game haven't created any venture ideas yet. Make sure participants have created venture ideas in their profiles first."
             />
           ) : (
             <div className="overflow-x-auto">
