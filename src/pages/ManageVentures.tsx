@@ -10,6 +10,7 @@ import { Loader2, ArrowLeft, Building2, UserPlus, ExternalLink, RefreshCw, Send,
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { EmptyState } from "@/components/EmptyState";
+import { VentureOwnershipFix } from "@/components/VentureOwnershipFix";
 
 interface VentureIdea {
   id: string;
@@ -543,7 +544,12 @@ export default function ManageVentures() {
                         )}
                       </TableCell>
                        <TableCell>
-                         <div className="flex gap-2">
+                         <div className="flex gap-2 flex-wrap">
+                           <VentureOwnershipFix
+                             ventureIdea={ventureIdea}
+                             gameId={gameId!}
+                             onFixed={fetchVentureIdeas}
+                           />
                            {!ventureIdea.already_in_game ? (
                              <Button
                                variant="outline"
